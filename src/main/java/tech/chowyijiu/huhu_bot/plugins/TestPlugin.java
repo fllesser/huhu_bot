@@ -18,16 +18,16 @@ public class TestPlugin {
 
     @MessageHandler(name = "测试消息", command = {"测试", "test"})
     public void test1(WebSocketSession session, Message message) {
-        Server.sendPrivateMessage(session, 1942422015L, "测试所有消息", false);
+        Server.sendPrivateMessage(session, 1942422015L, "测试所有消息", true);
     }
 
     @MessageHandler(type = MessageTypeEnum.group, name = "群聊测试", command = {"群聊测试"})
     public void test2(WebSocketSession session, Message message) {
-        Server.sendGroupMessage(session, message.getGroupId(), "测试群聊", false);
+        Server.sendGroupMessage(session, message.getGroupId(), "测试群聊", true);
     }
 
     @MessageHandler(type = MessageTypeEnum.private_, name = "私聊测试", command = {"私聊测试"})
     public void test3(final WebSocketSession session, Message message) {
-        Server.sendPrivateMessage(session, message.getUserId(), "测试私聊", false);
+        Server.sendPrivateMessage(session, message.getUserId(), "测试私聊", true);
     }
 }

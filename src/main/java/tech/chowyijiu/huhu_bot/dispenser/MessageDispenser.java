@@ -73,7 +73,7 @@ public class MessageDispenser {
                 for (Method handler : handlers) {
                     MessageHandler annotation = handler.getAnnotation(MessageHandler.class);
                     if (matchPrefix(annotation.command(), rawMessage)) {
-                        if (annotation.type().equals(MessageTypeEnum.null_)
+                        if (annotation.type().equals(MessageTypeEnum.all)
                                 || annotation.type().getType().equals(message.getMessageType())) {
                             log.info("匹配到 handler: [{}]", annotation.name());
                             handler.invoke(plugin, session, message);

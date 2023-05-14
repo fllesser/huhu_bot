@@ -5,15 +5,13 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author elastic chow
- * @date 13/5/2023
+ * @date 14/5/2023
  */
 @Getter
 @RequiredArgsConstructor
-public enum MessageTypeEnum {
-    all(""),
-    group("group"),
-    private_("private");
+public enum CqTypeEnum {
+    image("image"),
+    reply("reply");
 
-    private final String type;
-
+    public final String type;
 }

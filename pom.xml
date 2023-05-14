@@ -55,6 +55,13 @@
             <version>2.0.26</version>
         </dependency>
 
+        <!--cqUtil文档 https://www.kancloud.cn/forte-scarlet/simple-coolq-doc/1934839 -->
+        <dependency>
+            <groupId>io.github.ForteScarlet.simple-robot-module</groupId>
+            <artifactId>mod-cqcodeutils</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
