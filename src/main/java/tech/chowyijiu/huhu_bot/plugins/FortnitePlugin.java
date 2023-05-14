@@ -10,7 +10,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
  * @author elastic chow
  * @date 14/5/2023
  */
-@BotPlugin(value = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
     @MessageHandler(name = "商城", command = {"商城", "shop"})

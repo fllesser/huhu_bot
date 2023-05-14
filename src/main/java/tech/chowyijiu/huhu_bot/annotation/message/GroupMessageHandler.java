@@ -18,7 +18,7 @@ public @interface GroupMessageHandler {
     //@AliasFor(
     //        annotation = MessageHandler.class
     //)
-    //int weight();
+    //int weight(); //
 
     @AliasFor(
             annotation = MessageHandler.class

@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 public @interface MessageHandler {
 
     MessageTypeEnum type() default MessageTypeEnum.all;
-    //int weight() default 0;
+    //int weight() default 0; 按方法定义顺序匹配
     String name() default "";
     String[] command() default {};
 

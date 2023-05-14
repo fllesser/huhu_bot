@@ -45,7 +45,7 @@ public class MessageDispenser {
                         .collect(Collectors.toList());
                 plugins.put(plugin, handlers);
                 List<String> handlerNames = getHandlerNames(handlers);
-                log.info("成功加载插件[{}], 进度[{}/{}], 功能集:{}" ,pluginName, count, botPluginMap.size(), handlerNames);
+                log.info("成功加载插件[{}], 进度[{}/{}], 功能集:{}" , pluginName, count, botPluginMap.size(), handlerNames);
                 count++;
             }
         }

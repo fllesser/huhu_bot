@@ -12,7 +12,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
  * @date 14/5/2023
  */
 @Slf4j
-@BotPlugin(value = "测试插件")
+@BotPlugin(name = "测试插件")
 public class TestPlugin {
 
     @MessageHandler(name = "测试消息", command = {"测试", "test"})

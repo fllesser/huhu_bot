@@ -19,4 +19,10 @@ public @interface BotPlugin {
             annotation = Component.class
     )
     String value() default "";
+
+    @AliasFor(
+            annotation = Component.class,
+            value = "value"
+    )
+    String name() default "";
 }
