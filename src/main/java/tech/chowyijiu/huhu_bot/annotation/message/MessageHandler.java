@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface MessageHandler {
 
-    MessageTypeEnum type() default MessageTypeEnum.all;
+    MessageTypeEnum type() default MessageTypeEnum.null_;
     //int weight() default 0; 按方法定义顺序匹配
     String name() default "";
     String[] command() default {};

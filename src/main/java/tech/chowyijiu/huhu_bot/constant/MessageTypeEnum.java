@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum MessageTypeEnum {
-    all("all"),
+    null_(""),
     group("group"),
     private_("private");
 

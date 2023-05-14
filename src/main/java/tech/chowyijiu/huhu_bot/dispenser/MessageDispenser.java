@@ -6,15 +6,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
+import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +43,7 @@ public class MessageDispenser {
                         .collect(Collectors.toList());
                 plugins.put(plugin, handlers);
                 List<String> handlerNames = getHandlerNames(handlers);
-                log.info("成功加载插件[{}], 进度[{}/{}], 功能集:{}" , pluginName, count, botPluginMap.size(), handlerNames);
+                log.info("成功加载插件[{}], 进度[{}/{}], 功能集:{}", pluginName, count, botPluginMap.size(), handlerNames);
                 count++;
             }
         }
@@ -53,7 +51,7 @@ public class MessageDispenser {
     }
 
     public boolean isHandler(Method method) {
-        return method.isAnnotationPresent(MessageHandler.class) ;
+        return method.isAnnotationPresent(MessageHandler.class);
         //    ||method.isAnnotationPresent(GroupMessageHandler.class)
         //   || method.isAnnotationPresent(PrivateMessageHandler.class);
     }
@@ -66,16 +64,20 @@ public class MessageDispenser {
 
     /**
      * 响应handler
-     *
      */
     public void onEvent(final WebSocketSession session, final Message message, final String rawMessage) throws InvocationTargetException, IllegalAccessException {
         if (!CollectionUtils.isEmpty(plugins)) {
-            outer:for (Object plugin : plugins.keySet()) {
+            outer:
+            for (Object plugin : plugins.keySet()) {
                 List<Method> handlers = plugins.get(plugin);
                 for (Method handler : handlers) {
                     MessageHandler annotation = handler.getAnnotation(MessageHandler.class);
                     if (matchPrefix(annotation.command(), rawMessage)) {
-                        handler.invoke(plugin, session, message);
+                        if (annotation.type().equals(MessageTypeEnum.null_)
+                                || annotation.type().getType().equals(message.getMessageType())) {
+                            log.info("匹配到 handler: [{}]", annotation.name());
+                            handler.invoke(plugin, session, message);
+                        }
                         break outer;
                     }
                 }
