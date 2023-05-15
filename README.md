@@ -11,7 +11,7 @@ go-cqhttp
 websocket
 
 ## 使用要点
-1. go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
+go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 
 
-改自 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)
+参考 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)

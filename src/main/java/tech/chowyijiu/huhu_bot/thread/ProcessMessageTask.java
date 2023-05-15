@@ -9,11 +9,13 @@ import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.dispenser.MessageDispenser;
+import tech.chowyijiu.huhu_bot.dispenser.NoticeDispenser;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
+import java.util.Locale;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -39,10 +41,11 @@ public class ProcessMessageTask implements Runnable {
 
     private static final MessageDispenser messageDispenser;
 
-    //private static final NoticeDispenser noticeDispenser;
+    private static final NoticeDispenser noticeDispenser;
+
     static {
         messageDispenser = IocUtil.getBean(MessageDispenser.class);
-        //noticeDispenser = ApplicationContextProvider.getBean(NoticeDispenser.class);
+        noticeDispenser = IocUtil.getBean(NoticeDispenser.class);
         threadPool = new ThreadPoolExecutor(16, 31, 10L * 60L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(160),
                 new CustomizableThreadFactory("pool-processMessage-"),
@@ -55,13 +58,14 @@ public class ProcessMessageTask implements Runnable {
             if (PostTypeEnum.message.toString().equals(bean.getPostType())) {
                 // 普通消息
                 final String rawMessage = bean.getRawMessage();
-                log.info("[{}] 收到来自用户[{}]的消息: [{}]", bean.getMessageType(), bean.getUserId(), rawMessage);
+                log.info("[{}] 收到来自用户[{}]的消息: [{}]", bean.getMessageType().toUpperCase(Locale.ROOT)
+                        , bean.getUserId(), rawMessage);
                 if (rawMessage != null) {
-                    messageDispenser.onEvent(session, bean, rawMessage);
+                    messageDispenser.dispense(session, bean, rawMessage);
                 }
             } else if (PostTypeEnum.notice.toString().equals(bean.getPostType())) {
                 // bot通知
-                //noticeDispenser.onEvent(session, bean);
+                noticeDispenser.dispense(session, bean);
             } else if (PostTypeEnum.meta_event.toString().equals(bean.getPostType())) {
                 // 系统消息
                 if (MetaTypeEnum.lifecycle.toString().equals(bean.getMetaEventType()) && SubTypeEnum.connect.toString().equals(bean.getSubType())) {

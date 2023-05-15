@@ -19,7 +19,7 @@ import java.util.Objects;
 @BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
-    @MessageHandler(name = "商城", command = {"商城", "shop"})
+    @MessageHandler(name = "商城", command = {"每日商城", "shop"})
     public void shop(WebSocketSession session, Message message) {
         String cq = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");
         if (Objects.equals(message.getMessageType(), MessageTypeEnum.private_.getType())) {
@@ -30,7 +30,7 @@ public class FortnitePlugin {
 
     }
 
-    @MessageHandler(type = MessageTypeEnum.group, name = "堡垒之夜每日vb图", command = {"vb", "VB"})
+    @MessageHandler(type = MessageTypeEnum.group, name = "每日vb图", command = {"vb", "VB"})
     public void vb(WebSocketSession session, Message message) {
         Server.sendGroupMessage(session, message.getGroupId(), "vb图", true);
     }

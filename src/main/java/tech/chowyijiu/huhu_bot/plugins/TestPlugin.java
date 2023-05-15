@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
+import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
+import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -29,5 +31,10 @@ public class TestPlugin {
     @MessageHandler(type = MessageTypeEnum.private_, name = "私聊测试", command = {"私聊测试"})
     public void test3(final WebSocketSession session, Message message) {
         Server.sendPrivateMessage(session, message.getUserId(), "测试私聊", true);
+    }
+
+    @NoticeHandler(type = NoticeTypeEnum.group_card, name = "群名片变更推送")
+    public void test4(final WebSocketSession session, Message message) {
+        log.info("群名片变更");
     }
 }
