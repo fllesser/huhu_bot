@@ -23,5 +23,7 @@ public class Sender implements Serializable {
 
     @JSONField(name = "user_id")
     private Long userId;
+    @JSONField(name = "group_id")
+    private Long groupId;
 
 }

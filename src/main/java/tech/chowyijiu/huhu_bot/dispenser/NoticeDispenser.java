@@ -76,10 +76,12 @@ public class NoticeDispenser {
                         && Objects.equals(annotation.type().name(), message.getNoticeType())
                         && Objects.equals(message.getSubType(), annotation.subType().name())
                     ) {
+                        log.info("匹配到 handler: [{}]", annotation.name());
                         handler.invoke(plugin, session, message);
                         break outer;
                     }
                     if (annotation.type().name().equals(message.getNoticeType())) {
+                        log.info("匹配到 handler: [{}]", annotation.name());
                         handler.invoke(plugin, session, message);
                         break outer;
                     }

@@ -7,9 +7,8 @@ import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 import tech.chowyijiu.huhu_bot.utils.MessageSegment;
+import tech.chowyijiu.huhu_bot.utils.TypeUtil;
 import tech.chowyijiu.huhu_bot.ws.Server;
-
-import java.util.Objects;
 
 /**
  * @author elastic chow
@@ -22,9 +21,9 @@ public class FortnitePlugin {
     @MessageHandler(name = "商城", command = {"每日商城", "shop"})
     public void shop(WebSocketSession session, Message message) {
         String cq = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");
-        if (Objects.equals(message.getMessageType(), MessageTypeEnum.private_.getType())) {
+        if (TypeUtil.isPrivateMessage(message)) {
             Server.sendPrivateMessage(session, message.getSender().getUserId(), cq ,false);
-        } else if (Objects.equals(message.getMessageType(), MessageTypeEnum.group.getType())) {
+        } else if (TypeUtil.isGroupMessage(message)) {
             Server.sendGroupMessage(session, message.getGroupId(), cq, false);
         }
 

@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.ws;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -15,8 +16,10 @@ import tech.chowyijiu.huhu_bot.entity.gocq.request.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
-import tech.chowyijiu.huhu_bot.thread.ProcessMessageTask;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
+import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 
 import java.util.ArrayList;
@@ -31,33 +34,50 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class Server extends TextWebSocketHandler {
 
-    private static Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
-    private static Map<String, Long> userIdMap = new ConcurrentHashMap<>();
+    private static final Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>();
+    private static final Map<String, Long> userIdMap = new ConcurrentHashMap<>();
 
     public static int getConnections() {
         return sessionMap.size();
     }
 
     @Override
-    public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(@NotNull final WebSocketSession session) throws Exception {
         sessionMap.put(session.getId(), session);
-        log.info("客户端连接成功,sessionId:{}，客户端数量：{}", session.getId(), getConnections());
+        log.info("[CLIENT] GOCQ CONNECT SUCCESS, Remote Address:{}，Client num：{}", session.getRemoteAddress(), getConnections());
     }
 
     @Override
-    public void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
+    public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
         final String s = message.getPayload();
         try {
+            //todo 想办法转为event
             final Message bean = JSONObject.parseObject(s, Message.class);
             if (PostTypeEnum.meta_event.toString().equals(bean.getPostType()) && MetaTypeEnum.heartbeat.toString().equals(bean.getMetaEventType())) {
                 // 心跳包
                 return;
             }
-            ProcessMessageTask.execute(session, bean, s);
+            ProcessEventTask.execute(session, bean, s);
         } catch (Exception e) {
             log.error("解析payload异常:{}", s);
         }
     }
+
+
+    public void handleMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
+        final String s = message.getPayload();
+        try {
+            //todo 想办法转为event
+            MessageResp messageResp = JSONObject.parseObject(s, MessageResp.class);
+            Event event = Event.respToEvent(messageResp);
+
+
+        } catch (Exception e) {
+            log.error("解析payload异常:{}", s);
+        }
+    }
+
+
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {

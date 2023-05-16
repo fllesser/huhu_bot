@@ -22,5 +22,5 @@ public enum SubTypeEnum {
     // 被踢出
     kick,
 
-    connect
+    connect // MetaEvent
 }

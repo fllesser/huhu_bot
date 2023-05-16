@@ -35,6 +35,11 @@ public class MessageSegment {
         }
     }
 
+    /**
+     * 生成图片CQ码
+     * @param url 图片链接
+     * @return [CQ:image,file=http://baidu.com/1.jpg]
+     */
     public static String image(String url) {
         CqCode cq = new CqCode(CqTypeEnum.image.type);
         cq.addParam("file", url);
@@ -46,9 +51,57 @@ public class MessageSegment {
         return "";
     }
 
+    /**
+     * at某人
+     * @param userId 要at的用户qq
+     * @return [CQ:at,qq=1943423423]
+     */
     public static String at(Long userId) {
         CqCode cq = new CqCode("at");
         cq.addParam("qq", userId.toString());
+        return cq.toString();
+    }
+
+    /**
+     * 戳一戳
+     * @param userId 要戳的用户qq
+     * @return [CQ:poke,qq=1943423423]
+     */
+    public static String poke(Long userId) {
+        CqCode cq = new CqCode("poke");
+        cq.addParam("qq", userId.toString());
+        return cq.toString();
+    }
+
+    /**
+     * 链接分享
+     * @param url 链接
+     * @param title 标题
+     * @param content 内容
+     * @param imageUrl 图片url
+     * @return [CQ:share,url=http://baidu.com,title=百度]
+     */
+    public static String share(String url, String title, String content, String imageUrl) {
+        CqCode cq = new CqCode("share");
+        cq.addParam("url", url);
+        cq.addParam("title", title);
+        cq.addParam("content", content);
+        cq.addParam("image", imageUrl);
+        return cq.toString();
+    }
+
+    public static String share(String url, String title, String content) {
+        CqCode cq = new CqCode("share");
+        cq.addParam("url", url);
+        cq.addParam("title", title);
+        cq.addParam("content", content);
+        return cq.toString();
+    }
+
+    public static String share(String url, String title) {
+        CqCode cq = new CqCode("share");
+        cq.addParam("url", url);
+        cq.addParam("title", title);
         return cq.toString();
     }
 }
