@@ -7,9 +7,7 @@ import tech.chowyijiu.huhu_bot.constant.EventTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.MetaEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.*;
 import tech.chowyijiu.huhu_bot.handler.HandlerContainer;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 
@@ -58,26 +56,19 @@ public class ProcessEventTask implements Runnable {
                     preProcessMetaEvent();
                     break;
                 case GroupMessageEvent:
-                    log.info("[{}] {} will be preProcessed", this.getClass().getSimpleName(), eventTypeEnum);
-                    preProcessGroupMessageEvent();
+                    handlerContainer.matchMessageHandler(session, ((GroupMessageEvent) event));
                     break;
                 case PrivateMessageEvent:
+                    handlerContainer.matchMessageHandler(session, ((PrivateMessageEvent) event));
+                    break;
                 case NoticeEvent:
                 default:
                     break;
             }
         } catch (Exception e) {
-            log.error("处理消息时异常", e);
+            log.error("[{}] Exception occurred in preprocessing event, Exception:", this.getClass().getSimpleName(), e);
         }
 
-    }
-
-
-    /**
-     * 预处理 GroupMessageEvent
-     */
-    public void preProcessGroupMessageEvent() {
-        handlerContainer.matchHandler(session, event);
     }
 
     /**

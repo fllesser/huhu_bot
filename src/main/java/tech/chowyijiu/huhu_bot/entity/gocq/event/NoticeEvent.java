@@ -21,6 +21,7 @@ public class NoticeEvent extends Event {
 
     private String noticeType;
     private String subType;
+    private Long UserId;
 
     public static NoticeEvent respToEvent(MessageResp messageResp) {
         switch (NoticeTypeEnum.valueOf(messageResp.getNoticeType())) {

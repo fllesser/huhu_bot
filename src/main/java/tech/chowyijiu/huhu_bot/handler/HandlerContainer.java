@@ -9,15 +9,15 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.PrivateMessageEvent;
 
 import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 /**
  * @author elastic chow
@@ -42,7 +42,7 @@ public class HandlerContainer {
             for (String pluginName : botPluginMap.keySet()) {
                 Object plugin = botPluginMap.get(pluginName);
                 //插件功能名, 用于打印日志
-                ArrayList<String> handlerNames = new ArrayList<>();
+                List<String> handlerNames = new ArrayList<>();
                 Arrays.stream(plugin.getClass().getMethods())
                         .filter(this::isHandler)
                         .forEach(method -> {
@@ -50,7 +50,7 @@ public class HandlerContainer {
                             handlerNames.add(annotation.name());
                             putHandler(annotation.command(), plugin, method, annotation);
                         });
-                log.info("[HandlerContainer] Load Plugin [{}], PROGRESS[{}/{}], COMMAND: {}",
+                log.info("[HandlerContainer] Load plugin [{}], progress[{}/{}], function set: {}",
                         pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()));
             }
         }
@@ -60,16 +60,20 @@ public class HandlerContainer {
 
     }
 
-    public Object matchHandler(final WebSocketSession session, final Event event) {
+    public Object matchMessageHandler(final WebSocketSession session, final MessageEvent event) {
         log.info("[{}] {} start match handler", this.getClass().getSimpleName(), event.getClass().getSimpleName());
-        if (event instanceof GroupMessageEvent) {
-            GroupMessageEvent groupMessageEvent = (GroupMessageEvent) event;
+        if (event instanceof GroupMessageEvent || event instanceof PrivateMessageEvent) {
             for (String[] commands : container.keySet()) {
                 for (String command : commands) {
-                    if (groupMessageEvent.getMessage().startsWith(command)) {
-                        log.info("[{}] {} matched handler", this.getClass().getSimpleName(), event.getClass().getSimpleName());
+                    if (event.getMessage().startsWith(command)) {
                         Handler handler = container.get(commands);
-                        handler.execute(session, event);
+                        log.info("{}, {}", handler.eventType, event.getClass());
+                        if (handler.eventType.isAssignableFrom(event.getClass())) {
+                            log.info("[{}] matched handler", this.getClass().getSimpleName());
+                            handler.execute(session, event);
+                            // TODO handler中添加 bloke 属性进行阻断
+                            // break;
+                        }
                     }
                 }
             }
@@ -78,11 +82,23 @@ public class HandlerContainer {
     }
 
 
-    @RequiredArgsConstructor
     static class Handler {
         private final Object plugin;
         private final Method method;
         private final Annotation annotation;
+        private Class<?> eventType = Event.class;
+
+        public Handler(Object plugin, Method method, Annotation annotation) {
+            this.plugin = plugin;
+            this.method = method;
+            this.annotation = annotation;
+            for (Class<?> clazz : method.getParameterTypes()) {
+                if (Event.class.isAssignableFrom(clazz)) {
+                    eventType = clazz;
+                    break;
+                }
+            }
+        }
 
         public Object execute(Object... args) {
             Object result = null;

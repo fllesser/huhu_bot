@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhu_bot.annotation.notice;
 
-import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 
 import java.lang.annotation.*;
@@ -14,7 +13,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface NoticeHandler {
 
-    NoticeTypeEnum type();
+    //NoticeTypeEnum type();
     SubTypeEnum subType() default SubTypeEnum.ignore; //如果, type为notify, 必须指定subtype
     //int weight() default 0; 按方法定义顺序匹配
     String name() default "";
