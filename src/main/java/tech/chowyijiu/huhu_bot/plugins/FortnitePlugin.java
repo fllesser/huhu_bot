@@ -19,12 +19,12 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 public class FortnitePlugin {
 
 
-    @MessageHandler(name = "每日vb图", command = {"vb", "VB"})
+    @MessageHandler(name = "每日vb图", commands = {"vb", "VB"}, priority = 4)
     public void vb(WebSocketSession session, GroupMessageEvent event) {
         Server.sendGroupMessage(session, event.getGroupId(), "vb图", true);
     }
 
-    @MessageHandler(name = "商城", command = {"商城"})
+    @MessageHandler(name = "商城", commands = {"商城"}, priority = 1)
     public void shop(WebSocketSession session, MessageEvent event) {
         String cq = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");
         if (event instanceof PrivateMessageEvent) {

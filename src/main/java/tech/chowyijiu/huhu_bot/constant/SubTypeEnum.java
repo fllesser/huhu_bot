@@ -5,8 +5,6 @@ package tech.chowyijiu.huhu_bot.constant;
  * @date 14/5/2023
  */
 public enum SubTypeEnum {
-    //
-    ignore,
     // 戳一戳
     poke,
     // 红包运气王

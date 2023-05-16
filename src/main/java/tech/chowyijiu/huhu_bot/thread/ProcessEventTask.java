@@ -8,7 +8,7 @@ import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.*;
-import tech.chowyijiu.huhu_bot.handler.HandlerContainer;
+import tech.chowyijiu.huhu_bot.handler.DispatcherContext;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 
 import java.util.Objects;
@@ -34,10 +34,10 @@ public class ProcessEventTask implements Runnable {
     }
 
     private static final ThreadPoolExecutor threadPool;
-    private static final HandlerContainer handlerContainer;
+    private static final DispatcherContext DISPATCHER_CONTEXT;
 
     static {
-        handlerContainer = IocUtil.getBean(HandlerContainer.class);
+        DISPATCHER_CONTEXT = IocUtil.getBean(DispatcherContext.class);
         threadPool = new ThreadPoolExecutor(16, 31,
                 10L * 60L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(160),
@@ -53,13 +53,12 @@ public class ProcessEventTask implements Runnable {
             //log.info("[{}] {} will be preProcessed", this.getClass().getSimpleName(), eventTypeEnum);
             switch (eventTypeEnum) {
                 case MetaEvent:
-                    preProcessMetaEvent();
+                    processMetaEvent();
                     break;
                 case GroupMessageEvent:
-                    handlerContainer.matchMessageHandler(session, ((GroupMessageEvent) event));
-                    break;
                 case PrivateMessageEvent:
-                    handlerContainer.matchMessageHandler(session, ((PrivateMessageEvent) event));
+                    //todo 命令传参数 args
+                    DISPATCHER_CONTEXT.matchMessageHandler(session, ((MessageEvent) event));
                     break;
                 case NoticeEvent:
                 default:
@@ -72,9 +71,9 @@ public class ProcessEventTask implements Runnable {
     }
 
     /**
-     * 预处理 MetaEvent
+     * 处理 MetaEvent
      */
-    public void preProcessMetaEvent() {
+    public void processMetaEvent() {
         MetaEvent metaEvent = (MetaEvent) this.event;
         switch (MetaTypeEnum.valueOf(metaEvent.getMetaEventType())) {
             case heartbeat:
