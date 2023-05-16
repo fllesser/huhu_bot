@@ -1,7 +1,9 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.event;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.beans.BeanUtils;
 import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
@@ -13,6 +15,8 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
+@NoArgsConstructor
 public class NoticeEvent extends Event {
 
     private String noticeType;

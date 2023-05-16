@@ -10,15 +10,12 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
-import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
-import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 
@@ -47,31 +44,29 @@ public class Server extends TextWebSocketHandler {
         log.info("[CLIENT] GOCQ CONNECT SUCCESS, Remote Address:{}，Client num：{}", session.getRemoteAddress(), getConnections());
     }
 
+    //@Override
+    //public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
+    //    final String s = message.getPayload();
+    //    try {
+    //        //todo 想办法转为event
+    //        final Message bean = JSONObject.parseObject(s, Message.class);
+    //        if (PostTypeEnum.meta_event.toString().equals(bean.getPostType()) && MetaTypeEnum.heartbeat.toString().equals(bean.getMetaEventType())) {
+    //            // 心跳包
+    //            return;
+    //        }
+    //        ProcessEventTask.execute(session, bean, s);
+    //    } catch (Exception e) {
+    //        log.error("解析payload异常:{}", s);
+    //    }
+    //}
+
     @Override
     public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
         final String s = message.getPayload();
         try {
-            //todo 想办法转为event
-            final Message bean = JSONObject.parseObject(s, Message.class);
-            if (PostTypeEnum.meta_event.toString().equals(bean.getPostType()) && MetaTypeEnum.heartbeat.toString().equals(bean.getMetaEventType())) {
-                // 心跳包
-                return;
-            }
-            ProcessEventTask.execute(session, bean, s);
-        } catch (Exception e) {
-            log.error("解析payload异常:{}", s);
-        }
-    }
-
-
-    public void handleMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
-        final String s = message.getPayload();
-        try {
-            //todo 想办法转为event
             MessageResp messageResp = JSONObject.parseObject(s, MessageResp.class);
             Event event = Event.respToEvent(messageResp);
-
-
+            ProcessEventTask.execute(session, event, s);
         } catch (Exception e) {
             log.error("解析payload异常:{}", s);
         }

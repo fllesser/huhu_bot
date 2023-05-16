@@ -6,6 +6,7 @@ package tech.chowyijiu.huhu_bot.constant;
  */
 public enum EventTypeEnum {
 
+    Event,
     MessageEvent,
     GroupMessageEvent,
     PrivateMessageEvent,

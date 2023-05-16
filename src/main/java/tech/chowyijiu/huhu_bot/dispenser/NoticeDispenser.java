@@ -11,7 +11,6 @@ import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -30,7 +29,7 @@ public class NoticeDispenser {
 
     private final Map<Object, List<Method>> plugins = new HashMap<>();
 
-    @PostConstruct
+    //@PostConstruct
     public void loadPlugin() {
         //Map<String, Object> botPluginMap = IocUtil.getBeansWithAnnotation(BotPlugin.class);
         Map<String, Object> botPluginMap = ioc.getBeansWithAnnotation(BotPlugin.class);

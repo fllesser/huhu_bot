@@ -11,7 +11,6 @@ import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Message;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -40,7 +39,7 @@ public class MessageDispenser {
     private final Map<Object, List<Method>> plugins = new HashMap<>();
     private final Map<Method, MessageHandler> handlers = new HashMap<>();
 
-    @PostConstruct
+    //@PostConstruct
     public void loadPlugin() {
         //Map<String, Object> botPluginMap = IocUtil.getBeansWithAnnotation(BotPlugin.class);
         Map<String, Object> botPluginMap = ioc.getBeansWithAnnotation(BotPlugin.class);
