@@ -7,7 +7,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.*;
@@ -39,16 +38,14 @@ public class GocqSyncRequestUtil {
 
     /**
      * 获取消息详情对象
-     *
-     * @param session
      * @param messageId
      * @param timeout
      * @return
      */
-    public static MessageResp getMsg(WebSocketSession session, String messageId, long timeout) {
+    public static MessageResp getMsg(Bot bot, String messageId, long timeout) {
         Map<String, Object> map = new HashMap<>(1);
         map.put("message_id", messageId);
-        JSONObject jsonObject = sendSyncRequest(session, GocqActionEnum.GET_MSG, map, timeout);
+        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.GET_MSG, map, timeout);
         if (jsonObject != null) {
             return JSONObject.parseObject(jsonObject.getString("data"), MessageResp.class);
         }
@@ -56,8 +53,8 @@ public class GocqSyncRequestUtil {
     }
 
 
-    public static SelfInfo getLoginInfo(WebSocketSession session, long timeout) {
-        JSONObject responseStr = sendSyncRequest(session, GocqActionEnum.GET_LOGIN_INGO, null, timeout);
+    public static SelfInfo getLoginInfo(Bot bot, long timeout) {
+        JSONObject responseStr = sendSyncRequest(bot, GocqActionEnum.GET_LOGIN_INGO, null, timeout);
         if (responseStr != null) {
             SelfInfo data = JSONObject.parseObject(responseStr.getString("data"), SelfInfo.class);
             return data;
@@ -72,10 +69,10 @@ public class GocqSyncRequestUtil {
      * @param exclude 需要排除的成员qq号
      * @return
      */
-    public static List<GroupMember> getGroupMemberList(WebSocketSession session, Long groupId, List<Long> exclude, long timeout) {
+    public static List<GroupMember> getGroupMemberList(Bot bot, Long groupId, List<Long> exclude, long timeout) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("group_id", groupId);
-        JSONObject jsonObject = sendSyncRequest(session, GocqActionEnum.GET_GROUP_MEMBER_LIST, params, timeout);
+        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.GET_GROUP_MEMBER_LIST, params, timeout);
         if (jsonObject == null) {
             return null;
         }
@@ -92,20 +89,18 @@ public class GocqSyncRequestUtil {
 
     /**
      * 发送私聊文件
-     *
-     * @param session
      * @param userId
      * @param filePath 该文件必须与gocqhttp在同一主机上
      * @param fileName
      * @param timeout
      * @return
      */
-    public static SyncResponse uploadPrivateFile(WebSocketSession session, Long userId, String filePath, String fileName, long timeout) {
+    public static SyncResponse uploadPrivateFile(Bot bot, Long userId, String filePath, String fileName, long timeout) {
         Map<String, Object> param = new HashMap<>(3);
         param.put("user_id", userId);
         param.put("file", filePath);
         param.put("name", fileName);
-        JSONObject responseStr = sendSyncRequest(session, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
+        JSONObject responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
         if (responseStr != null) {
             SyncResponse response = JSONObject.parseObject(responseStr.toJSONString(), SyncResponse.class);
             return response;
@@ -115,15 +110,13 @@ public class GocqSyncRequestUtil {
 
     /**
      * 用gocq去下载文件
-     *
-     * @param session
      * @param url
      * @param threadCount
      * @param httpHeaders
      * @param timeout
      * @return 返回gocq下载到的文件绝对路径
      */
-    public static DownloadFileResp downloadFile(WebSocketSession session, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
+    public static DownloadFileResp downloadFile(Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
 
         Map<String, Object> param = new HashMap<>(3);
         param.put("url", url);
@@ -141,7 +134,7 @@ public class GocqSyncRequestUtil {
             param.put("headers", JSONObject.toJSONString(headStrs));
 
         }
-        JSONObject jsonObject = sendSyncRequest(session, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
+        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
         if (jsonObject != null) {
             return jsonObject.getObject("data", DownloadFileResp.class);
         }
@@ -151,25 +144,24 @@ public class GocqSyncRequestUtil {
 
     /***
      * 发送同步消息
-     * @param session 客户端session
      * @param action 终结点
      * @param params 参数
      * @param timeout 超时 ms
      * @param <T>
      * @return
      */
-    public static <T> JSONObject sendSyncRequest(WebSocketSession session, GocqActionEnum action, T params, long timeout) {
+    public static <T> JSONObject sendSyncRequest(Bot bot, GocqActionEnum action, T params, long timeout) {
         RequestBox<T> requestBox = new RequestBox<>();
         if (params != null) {
             requestBox.setParams(params);
         }
         requestBox.setAction(action.getAction());
         String echo = Thread.currentThread().getName() + "_" +
-                session.getId() + "_" +
+                bot.getUserId() + "_" +
                 action.getAction() + "_" +
                 UUID.randomUUID().toString().replace("-","");
         requestBox.setEcho(echo);
-        Bot.sendMessage(session, JSONObject.toJSONString(requestBox));
+        //bot.sendMessage(JSONObject.toJSONString(requestBox));
         log.info("echo: {}", echo);
         FutureTask<JSONObject> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
         pool.submit(futureTask);

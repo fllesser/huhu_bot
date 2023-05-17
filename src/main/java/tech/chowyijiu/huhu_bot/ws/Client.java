@@ -20,6 +20,7 @@ import java.net.URI;
 
 @Slf4j
 //@ClientEndpoint
+//ws正向连接 客户端
 @Deprecated
 public class Client {
 

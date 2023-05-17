@@ -38,7 +38,7 @@ public class WebSocketHandshakeInterceptor /*implements HandshakeInterceptor*/ {
     //    if(BotConfig.MAX_CONNECTIONS < 0){
     //        return true;
     //    }
-    //    int connections = Bot.getConnections();
+    //    int connections = Server.getConnections();
     //    if(connections >= BotConfig.MAX_CONNECTIONS){
     //        log.info("当前连接数:{},已达到最大连接数:{},本次禁止握手",connections,BotConfig.MAX_CONNECTIONS);
     //        return false;

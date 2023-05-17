@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
@@ -13,6 +12,7 @@ import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
@@ -79,7 +79,7 @@ public class DispatcherCore {
                 .collect(Collectors.toList()));
     }
 
-    public void matchMessageHandler(final WebSocketSession session, final MessageEvent event) {
+    public void matchMessageHandler(final Bot bot, final MessageEvent event) {
         log.info("[{}] {}[user_id:{},message:{}] start match handler",
                 this.getClass().getSimpleName(), event.getClass().getSimpleName(),
                 event.getUserId(), event.getMessage());
@@ -95,7 +95,7 @@ public class DispatcherCore {
                         log.info("[DispatcherCore] {}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
                                 event.getClass().getSimpleName(), event.getUserId(), event.getMessage(),
                                 handler.plugin.getClass().getSimpleName(), command, handler.priority);
-                        handler.execute(session, event);
+                        handler.execute(bot, event);
                         if (handler.block) {
                             //停止向低优先级传递
                             break outer;
@@ -109,7 +109,7 @@ public class DispatcherCore {
                 event.getUserId(), event.getMessage());
     }
 
-    public void matchNoticeHandler(final WebSocketSession session, final NoticeEvent event) {
+    public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
         String noticeType = event.getNoticeType();
         String subtype = event.getSubType();
         log.info("[{}] NoticeEvent[type:{}, subtype:{}] start match handler",
@@ -118,17 +118,17 @@ public class DispatcherCore {
             if (Objects.equals(handler.noticeType, noticeType)) {
                 if (Objects.equals(noticeType, NoticeTypeEnum.notify.name())) {
                     if (Objects.equals(handler.subType, subtype)) {
-                        log.info("[DispatcherCore] NoticeEvent[notice_type:{},sub_type:{}] will be handled by Plugin[{}], Priority[{}]",
-                                noticeType, subtype, handler.plugin.getClass().getSimpleName(), handler.priority);
-                        handler.execute(session, event);
+                        log.info("[DispatcherCore] NoticeEvent[notice_type:{},sub_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
+                                noticeType, subtype, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
+                        handler.execute(bot, event);
                         if (handler.block) {
                             break;
                         }
                     }
                 } else {
-                    log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}], Priority[{}]",
-                            noticeType, handler.plugin.getClass().getSimpleName(), handler.priority);
-                    handler.execute(session, event);
+                    log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
+                            noticeType, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
+                    handler.execute(bot, event);
                     if (handler.block) {
                         break;
                     }
@@ -137,10 +137,13 @@ public class DispatcherCore {
         }
     }
 
+
+
     static class Handler {
         private final Object plugin;
         private final Method method;
 
+        //用于 isAssignableFrom 匹配事件类型
         public Class<?> eventType = Event.class;
         public String name;
         public int priority;
