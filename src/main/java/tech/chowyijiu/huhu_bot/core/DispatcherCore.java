@@ -80,9 +80,11 @@ public class DispatcherCore {
     }
 
     public void matchMessageHandler(final Bot bot, final MessageEvent event) {
+        String briefMessage = event.getMessage().length() <= 10 ? event.getMessage()
+                : (event.getMessage().substring(0, 10) + "......");
         log.info("[{}] {}[user_id:{},message:{}] start match handler",
                 this.getClass().getSimpleName(), event.getClass().getSimpleName(),
-                event.getUserId(), event.getMessage());
+                event.getUserId(), briefMessage);
         outer:
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             String[] commands = handler.commands;
@@ -93,7 +95,7 @@ public class DispatcherCore {
                 if (event.getMessage().startsWith(command)) {
                     if (handler.eventType.isAssignableFrom(event.getClass())) {
                         log.info("[DispatcherCore] {}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
-                                event.getClass().getSimpleName(), event.getUserId(), event.getMessage(),
+                                event.getClass().getSimpleName(), event.getUserId(), briefMessage,
                                 handler.plugin.getClass().getSimpleName(), command, handler.priority);
                         handler.execute(bot, event);
                         if (handler.block) {
@@ -106,7 +108,7 @@ public class DispatcherCore {
         }
         log.info("[{}] {}[user_id:{}, message:{}] match handler end",
                 this.getClass().getSimpleName(), event.getClass().getSimpleName(),
-                event.getUserId(), event.getMessage());
+                event.getUserId(), briefMessage);
     }
 
     public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {

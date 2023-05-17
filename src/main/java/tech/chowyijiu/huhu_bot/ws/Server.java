@@ -2,7 +2,6 @@ package tech.chowyijiu.huhu_bot.ws;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -59,16 +58,17 @@ public class Server extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(@NotNull final WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
         log.info("[Server] GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), getConnections() + 1);
     }
 
     @Override
-    public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
+    public void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
         final String json = message.getPayload();
         try {
             MessageResp messageResp = JSONObject.parseObject(json, MessageResp.class);
             Event event = Event.respToEvent(messageResp);
+            if (event == null) return;
             if (Objects.equals(event.getClass().getSimpleName(), EventTypeEnum.MetaEvent.name())) {
                 MetaEvent metaEvent = (MetaEvent) event;
                 if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.heartbeat.name())) {
@@ -85,6 +85,7 @@ public class Server extends TextWebSocketHandler {
             }
             for (Bot bot : bots) {
                 if (bot.getSession() == session) {
+                    log.info("{}", messageResp);
                     ProcessEventTask.execute(bot, event, json);
                 }
             }

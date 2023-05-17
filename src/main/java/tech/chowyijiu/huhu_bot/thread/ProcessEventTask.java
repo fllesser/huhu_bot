@@ -1,18 +1,16 @@
 package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import tech.chowyijiu.huhu_bot.constant.EventTypeEnum;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
+import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author elastic chow
@@ -31,17 +29,12 @@ public class ProcessEventTask implements Runnable {
         this.original = original;
     }
 
-    private static final ThreadPoolExecutor threadPool;
+    private static final ThreadPoolExecutor THREAD_POOL;
     private static final DispatcherCore DISPATCHER_CORE;
 
     static {
+        THREAD_POOL = ThreadPoolUtil.getExecutor();
         DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
-        threadPool = new ThreadPoolExecutor(16, 31,
-                10L * 60L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(160),
-                new CustomizableThreadFactory("pool-processMessage-"),
-                new ShareRunsPolicy("pool-processMessage")
-        );
     }
 
     @Override
@@ -67,7 +60,7 @@ public class ProcessEventTask implements Runnable {
     }
 
     public static void execute(final Bot bot, final Event event, final String original) {
-        threadPool.execute(new ProcessEventTask(bot, event, original));
+        THREAD_POOL.execute(new ProcessEventTask(bot, event, original));
     }
 
 
