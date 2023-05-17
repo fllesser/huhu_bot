@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.utils;
+package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +7,8 @@ import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author elastic chow
@@ -18,7 +20,7 @@ public class MessageSegment {
     @Data
     @AllArgsConstructor
     public static class CqCode {
-        private String type;
+        private CqTypeEnum type;
         private final Map<String, String> params = new HashMap<>();
 
         public void addParam(String key, String value) {
@@ -28,11 +30,29 @@ public class MessageSegment {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("[CQ:").append(type);
+            sb.append("[CQ:").append(type.getType());
             params.keySet().forEach(key -> sb.append(",").append(key).append("=").append(params.get(key)));
             sb.append("]");
             return sb.toString();
         }
+
+    }
+
+    public static CqCode toCqCode(String cqStr) {
+        String regex = "\\[CQ:([a-z]+)((,([a-z]+)=([\\w:/.]+))+)]";
+        Pattern r = Pattern.compile(regex);
+        Matcher matcher = r.matcher(cqStr);
+        if (matcher.find()) {
+            String type = matcher.group(1);
+            MessageSegment.CqCode cqCode = new MessageSegment.CqCode(CqTypeEnum.valueOf(type));
+            String[] split = matcher.group(2).replaceFirst(",", "").split(",");
+            for (String s : split) {
+                String[] keyValue = s.split("=");
+                cqCode.addParam(keyValue[0], keyValue[1]);
+            }
+            return cqCode;
+        }
+        return null;
     }
 
     /**
@@ -41,7 +61,7 @@ public class MessageSegment {
      * @return [CQ:image,file=http://baidu.com/1.jpg]
      */
     public static String image(String url) {
-        CqCode cq = new CqCode(CqTypeEnum.image.type);
+        CqCode cq = new CqCode(CqTypeEnum.image);
         cq.addParam("file", url);
         cq.addParam("subType", "0");
         return cq.toString();
@@ -57,7 +77,7 @@ public class MessageSegment {
      * @return [CQ:at,qq=1943423423]
      */
     public static String at(Long userId) {
-        CqCode cq = new CqCode("at");
+        CqCode cq = new CqCode(CqTypeEnum.at);
         cq.addParam("qq", userId.toString());
         return cq.toString();
     }
@@ -68,7 +88,7 @@ public class MessageSegment {
      * @return [CQ:poke,qq=1943423423]
      */
     public static String poke(Long userId) {
-        CqCode cq = new CqCode("poke");
+        CqCode cq = new CqCode(CqTypeEnum.poke);
         cq.addParam("qq", userId.toString());
         return cq.toString();
     }
@@ -82,7 +102,7 @@ public class MessageSegment {
      * @return [CQ:share,url=http://baidu.com,title=百度]
      */
     public static String share(String url, String title, String content, String imageUrl) {
-        CqCode cq = new CqCode("share");
+        CqCode cq = new CqCode(CqTypeEnum.share);
         cq.addParam("url", url);
         cq.addParam("title", title);
         cq.addParam("content", content);
@@ -91,7 +111,7 @@ public class MessageSegment {
     }
 
     public static String share(String url, String title, String content) {
-        CqCode cq = new CqCode("share");
+        CqCode cq = new CqCode(CqTypeEnum.share);
         cq.addParam("url", url);
         cq.addParam("title", title);
         cq.addParam("content", content);
@@ -99,7 +119,7 @@ public class MessageSegment {
     }
 
     public static String share(String url, String title) {
-        CqCode cq = new CqCode("share");
+        CqCode cq = new CqCode(CqTypeEnum.share);
         cq.addParam("url", url);
         cq.addParam("title", title);
         return cq.toString();

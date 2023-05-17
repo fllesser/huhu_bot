@@ -46,7 +46,7 @@ public class ThreadPoolUtil {
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         if (availableProcessors > 0) {
             executor.setCorePoolSize(availableProcessors * 2);
-            executor.setMaximumPoolSize(availableProcessors * 2);
+            executor.setMaximumPoolSize(availableProcessors * 4);
             log.info("根据CPU线程数:{}, 重置事件处理线程池容量完成 corePoolSize:[{}], maximumPoolSize:[{}]",
                     availableProcessors, executor.getCorePoolSize(), executor.getMaximumPoolSize());
         }

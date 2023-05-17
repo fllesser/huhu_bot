@@ -6,7 +6,7 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
-import tech.chowyijiu.huhu_bot.utils.MessageSegment;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -30,7 +30,7 @@ public class FortnitePlugin {
         bot.sendMessage(event, shop, false);
     }
 
-    @Scheduled(cron = "0 32 16 * * * ")
+    @Scheduled(cron = "0 1 8 * * * ")
     public void scheduleShop() {
         Server.getBots().forEach(bot -> bot.sendPrivateMessage(1942422015L, shop, false));
     }

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.beans.BeanUtils;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
@@ -34,7 +33,6 @@ public class MessageEvent extends Event {
 
     private Integer font;
     private Sender sender;
-    private boolean toMe;
 
 
     public static MessageEvent respToEvent(MessageResp messageResp) {
@@ -43,9 +41,7 @@ public class MessageEvent extends Event {
         } else if (Objects.equals(messageResp.getMessageType(), MessageTypeEnum.group.getType())) {
             return new GroupMessageEvent(messageResp);
         }
-        MessageEvent messageEvent = new MessageEvent();
-        BeanUtils.copyProperties(messageResp, messageEvent);
-        return messageEvent;
+        return null;
     }
 
 }

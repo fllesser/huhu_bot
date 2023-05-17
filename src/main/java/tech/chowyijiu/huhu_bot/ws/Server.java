@@ -83,9 +83,11 @@ public class Server extends TextWebSocketHandler {
                     return;
                 }
             }
+            //log.info("json: {}", json);
+            //log.info("messageResp: {}", messageResp);
+            //log.info("event: {}", event);
             for (Bot bot : bots) {
                 if (bot.getSession() == session) {
-                    log.info("{}", messageResp);
                     ProcessEventTask.execute(bot, event, json);
                 }
             }

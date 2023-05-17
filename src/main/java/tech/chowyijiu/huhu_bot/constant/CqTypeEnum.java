@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CqTypeEnum {
     image("image"),
-    reply("reply");
+    reply("reply"),
+    poke("poke"),
+    share("share"),
 
+    at("at");
     public final String type;
 }

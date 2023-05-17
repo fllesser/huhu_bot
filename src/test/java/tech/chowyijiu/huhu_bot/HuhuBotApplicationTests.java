@@ -3,8 +3,13 @@ package tech.chowyijiu.huhu_bot;
 import com.alibaba.fastjson2.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 class HuhuBotApplicationTests {
@@ -23,4 +28,24 @@ class HuhuBotApplicationTests {
         System.out.println(groupEvent);
 
     }
+
+    @Test
+    public void testRegex() {
+        String cq = "[CQ:at,qq=1487248817,file=https://dsfsdfsfsd,image=sdfsdfs.png]sdfsdf[CQ:file,qq=1487817,file=https://dsfsdfsfsd]";
+        String regex = "\\[CQ:([a-z]+)((,([a-z]+)=([\\w:/.]+))+)]";
+        Pattern r = Pattern.compile(regex);
+        Matcher matcher = r.matcher(cq);
+        if (matcher.find()) {
+            String type = matcher.group(1);
+            MessageSegment.CqCode cqCode = new MessageSegment.CqCode(CqTypeEnum.valueOf(type));
+            String[] split = matcher.group(2).replaceFirst(",", "").split(",");
+            for (String s : split) {
+                String[] keyValue = s.split("=");
+                cqCode.addParam(keyValue[0], keyValue[1]);
+            }
+            System.out.println(cqCode);
+        }
+
+    }
+
 }
