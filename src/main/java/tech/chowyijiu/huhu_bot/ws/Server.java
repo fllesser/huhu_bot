@@ -32,6 +32,11 @@ public class Server extends TextWebSocketHandler {
         return bots.size();
     }
 
+    /**
+     * 根据userId获取Bot
+     * @param userId qq号
+     * @return Bot
+     */
     public static Bot getBot(Long userId) {
         for (Bot bot : bots) {
             if (Objects.equals(bot.getUserId(), userId)) {
@@ -41,15 +46,22 @@ public class Server extends TextWebSocketHandler {
         return null;
     }
 
+    /**
+     * 获取所有Bot
+     * @return List<Bot>
+     */
+    public static List<Bot> getBots() {
+        return bots;
+    }
+
     public static void addBot(Long userId, WebSocketSession session) {
         bots.add(new Bot(userId, session));
     }
 
     @Override
     public void afterConnectionEstablished(@NotNull final WebSocketSession session) throws Exception {
-        log.info("[CLIENT] GOCQ CONNECT SUCCESS, Remote Address:{}，Client num：{}", session.getRemoteAddress(), getConnections());
+        log.info("[Server] GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), getConnections() + 1);
     }
-
 
     @Override
     public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
@@ -67,7 +79,7 @@ public class Server extends TextWebSocketHandler {
                             && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     addBot(event.getSelfId(), session);
-                    log.info("[{}] bot[{}] received gocq connection success message ", this.getClass().getSimpleName(), metaEvent.getSelfId());
+                    log.info("[{}] RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE ", this.getClass().getSimpleName(), metaEvent.getSelfId());
                     return;
                 }
             }
