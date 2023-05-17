@@ -13,7 +13,7 @@ websocket
 ## 使用要点
 go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 
-```
+
 ## 示例插件
 ```Java
 @Slf4j
