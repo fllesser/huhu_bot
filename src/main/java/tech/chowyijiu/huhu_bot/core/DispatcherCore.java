@@ -15,11 +15,9 @@ import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
 
 import javax.annotation.PostConstruct;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 
@@ -34,11 +32,11 @@ public class DispatcherCore {
 
     private final ApplicationContext ioc;
 
-    private final List<Handler> MESSAGE_HANDLER_CONTAINER = new CopyOnWriteArrayList<>();
-    private final List<Handler> NOTICE_HANDLER_CONTAINER = new CopyOnWriteArrayList<>();
+    private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
+    private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
     @PostConstruct
-    public void loadPlugin() {
+    private void loadPlugin() {
         Map<String, Object> botPluginMap = ioc.getBeansWithAnnotation(BotPlugin.class);
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
@@ -51,17 +49,17 @@ public class DispatcherCore {
                 List<String> handlerNames = new ArrayList<>();
                 Arrays.stream(plugin.getClass().getMethods()).forEach(method -> {
                     if (method.isAnnotationPresent(MessageHandler.class)) {
-                        MessageHandler annotation = method.getAnnotation(MessageHandler.class);
-                        handlerNames.add(annotation.name());
-                        messageHandlers.add(new Handler(plugin, method));
+                        Handler handler = Handler.buildMessageHandler(plugin, method);
+                        handlerNames.add(handler.name);
+                        messageHandlers.add(handler);
                     } else if (method.isAnnotationPresent(NoticeHandler.class)) {
-                        NoticeHandler annotation = method.getAnnotation(NoticeHandler.class);
-                        handlerNames.add(annotation.name());
-                        noticeHandlers.add(new Handler(plugin, method));
+                        Handler handler = Handler.buildNoticeHandler(plugin, method);
+                        handlerNames.add(handler.name);
+                        noticeHandlers.add(handler);
                     } else if (method.isAnnotationPresent(NotifyNoticeHandler.class)) {
-                        NotifyNoticeHandler annotation = method.getAnnotation(NotifyNoticeHandler.class);
-                        handlerNames.add(annotation.name());
-                        noticeHandlers.add(new Handler(plugin, method));
+                        Handler handler = Handler.buildNotifyNoticeHandler(plugin, method);
+                        handlerNames.add(handler.name);
+                        noticeHandlers.add(handler);
                     }
                 });
                 log.info("[DispatcherCore] Load plugin [{}], progress[{}/{}], function set: {}",
@@ -111,9 +109,6 @@ public class DispatcherCore {
                 event.getUserId(), event.getMessage());
     }
 
-    /**
-     * todo
-     */
     public void matchNoticeHandler(final WebSocketSession session, final NoticeEvent event) {
         String noticeType = event.getNoticeType();
         String subtype = event.getSubType();
@@ -142,48 +137,61 @@ public class DispatcherCore {
         }
     }
 
-
     static class Handler {
         private final Object plugin;
         private final Method method;
 
         public Class<?> eventType = Event.class;
+        public String name;
         public int priority;
         public boolean block;
 
+        //MessageHandler
         public String[] commands;
 
+        //NoticeHandler
         public String noticeType;
+
+        //NotifyNoticeHandler
         public String subType;
 
-        public Handler(Object plugin, Method method) {
+        private Handler(Object plugin, Method method) {
             this.plugin = plugin;
             this.method = method;
-            fillFields();
-        }
-
-        private void fillFields() {
             for (Class<?> clazz : method.getParameterTypes()) {
                 if (Event.class.isAssignableFrom(clazz)) {
                     eventType = clazz;
                     break;
                 }
             }
-            Annotation annotation = (this.method.getAnnotations())[0];
-            if (annotation instanceof MessageHandler) {
-                MessageHandler mh = (MessageHandler) annotation;
-                this.commands = mh.commands();
-                this.priority = mh.priority();
-                this.block = mh.block();
-            } else if (annotation instanceof NoticeHandler) {
-                NoticeHandler nh = (NoticeHandler) annotation;
-                this.noticeType = nh.type().name();
-                this.priority = nh.priority();
-            } else if (annotation instanceof NotifyNoticeHandler) {
-                NotifyNoticeHandler nnh = (NotifyNoticeHandler) annotation;
-                this.subType = nnh.subType().name();
-                this.priority = nnh.priority();
-            }
+        }
+
+        public static Handler buildMessageHandler(Object plugin, Method method) {
+            Handler handler = new Handler(plugin, method);
+            MessageHandler mh = method.getAnnotation(MessageHandler.class);
+            handler.name = mh.name();
+            handler.block = mh.block();
+            handler.priority = mh.priority();
+            handler.commands = mh.commands();
+            return handler;
+        }
+
+        public static Handler buildNoticeHandler(Object plugin, Method method) {
+            Handler handler = new Handler(plugin, method);
+            NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
+            handler.name = nh.name();
+            handler.priority = nh.priority();
+            handler.noticeType = nh.type().name();
+            return handler;
+        }
+
+        public static Handler buildNotifyNoticeHandler(Object plugin, Method method) {
+            Handler handler = new Handler(plugin, method);
+            NotifyNoticeHandler nnh = method.getAnnotation(NotifyNoticeHandler.class);
+            handler.name = nnh.name();
+            handler.priority = nnh.priority();
+            handler.subType = nnh.subType().name();
+            return handler;
         }
 
         public Object execute(Object... args) {
@@ -195,8 +203,6 @@ public class DispatcherCore {
             }
             return result;
         }
-
     }
-
 
 }

@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhu_bot.annotation.message;
 
+import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
+
 import java.lang.annotation.*;
 
 /**
