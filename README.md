@@ -14,7 +14,7 @@ websocket
 go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 
 ## 自定义注解使用方式
-<img width="1331" alt="image" src="https://github.com/elastichow/huhu_bot/assets/64878354/16905c9b-b09b-426a-92f7-7b5adfdd80c5">
+![086165b9dfa945616a8a9b2ad1493f57](https://github.com/elastichow/huhu_bot/assets/64878354/786769d1-79b0-47d3-9dfc-600a03e7e9e5)
 
 
 参考 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)
