@@ -11,7 +11,7 @@ import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.*;
-import tech.chowyijiu.huhu_bot.ws.Server;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -27,7 +27,9 @@ public class GocqSyncRequestUtil {
 
     public static int poolSize = Runtime.getRuntime().availableProcessors() + 1;
     public static long sleep = 5000L;
-    public static final ExecutorService pool = new ThreadPoolExecutor(poolSize, Integer.MAX_VALUE, 24L, TimeUnit.HOURS, new SynchronousQueue<Runnable>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
+    public static final ExecutorService pool =
+            new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
+            new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
 
     private static final Map<String, JSONObject> resultMap = new ConcurrentHashMap<>();
 
@@ -43,12 +45,12 @@ public class GocqSyncRequestUtil {
      * @param timeout
      * @return
      */
-    public static Message getMsg(WebSocketSession session, String messageId, long timeout) {
+    public static MessageResp getMsg(WebSocketSession session, String messageId, long timeout) {
         Map<String, Object> map = new HashMap<>(1);
         map.put("message_id", messageId);
         JSONObject jsonObject = sendSyncRequest(session, GocqActionEnum.GET_MSG, map, timeout);
         if (jsonObject != null) {
-            return JSONObject.parseObject(jsonObject.getString("data"), Message.class);
+            return JSONObject.parseObject(jsonObject.getString("data"), MessageResp.class);
         }
         return null;
     }
@@ -167,7 +169,7 @@ public class GocqSyncRequestUtil {
                 action.getAction() + "_" +
                 UUID.randomUUID().toString().replace("-","");
         requestBox.setEcho(echo);
-        Server.sendMessage(session, JSONObject.toJSONString(requestBox));
+        Bot.sendMessage(session, JSONObject.toJSONString(requestBox));
         log.info("echo: {}", echo);
         FutureTask<JSONObject> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
         pool.submit(futureTask);

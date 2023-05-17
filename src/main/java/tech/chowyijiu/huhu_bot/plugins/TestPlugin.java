@@ -12,8 +12,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.event.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.PrivateMessageEvent;
-import tech.chowyijiu.huhu_bot.utils.MessageSegment;
-import tech.chowyijiu.huhu_bot.ws.Server;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 /**
  * @author elastic chow
@@ -26,40 +25,43 @@ public class TestPlugin {
     @MessageHandler(name = "测试消息", commands = {"测试", "test"})
     public void test1(WebSocketSession session, MessageEvent event) {
         if (event instanceof PrivateMessageEvent) {
-            Server.sendPrivateMessage(session, event.getSender().getUserId(), "测试消息" ,false);
+            Bot.sendPrivateMessage(session, event.getSender().getUserId(), "测试消息" ,false);
         } else if (event instanceof GroupMessageEvent) {
-            Server.sendGroupMessage(session, ((GroupMessageEvent) event).getGroupId(), "测试消息", false);
+            Bot.sendGroupMessage(session, ((GroupMessageEvent) event).getGroupId(), "测试消息", false);
         }
     }
 
     @MessageHandler(name = "群聊测试1", commands = {"echo"}, priority = 3)
     public void test2(WebSocketSession session, GroupMessageEvent event) {
-        Server.sendGroupMessage(session, event.getGroupId(), "群聊测试111", true);
+        Bot.sendGroupMessage(session, event.getGroupId(), "群聊测试111", true);
     }
 
     @MessageHandler(name = "群聊测试2", commands = {"echo"}, priority = 2, block = true)
     public void test3(WebSocketSession session, GroupMessageEvent event) {
-        Server.sendGroupMessage(session, event.getGroupId(), "群聊测试222", true);
+        Bot.sendGroupMessage(session, event.getGroupId(), "群聊测试222", true);
     }
     @MessageHandler(name = "群聊测试3", commands = {"echo"}, priority = 1)
     public void test7(WebSocketSession session, GroupMessageEvent event) {
-        Server.sendGroupMessage(session, event.getGroupId(), "群聊测试333", true);
+        Bot.sendGroupMessage(session, event.getGroupId(), "群聊测试333", true);
     }
 
     @MessageHandler(name = "私聊测试", commands = {"echo"})
     public void test4(final WebSocketSession session, PrivateMessageEvent event) {
-        Server.sendPrivateMessage(session, event.getUserId(), "测试私聊", true);
+        Bot.sendPrivateMessage(session, event.getUserId(), "测试私聊", true);
     }
 
-    @NoticeHandler(name = "清理不活跃成员", type = NoticeTypeEnum.group_increase)
+    @NoticeHandler(name = "群聊撤回1", type = NoticeTypeEnum.group_recall, priority = 2)
     public void test5(final WebSocketSession session, NoticeEvent event) {
-        log.info("群满了 event: {}", event);
+        log.info("群聊撤回1 event: {}", event);
     }
 
+    @NoticeHandler(name = "群聊撤回2", type = NoticeTypeEnum.group_recall, priority = 1)
+    public void test8(final WebSocketSession session, NoticeEvent event) {
+        log.info("群聊撤回2 event: {}", event);
+    }
 
-    @NotifyNoticeHandler(name = "戳一戳", subType = SubTypeEnum.poke)
+    @NotifyNoticeHandler(name = "群昵称变更", subType = SubTypeEnum.title)
     public void test6(final WebSocketSession session, NoticeEvent event) {
-        log.info("戳一戳 event: {}", event);
-        String poke = MessageSegment.poke(event.getUserId());
+        log.info("群昵称变更 event: {}", event);
     }
 }

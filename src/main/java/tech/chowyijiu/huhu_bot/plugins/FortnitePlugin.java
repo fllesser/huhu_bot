@@ -8,7 +8,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.event.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.PrivateMessageEvent;
 import tech.chowyijiu.huhu_bot.utils.MessageSegment;
-import tech.chowyijiu.huhu_bot.ws.Server;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 /**
  * @author elastic chow
@@ -21,16 +21,16 @@ public class FortnitePlugin {
 
     @MessageHandler(name = "每日vb图", commands = {"vb", "VB"}, priority = 4)
     public void vb(WebSocketSession session, GroupMessageEvent event) {
-        Server.sendGroupMessage(session, event.getGroupId(), "vb图", true);
+        Bot.sendGroupMessage(session, event.getGroupId(), "vb图", true);
     }
 
     @MessageHandler(name = "商城", commands = {"商城"}, priority = 1)
     public void shop(WebSocketSession session, MessageEvent event) {
         String cq = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");
         if (event instanceof PrivateMessageEvent) {
-            Server.sendPrivateMessage(session, event.getUserId(), cq ,false);
+            Bot.sendPrivateMessage(session, event.getUserId(), cq ,false);
         } else if (event instanceof GroupMessageEvent) {
-            Server.sendGroupMessage(session, ((GroupMessageEvent) event).getGroupId(), cq, false);
+            Bot.sendGroupMessage(session, ((GroupMessageEvent) event).getGroupId(), cq, false);
         }
     }
 }

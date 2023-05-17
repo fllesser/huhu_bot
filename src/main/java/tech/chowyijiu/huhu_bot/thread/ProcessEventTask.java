@@ -7,8 +7,8 @@ import tech.chowyijiu.huhu_bot.constant.EventTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
+import tech.chowyijiu.huhu_bot.core.DispatcherCore;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.*;
-import tech.chowyijiu.huhu_bot.handler.DispatcherContext;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 
 import java.util.Objects;
@@ -34,10 +34,10 @@ public class ProcessEventTask implements Runnable {
     }
 
     private static final ThreadPoolExecutor threadPool;
-    private static final DispatcherContext DISPATCHER_CONTEXT;
+    private static final DispatcherCore DISPATCHER_CORE;
 
     static {
-        DISPATCHER_CONTEXT = IocUtil.getBean(DispatcherContext.class);
+        DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
         threadPool = new ThreadPoolExecutor(16, 31,
                 10L * 60L, TimeUnit.SECONDS,
                 new ArrayBlockingQueue<>(160),
@@ -58,9 +58,10 @@ public class ProcessEventTask implements Runnable {
                 case GroupMessageEvent:
                 case PrivateMessageEvent:
                     //todo 命令传参数 args
-                    DISPATCHER_CONTEXT.matchMessageHandler(session, ((MessageEvent) event));
+                    DISPATCHER_CORE.matchMessageHandler(session, ((MessageEvent) event));
                     break;
                 case NoticeEvent:
+                    DISPATCHER_CORE.matchNoticeHandler(session, ((NoticeEvent) event));
                 default:
                     break;
             }

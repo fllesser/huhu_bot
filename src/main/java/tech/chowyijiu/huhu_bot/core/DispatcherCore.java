@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.handler;
+package tech.chowyijiu.huhu_bot.core;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,14 +9,17 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NotifyNoticeHandler;
+import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
 
 import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 
@@ -27,11 +30,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DispatcherContext {
+public class DispatcherCore {
 
     private final ApplicationContext ioc;
 
-    private final List<Handler> handlerContainer = new ArrayList<>();
+    private final List<Handler> handlerContainer = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     public void loadPlugin() {
@@ -57,7 +60,7 @@ public class DispatcherContext {
                             }
                             tempHandlerContainer.add(new Handler(plugin, method));
                         });
-                log.info("[DispatcherContext] Load plugin [{}], progress[{}/{}], function set: {}",
+                log.info("[DispatcherCore] Load plugin [{}], progress[{}/{}], function set: {}",
                         pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()));
             }
         }
@@ -67,11 +70,14 @@ public class DispatcherContext {
         //根据weight对handler进行排序, 并全部加入到handlerContainer中
         handlerContainer.addAll(tempHandlerContainer.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())
+        );
     }
 
     public void matchMessageHandler(final WebSocketSession session, final MessageEvent event) {
-        log.info("[{}] {} start match handler", this.getClass().getSimpleName(), event.getClass().getSimpleName());
+        log.info("[{}] {}[user_id:{},message:{}] start match handler",
+                this.getClass().getSimpleName(), event.getClass().getSimpleName(),
+                event.getUserId(), event.getMessage());
         outer:
         for (Handler handler : handlerContainer) {
             String[] commands = handler.commands;
@@ -81,18 +87,51 @@ public class DispatcherContext {
             for (String command : commands) {
                 if (event.getMessage().startsWith(command)) {
                     if (handler.eventType.isAssignableFrom(event.getClass())) {
-                        log.info("[{}] matched handler, matchCommand[{}]", this.getClass().getSimpleName(), command);
+                        log.info("[DispatcherCore] {}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
+                                event.getClass().getSimpleName(), event.getUserId(), event.getMessage(),
+                                handler.plugin.getClass().getSimpleName(), command, handler.priority);
                         handler.execute(session, event);
                         if (handler.block) {
-                            //停止向下传递
+                            //停止向低优先级传递
                             break outer;
                         }
                     }
                 }
             }
         }
-
+        log.info("[{}] {}[user_id:{}, message:{}] match handler end",
+                this.getClass().getSimpleName(), event.getClass().getSimpleName(),
+                event.getUserId(), event.getMessage());
     }
+
+    /**
+     * todo
+     */
+    public void matchNoticeHandler(final WebSocketSession session, final NoticeEvent event) {
+        String noticeType = event.getNoticeType();
+        String subtype = event.getSubType();
+        log.info("[{}] NoticeEvent[type:{}, subtype:{}] start match handler",
+                this.getClass().getSimpleName(), noticeType, subtype);
+        List<Handler> noticeHandlers = handlerContainer.stream().filter(handler -> handler.eventType == NoticeEvent.class).collect(Collectors.toList());
+        for (Handler handler : noticeHandlers) {
+            if (Objects.equals(handler.noticeType, noticeType)) {
+                if (Objects.equals(noticeType, NoticeTypeEnum.notify.name())) {
+                    if (Objects.equals(handler.subType, subtype)) {
+                        handler.execute(session, event);
+                        if (handler.block) {
+                            break;
+                        }
+                    }
+                } else {
+                    handler.execute(session, event);
+                    if (handler.block) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
 
     static class Handler {

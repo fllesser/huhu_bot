@@ -4,8 +4,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.lang.annotation.Annotation;
-import java.util.Map;
 
 /**
  * @author elastic chow
@@ -24,11 +22,6 @@ public class IocUtil {
     public static <T> T getBean(Class<T> clazz) {
         return ioc.getBean(clazz);
     }
-
-    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> clazz) {
-        return ioc.getBeansWithAnnotation(clazz);
-    }
-
 
 
 }
