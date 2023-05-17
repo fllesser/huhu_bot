@@ -18,7 +18,6 @@ import tech.chowyijiu.huhu_bot.ws.Bot;
 @BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
-
     @MessageHandler(name = "每日vb图", commands = {"vb", "VB"}, priority = 4)
     public void vb(WebSocketSession session, GroupMessageEvent event) {
         Bot.sendGroupMessage(session, event.getGroupId(), "vb图", true);

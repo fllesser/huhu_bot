@@ -34,44 +34,51 @@ public class DispatcherCore {
 
     private final ApplicationContext ioc;
 
-    private final List<Handler> handlerContainer = new CopyOnWriteArrayList<>();
+    private final List<Handler> MESSAGE_HANDLER_CONTAINER = new CopyOnWriteArrayList<>();
+    private final List<Handler> NOTICE_HANDLER_CONTAINER = new CopyOnWriteArrayList<>();
 
     @PostConstruct
     public void loadPlugin() {
         Map<String, Object> botPluginMap = ioc.getBeansWithAnnotation(BotPlugin.class);
-        List<Handler> tempHandlerContainer = new ArrayList<>();
+        List<Handler> messageHandlers = new ArrayList<>();
+        List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("[HuHu Bot] Start Load Plugin...");
+            log.info("[DispatcherCore] Start Load Plugin...");
             int count = 1;
             for (String pluginName : botPluginMap.keySet()) {
                 Object plugin = botPluginMap.get(pluginName);
                 //插件功能名, 用于打印日志
                 List<String> handlerNames = new ArrayList<>();
-                Arrays.stream(plugin.getClass().getMethods())
-                        .filter(this::isHandler)
-                        .forEach(method -> {
-                            Annotation annotation = method.getAnnotations()[0];
-                            if (annotation instanceof MessageHandler) {
-                                handlerNames.add(((MessageHandler) annotation).name());
-                            } else if (annotation instanceof NoticeHandler) {
-                                handlerNames.add(((NoticeHandler) annotation).name());
-                            } else if (annotation instanceof NotifyNoticeHandler) {
-                                handlerNames.add(((NotifyNoticeHandler) annotation).name());
-                            }
-                            tempHandlerContainer.add(new Handler(plugin, method));
-                        });
+                Arrays.stream(plugin.getClass().getMethods()).forEach(method -> {
+                    if (method.isAnnotationPresent(MessageHandler.class)) {
+                        MessageHandler annotation = method.getAnnotation(MessageHandler.class);
+                        handlerNames.add(annotation.name());
+                        messageHandlers.add(new Handler(plugin, method));
+                    } else if (method.isAnnotationPresent(NoticeHandler.class)) {
+                        NoticeHandler annotation = method.getAnnotation(NoticeHandler.class);
+                        handlerNames.add(annotation.name());
+                        noticeHandlers.add(new Handler(plugin, method));
+                    } else if (method.isAnnotationPresent(NotifyNoticeHandler.class)) {
+                        NotifyNoticeHandler annotation = method.getAnnotation(NotifyNoticeHandler.class);
+                        handlerNames.add(annotation.name());
+                        noticeHandlers.add(new Handler(plugin, method));
+                    }
+                });
                 log.info("[DispatcherCore] Load plugin [{}], progress[{}/{}], function set: {}",
                         pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()));
             }
         }
-        if (tempHandlerContainer.isEmpty()) {
-            throw new RuntimeException("No plugins were found");
+        if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
+            throw new RuntimeException("[DispatcherCore] No plugins were found");
         }
         //根据weight对handler进行排序, 并全部加入到handlerContainer中
-        handlerContainer.addAll(tempHandlerContainer.stream()
+        MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority))
                 .collect(Collectors.toList())
         );
+        NOTICE_HANDLER_CONTAINER.addAll(noticeHandlers.stream()
+                .sorted(Comparator.comparingInt(handler -> handler.priority))
+                .collect(Collectors.toList()));
     }
 
     public void matchMessageHandler(final WebSocketSession session, final MessageEvent event) {
@@ -79,7 +86,7 @@ public class DispatcherCore {
                 this.getClass().getSimpleName(), event.getClass().getSimpleName(),
                 event.getUserId(), event.getMessage());
         outer:
-        for (Handler handler : handlerContainer) {
+        for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             String[] commands = handler.commands;
             if (commands == null) {
                 continue;
@@ -112,17 +119,20 @@ public class DispatcherCore {
         String subtype = event.getSubType();
         log.info("[{}] NoticeEvent[type:{}, subtype:{}] start match handler",
                 this.getClass().getSimpleName(), noticeType, subtype);
-        List<Handler> noticeHandlers = handlerContainer.stream().filter(handler -> handler.eventType == NoticeEvent.class).collect(Collectors.toList());
-        for (Handler handler : noticeHandlers) {
+        for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (Objects.equals(handler.noticeType, noticeType)) {
                 if (Objects.equals(noticeType, NoticeTypeEnum.notify.name())) {
                     if (Objects.equals(handler.subType, subtype)) {
+                        log.info("[DispatcherCore] NoticeEvent[notice_type:{},sub_type:{}] will be handled by Plugin[{}], Priority[{}]",
+                                noticeType, subtype, handler.plugin.getClass().getSimpleName(), handler.priority);
                         handler.execute(session, event);
                         if (handler.block) {
                             break;
                         }
                     }
                 } else {
+                    log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}], Priority[{}]",
+                            noticeType, handler.plugin.getClass().getSimpleName(), handler.priority);
                     handler.execute(session, event);
                     if (handler.block) {
                         break;
@@ -131,7 +141,6 @@ public class DispatcherCore {
             }
         }
     }
-
 
 
     static class Handler {
@@ -187,13 +196,6 @@ public class DispatcherCore {
             return result;
         }
 
-    }
-
-
-    public boolean isHandler(Method method) {
-        return method.isAnnotationPresent(MessageHandler.class)
-                || method.isAnnotationPresent(NoticeHandler.class)
-                || method.isAnnotationPresent(NotifyNoticeHandler.class);
     }
 
 

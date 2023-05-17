@@ -4,6 +4,7 @@ nonebot2, 但是jvav
 ## 介绍
 1. java(springboot)基于go-cqhttp, websocket反向连接的qq机器人;
 2. 支持被多个go-cqhttp连接;
+3. 类似于nonebot2的插件编写方式
 
 ## 架构
 Spring Boot
