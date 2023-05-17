@@ -42,7 +42,7 @@ public class Server extends TextWebSocketHandler {
     }
 
     public static void addBot(Long userId, WebSocketSession session) {
-        bots.add(new Bot(1487248817L, session));
+        bots.add(new Bot(userId, session));
     }
 
     @Override
@@ -51,34 +51,29 @@ public class Server extends TextWebSocketHandler {
     }
 
 
-
-
     @Override
     public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) throws Exception {
-        final String s = message.getPayload();
+        final String json = message.getPayload();
         try {
-            MessageResp messageResp = JSONObject.parseObject(s, MessageResp.class);
+            MessageResp messageResp = JSONObject.parseObject(json, MessageResp.class);
             Event event = Event.respToEvent(messageResp);
-
-            if (Objects.equals(event.getPostType(), EventTypeEnum.MetaEvent.name())) {
+            if (Objects.equals(event.getClass().getSimpleName(), EventTypeEnum.MetaEvent.name())) {
                 MetaEvent metaEvent = (MetaEvent) event;
-                switch (MetaTypeEnum.valueOf(metaEvent.getMetaEventType())) {
-                    case heartbeat:
-                        //心跳忽略
-                        //log.info("[{}] bot[{}] heartbeat ", this.getClass().getSimpleName(), metaEvent.getSelfId());
-                        break;
-                    case lifecycle:
-                        if (Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
-                            //刚连接成功时，gocq会发一条消息给bot
-                            addBot(event.getSelfId(), session);
-                            log.info("[{}] bot[{}] received gocq connection success message ", this.getClass().getSimpleName(), metaEvent.getSelfId());
-                        }
-                        break;
+                if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.heartbeat.name())) {
+                    //心跳忽略
+                    //log.info("[{}] bot[{}] heartbeat ", this.getClass().getSimpleName(), metaEvent.getSelfId());
+                    return;
+                } else if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.lifecycle.name())
+                            && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
+                    //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
+                    addBot(event.getSelfId(), session);
+                    log.info("[{}] bot[{}] received gocq connection success message ", this.getClass().getSimpleName(), metaEvent.getSelfId());
+                    return;
                 }
             }
             for (Bot bot : bots) {
                 if (bot.getSession() == session) {
-                    ProcessEventTask.execute(bot, event, s);
+                    ProcessEventTask.execute(bot, event, json);
                 }
             }
 

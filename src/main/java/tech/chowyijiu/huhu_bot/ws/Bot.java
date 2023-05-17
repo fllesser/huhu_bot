@@ -3,6 +3,7 @@ package tech.chowyijiu.huhu_bot.ws;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,6 +19,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 @Slf4j
 @Getter
 @RequiredArgsConstructor
+@ToString
 public class Bot {
 
     private final Long userId;

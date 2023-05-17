@@ -66,7 +66,6 @@ public class ProcessEventTask implements Runnable {
 
     }
 
-
     public static void execute(final Bot bot, final Event event, final String original) {
         threadPool.execute(new ProcessEventTask(bot, event, original));
     }
