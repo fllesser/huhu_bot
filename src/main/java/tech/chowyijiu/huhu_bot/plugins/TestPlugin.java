@@ -23,11 +23,7 @@ public class TestPlugin {
 
     @MessageHandler(name = "测试消息", commands = {"测试", "test"})
     public void test1(Bot bot, MessageEvent event) {
-        if (event instanceof PrivateMessageEvent) {
-            bot.sendPrivateMessage(event.getSender().getUserId(), "测试消息", false);
-        } else if (event instanceof GroupMessageEvent) {
-            bot.sendGroupMessage(((GroupMessageEvent) event).getGroupId(), "测试消息", false);
-        }
+        bot.sendMessage(event, "测试消息", false);
     }
 
     @MessageHandler(name = "群聊测试1", commands = {"echo"}, priority = 3)
