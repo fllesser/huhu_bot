@@ -6,7 +6,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import tech.chowyijiu.huhu_bot.constant.EventTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
@@ -68,7 +67,7 @@ public class Server extends TextWebSocketHandler {
             JSONObject jsonObject = JSONObject.parseObject(json);
             Event event = Event.jsonToEvent(jsonObject);
             if (event == null) return;
-            if (Objects.equals(event.getClass().getSimpleName(), EventTypeEnum.MetaEvent.name())) {
+            if (event instanceof MetaEvent) {
                 MetaEvent metaEvent = (MetaEvent) event;
                 if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.heartbeat.name())) {
                     //心跳忽略
@@ -85,7 +84,7 @@ public class Server extends TextWebSocketHandler {
             log.info("[Server] Accepted {}", event);
             for (Bot bot : bots) {
                 if (bot.getSession() == session) {
-                    ProcessEventTask.execute(bot, event, json);
+                    ProcessEventTask.execute(bot, event);
                 }
             }
 

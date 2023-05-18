@@ -23,7 +23,7 @@ public class GroupMember implements Serializable {
     @JSONField(name = "card_changeable")
     private boolean cardChangeable;
     @JSONField(name = "group_id")
-    private String groupId;
+    private Long groupId;
     @JSONField(name = "join_time")
     private long joinTime;
     @JSONField(name = "last_sent_time")
@@ -39,5 +39,5 @@ public class GroupMember implements Serializable {
     private int titleExpireTime;
     private boolean unfriendly;
     @JSONField(name = "user_id")
-    private String userId;
+    private Long userId;
 }

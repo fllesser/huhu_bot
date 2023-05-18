@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.entity.gocq.request;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 
 import java.util.Collection;
 
@@ -26,12 +25,5 @@ public class Params {
     @JSONField(name = "auto_escape")
     private boolean autoEscape;
 
-    public static Params privateMessageParams() {
-        return new Params().setMessageType(MessageTypeEnum.private_.getType());
-    }
-
-    public static Params groupMessageParams() {
-        return new Params().setMessageType(MessageTypeEnum.group.getType());
-    }
 
 }

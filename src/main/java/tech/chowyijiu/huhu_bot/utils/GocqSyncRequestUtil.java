@@ -9,7 +9,10 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.util.CollectionUtils;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.*;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.*;
@@ -30,19 +33,17 @@ public class GocqSyncRequestUtil {
             new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
             new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
 
-    private static final Map<String, JSONObject> resultMap = new ConcurrentHashMap<>();
+    private static final Map<String, String> resultMap = new ConcurrentHashMap<>();
 
-    public static void putEchoResult(String key, JSONObject val) {
+    public static void putEchoResult(String key, String val) {
         resultMap.put(key, val);
     }
 
 
-
     public static SelfInfo getLoginInfo(Bot bot, long timeout) {
-        JSONObject responseStr = sendSyncRequest(bot, GocqActionEnum.GET_LOGIN_INGO, null, timeout);
+        String responseStr = sendSyncRequest(bot, GocqActionEnum.GET_LOGIN_INGO, null, timeout);
         if (responseStr != null) {
-            SelfInfo data = JSONObject.parseObject(responseStr.getString("data"), SelfInfo.class);
-            return data;
+            return JSONObject.parseObject(responseStr, SelfInfo.class);
         }
         return null;
     }
@@ -57,11 +58,10 @@ public class GocqSyncRequestUtil {
     public static List<GroupMember> getGroupMemberList(Bot bot, Long groupId, List<Long> exclude, long timeout) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("group_id", groupId);
-        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.GET_GROUP_MEMBER_LIST, params, timeout);
-        if (jsonObject == null) {
+        String dataStr = sendSyncRequest(bot, GocqActionEnum.GET_GROUP_MEMBER_LIST, params, timeout);
+        if (dataStr == null) {
             return null;
         }
-        String dataStr = jsonObject.getString("data");
         if (Strings.isBlank(dataStr)) {
             return null;
         }
@@ -70,6 +70,79 @@ public class GocqSyncRequestUtil {
             data.removeIf(next -> exclude.contains(next.getUserId()));
         }
         return data;
+    }
+
+
+    /***
+     * 发送同步消息
+     * @param action 终结点
+     * @param params 参数
+     * @param timeout 超时 ms
+     * @param <T>
+     * @return
+     */
+    public static <T> String sendSyncRequest(Bot bot, GocqActionEnum action, T params, long timeout) {
+        RequestBox<T> requestBox = new RequestBox<>();
+        if (params != null) {
+            requestBox.setParams(params);
+        }
+        requestBox.setAction(action.getAction());
+        String echo = Thread.currentThread().getName() + "_" +
+                bot.getUserId() + "_" +
+                action.getAction() + "_" +
+                UUID.randomUUID().toString().replace("-","");
+        requestBox.setEcho(echo);
+        bot.sessionSend(JSONObject.toJSONString(requestBox));
+        log.info("futureTask echo: {}", echo);
+        FutureTask<String> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
+        pool.submit(futureTask);
+        try {
+            String res;
+            if (timeout <= sleep) {
+                res = futureTask.get();
+            } else {
+                res = futureTask.get(timeout, TimeUnit.MILLISECONDS);
+            }
+            //log.info("echo: {}, result: {}", echo, res);
+            return res;
+        } catch (InterruptedException e) {
+            log.error("发送同步消息线程中断异常,echo:{}", echo, e);
+        } catch (ExecutionException e) {
+            log.error("发送同步消息执行异常,echo:{}", echo, e);
+        } catch (TimeoutException e) {
+            log.error("发送同步消息超时,echo:{}", echo, e);
+        } catch (Exception e) {
+            log.error("发送同步消息异常,echo:{}", echo, e);
+        } finally {
+            futureTask.cancel(true);
+            resultMap.remove(echo);
+        }
+        return null;
+    }
+
+    private static class Task implements Callable<String> {
+        private final String echo;
+
+        Task(String echo) {
+            if (Strings.isBlank(echo)) {
+                throw new IllegalArgumentException("echo is blank");
+            }
+            this.echo = echo;
+        }
+
+        @Override
+        public String call() throws Exception {
+            String res = null;
+            while (!Thread.currentThread().isInterrupted()) {
+                res = resultMap.get(echo);
+                if (res != null) {
+                    break;
+                } else {
+                    Thread.sleep(GocqSyncRequestUtil.sleep);
+                }
+            }
+            return res;
+        }
     }
 
     /**
@@ -85,9 +158,9 @@ public class GocqSyncRequestUtil {
         param.put("user_id", userId);
         param.put("file", filePath);
         param.put("name", fileName);
-        JSONObject responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
+        String responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
         if (responseStr != null) {
-            SyncResponse response = JSONObject.parseObject(responseStr.toJSONString(), SyncResponse.class);
+            SyncResponse response = JSONObject.parseObject(responseStr, SyncResponse.class);
             return response;
         }
         return null;
@@ -119,83 +192,10 @@ public class GocqSyncRequestUtil {
             param.put("headers", JSONObject.toJSONString(headStrs));
 
         }
-        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
-        if (jsonObject != null) {
-            return jsonObject.getObject("data", DownloadFileResp.class);
+        String jsonStr = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
+        if (jsonStr != null) {
+            return JSONObject.parseObject(jsonStr, DownloadFileResp.class);
         }
         return null;
-    }
-
-
-    /***
-     * 发送同步消息
-     * @param action 终结点
-     * @param params 参数
-     * @param timeout 超时 ms
-     * @param <T>
-     * @return
-     */
-    public static <T> JSONObject sendSyncRequest(Bot bot, GocqActionEnum action, T params, long timeout) {
-        RequestBox<T> requestBox = new RequestBox<>();
-        if (params != null) {
-            requestBox.setParams(params);
-        }
-        requestBox.setAction(action.getAction());
-        String echo = Thread.currentThread().getName() + "_" +
-                bot.getUserId() + "_" +
-                action.getAction() + "_" +
-                UUID.randomUUID().toString().replace("-","");
-        requestBox.setEcho(echo);
-        //bot.sendMessage(JSONObject.toJSONString(requestBox));
-        log.info("echo: {}", echo);
-        FutureTask<JSONObject> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
-        pool.submit(futureTask);
-        try {
-            JSONObject res;
-            if (timeout <= sleep) {
-                res = futureTask.get();
-            } else {
-                res = futureTask.get(timeout, TimeUnit.MILLISECONDS);
-            }
-            log.info("echo: {},result: {}", echo, res);
-            return res;
-        } catch (InterruptedException e) {
-            log.error("发送同步消息线程中断异常,echo:{}", echo, e);
-        } catch (ExecutionException e) {
-            log.error("发送同步消息执行异常,echo:{}", echo, e);
-        } catch (TimeoutException e) {
-            log.error("发送同步消息超时,echo:{}", echo, e);
-        } catch (Exception e) {
-            log.error("发送同步消息异常,echo:{}", echo, e);
-        } finally {
-            futureTask.cancel(true);
-            resultMap.remove(echo);
-        }
-        return null;
-    }
-
-    private static class Task implements Callable<JSONObject> {
-        private String echo;
-
-        Task(String echo) {
-            if (Strings.isBlank(echo)) {
-                throw new IllegalArgumentException("echo is blank");
-            }
-            this.echo = echo;
-        }
-
-        @Override
-        public JSONObject call() throws Exception {
-            JSONObject res = null;
-            while (!Thread.currentThread().isInterrupted()) {
-                res = resultMap.get(echo);
-                if (res != null) {
-                    break;
-                } else {
-                    Thread.sleep(GocqSyncRequestUtil.sleep);
-                }
-            }
-            return res;
-        }
     }
 }

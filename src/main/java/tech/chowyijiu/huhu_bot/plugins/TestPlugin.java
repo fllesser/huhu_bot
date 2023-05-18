@@ -1,10 +1,10 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
-import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
-import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
+import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
+import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
@@ -12,12 +12,14 @@ import tech.chowyijiu.huhu_bot.event.notice.GroupRecallNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
+import java.util.List;
+
 /**
  * @author elastic chow
  * @date 14/5/2023
  */
 @Slf4j
-@BotPlugin(name = "测试插件")
+//@BotPlugin(name = "测试插件")
 public class TestPlugin {
 
     @MessageHandler(name = "测试消息", commands = {"测试", "test"})
@@ -62,5 +64,16 @@ public class TestPlugin {
         if (SubTypeEnum.title.name().equals(event.getSubType())) {
             //bot.sendMessage(event, "群头衔变更", true);
         }
+    }
+
+    @MessageHandler(name = "获取群成员列表", commands = {"获取群成员列表"})
+    public void testGetGroupMemberList(Bot bot, GroupMessageEvent event) {
+        List<GroupMember> groupMembers = bot.getGroupMembers(event.getGroupId(), true);
+    }
+
+
+    @MessageHandler(name = "测试call get api", commands = {"callGetApi"})
+    public void testCallGetApi(Bot bot, MessageEvent event) {
+
     }
 }

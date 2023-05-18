@@ -43,7 +43,7 @@ public class Client {
             req.setAction(action.getAction()).setParams(params);
             String json = JSONObject.toJSONString(req);
             Client.INSTANCE.session.getAsyncRemote().sendText(json);
-            log.info("send message successfully, message: " + json);
+            log.info("sendMessage message successfully, message: " + json);
         }
     }
 

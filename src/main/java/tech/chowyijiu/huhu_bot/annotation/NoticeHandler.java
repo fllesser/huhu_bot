@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.annotation.notice;
+package tech.chowyijiu.huhu_bot.annotation;
 
 import java.lang.annotation.*;
 
