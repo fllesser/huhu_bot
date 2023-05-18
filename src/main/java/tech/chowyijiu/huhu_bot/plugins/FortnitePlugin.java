@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
@@ -14,7 +15,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
     private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");

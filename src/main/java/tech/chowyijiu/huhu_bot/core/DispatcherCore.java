@@ -129,7 +129,7 @@ public class DispatcherCore {
         private final Method method;
 
         public Class<?> eventType; //用于isAssignableFrom 匹配事件类型
-        public String name; //Handler注解里的name
+        public String name;         //Handler注解里的name
         public int priority;
         public boolean block;
 

@@ -65,4 +65,43 @@ public class TestPlugin {
 
 ```
 
+```Java
+@Slf4j
+@BotPlugin("群组骚操作")
+public class GroupCoquettishOperationPlugin {
+
+    @Scheduled(cron = "0 * * * * *  ")
+    public void dateCard() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 10:00", formatter);
+        Duration duration = Duration.between(LocalDateTime.now(), shitTime);
+        String card = "距离答辩还有 " + duration.toMinutes() + " 分钟";
+        Server.getBots().forEach(bot -> {
+            bot.getGroupList(true).stream().map(GroupInfo::getGroupId).forEach(groupId -> {
+                bot.callApi(GocqActionEnum.SET_GROUP_CARD,
+                        "group_id", groupId, "user_id", bot.getUserId(), "card", card);
+            });
+        });
+    }
+
+    @MessageHandler(name = "头衔自助", commands = {"sgst"})
+    public void sgst(Bot bot, GroupMessageEvent event) {
+        //先判断bot是不是群主
+        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), bot.getUserId(), true);
+        if (!"owner".equals(groupMember.getRole())) {
+            log.info("{} {} 机器人不是群主, 忽略", this.getClass().getSimpleName(), "头衔自助");
+            return;
+        }
+        String title = event.getMessage().replace(" ", "").replace("sgst", "");
+        if (title.length() > 6) {
+            bot.sendGroupMessage(event.getGroupId(), "群头衔最多为6位", true);
+            return;
+        }
+        bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
+                "group_id", event.getGroupId(), "user_id", event.getUserId(),
+                "special_title", title);
+    }
+}
+```
+
 参考 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)
