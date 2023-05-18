@@ -3,11 +3,8 @@ package tech.chowyijiu.huhu_bot.ws;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
-import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
-import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.WsResp;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -57,21 +54,21 @@ public class Client {
 
     @OnMessage
     public void onMessage(String json) {
-        log.info("accepted message, message: {}", json);
-        try {
-            WsResp message = JSONObject.parseObject(json, WsResp.class);
-            //if ("message".equals(message.getPostType())) {
-            //    sendMessage(new Params().setMessage(message.getMessage()).setUserId(message.getUserId()));
-            //}
-            log.info("json -> object: {}", message);
-            if(PostTypeEnum.meta_event.toString().equals(message.getPostType()) && MetaTypeEnum.heartbeat.toString().equals(message.getMetaEventType())){
-                // 心跳包过滤
-                return;
-            }
-            //ThreadPoolUtil.getEventThreadPool().execute(new OnEventTask(message));
-        } catch (Exception ignored) {
-
-        }
+        //log.info("accepted message, message: {}", json);
+        //try {
+        //    WsResp message = JSONObject.parseObject(json, WsResp.class);
+        //    //if ("message".equals(message.getPostType())) {
+        //    //    sendMessage(new Params().setMessage(message.getMessage()).setUserId(message.getUserId()));
+        //    //}
+        //    log.info("json -> object: {}", message);
+        //    if(PostTypeEnum.meta_event.toString().equals(message.getPostType()) && MetaTypeEnum.heartbeat.toString().equals(message.getMetaEventType())){
+        //        // 心跳包过滤
+        //        return;
+        //    }
+        //    //ThreadPoolUtil.getEventThreadPool().execute(new OnEventTask(message));
+        //} catch (Exception ignored) {
+        //
+        //}
 
     }
 

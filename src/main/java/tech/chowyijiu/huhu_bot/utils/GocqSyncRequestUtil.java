@@ -36,21 +36,6 @@ public class GocqSyncRequestUtil {
         resultMap.put(key, val);
     }
 
-    /**
-     * 获取消息详情对象
-     * @param messageId
-     * @param timeout
-     * @return
-     */
-    public static WsResp getMsg(Bot bot, String messageId, long timeout) {
-        Map<String, Object> map = new HashMap<>(1);
-        map.put("message_id", messageId);
-        JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.GET_MSG, map, timeout);
-        if (jsonObject != null) {
-            return JSONObject.parseObject(jsonObject.getString("data"), WsResp.class);
-        }
-        return null;
-    }
 
 
     public static SelfInfo getLoginInfo(Bot bot, long timeout) {

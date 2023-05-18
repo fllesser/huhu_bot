@@ -46,19 +46,20 @@ public class TestPlugin {
         bot.sendPrivateMessage(event.getUserId(), "测试私聊", true);
     }
 
-    @NoticeHandler(name = "群聊撤回1", type = NoticeTypeEnum.group_recall, priority = 2)
-    public void test5(Bot bot, NoticeEvent event) {
-        log.info("群聊撤回1 event: {}", event);
+    @NoticeHandler(name = "群聊撤回1", priority = 2)
+    public void test5(Bot bot, GroupRecallNoticeEvent event) {
+        bot.sendMessage(event, "群聊撤回1 优先级2", true);
+    }
+    @NoticeHandler(name = "群聊撤回2", priority = 1)
+    public void test8(Bot bot, GroupRecallNoticeEvent event) {
+        bot.sendMessage(event, "群聊撤回2 优先级1", true);
     }
 
-    @NoticeHandler(name = "群聊撤回2", type = NoticeTypeEnum.group_recall, priority = 1)
-    public void test8(Bot bot, NoticeEvent event) {
-        log.info("群聊撤回2 event: {}", event);
-    }
-
-    @NotifyNoticeHandler(name = "群昵称变更", subType = SubTypeEnum.title)
-    public void test6(Bot bot, NoticeEvent event) {
-        log.info("群昵称变更 event: {}", event);
+    @NoticeHandler(name = "群头衔变更")
+    public void test6(Bot bot, NotifyNoticeEvent event) {
+        if (SubTypeEnum.title.name().equals(event.getSubType())) {
+            bot.sendMessage(event, "群头衔变更", true);
+        }
     }
 }
 

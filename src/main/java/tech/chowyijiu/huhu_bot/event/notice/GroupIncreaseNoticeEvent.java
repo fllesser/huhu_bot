@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.gocq.event.notice;
+package tech.chowyijiu.huhu_bot.event.notice;
 
 import lombok.Getter;
 import lombok.Setter;

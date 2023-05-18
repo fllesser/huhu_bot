@@ -9,7 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
+import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 
@@ -67,11 +67,14 @@ public class Bot {
     }
 
     public void sendMessage(Event event, String message, boolean autoEscape) {
-        if (event.getGroupId() != null) {
-            sendGroupMessage(event.getGroupId(), message, autoEscape);
+        JSONObject jsonObject = event.getJsonObject();
+        Long groupId = jsonObject.getLong("group_id");
+        if (groupId != null) {
+            sendGroupMessage(groupId, message, autoEscape);
         } else {
-            if (event.getUserId() != null) {
-                sendPrivateMessage(event.getUserId(), message, autoEscape);
+            Long userId = jsonObject.getLong("user_id");
+            if (userId != null) {
+                sendPrivateMessage(userId, message, autoEscape);
             }
         }
     }

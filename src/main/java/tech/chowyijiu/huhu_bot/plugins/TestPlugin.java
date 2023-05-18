@@ -5,11 +5,11 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.message.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.GroupRecallNoticeEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.NotifyNoticeEvent;
+import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhu_bot.event.notice.GroupRecallNoticeEvent;
+import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 /**
@@ -47,17 +47,20 @@ public class TestPlugin {
 
     @NoticeHandler(name = "群聊撤回1", priority = 2)
     public void test5(Bot bot, GroupRecallNoticeEvent event) {
-        bot.sendMessage(event, "群聊撤回1 优先级2", true);
+        //bot.sendMessage(event, "群聊撤回1 优先级2", true);
+        log.info("群聊撤回1, 优先级2");
     }
+
     @NoticeHandler(name = "群聊撤回2", priority = 1)
     public void test8(Bot bot, GroupRecallNoticeEvent event) {
-        bot.sendMessage(event, "群聊撤回2 优先级1", true);
+        //bot.sendMessage(event, "群聊撤回2 优先级1", true);
+        log.info("群聊撤回2, 优先级1");
     }
 
     @NoticeHandler(name = "群头衔变更")
     public void test6(Bot bot, NotifyNoticeEvent event) {
         if (SubTypeEnum.title.name().equals(event.getSubType())) {
-            bot.sendMessage(event, "群头衔变更", true);
+            //bot.sendMessage(event, "群头衔变更", true);
         }
     }
 }

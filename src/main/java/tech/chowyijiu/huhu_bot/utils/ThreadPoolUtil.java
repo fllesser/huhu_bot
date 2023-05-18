@@ -18,14 +18,18 @@ public class ThreadPoolUtil {
     private ThreadPoolUtil() {
     }
 
-    private final static ThreadPoolExecutor executor =
-            new ProcessEventThreadPoolExecutor(5, 10, 1, TimeUnit.HOURS,
-                    new ArrayBlockingQueue<>(20),
-                    new CustomizableThreadFactory("pool-process-event"),
-                    new ShareRunsPolicy("pool-process-event"));
+    private final static ThreadPoolExecutor executor;
 
     static {
-        resetThreadPoolSize();
+        int corePoolSize = Runtime.getRuntime().availableProcessors() + 1;
+        assert corePoolSize > 0;
+        executor = new ProcessEventThreadPoolExecutor(corePoolSize, corePoolSize * 2,
+                1, TimeUnit.HOURS,
+                new ArrayBlockingQueue<>(corePoolSize * 4),
+                new CustomizableThreadFactory("pool-process-event"),
+                new ShareRunsPolicy("pool-process-event"));
+        log.info("根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]",
+                corePoolSize - 1, executor.getCorePoolSize(), executor.getMaximumPoolSize());
     }
 
     public static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {
@@ -36,20 +40,10 @@ public class ThreadPoolUtil {
 
         @Override
         public void execute(Runnable task) {
-            log.info("The thread pool has accepted a {}", task.getClass().getSimpleName());
+            log.info("[ThreadPool] Accepted a {}", task.getClass().getSimpleName());
             super.execute(task);
         }
 
-    }
-
-    public static void resetThreadPoolSize() {
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        if (availableProcessors > 0) {
-            executor.setCorePoolSize(availableProcessors * 2);
-            executor.setMaximumPoolSize(availableProcessors * 4);
-            log.info("根据CPU线程数:{}, 重置事件处理线程池容量完成 corePoolSize:[{}], maximumPoolSize:[{}]",
-                    availableProcessors, executor.getCorePoolSize(), executor.getMaximumPoolSize());
-        }
     }
 
     public static ThreadPoolExecutor getExecutor() {

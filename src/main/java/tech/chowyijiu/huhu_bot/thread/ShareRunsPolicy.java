@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhu_bot.thread;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.RejectedExecutionHandler;
@@ -18,6 +19,7 @@ public class ShareRunsPolicy implements RejectedExecutionHandler {
 
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
         if (!executor.isShutdown()) {
             //ThreadPoolUtil.getSharePool().execute(r);
             //log.info("线程池：{} 执行拒绝策略，本次任务由公共线程池执行, executor: {},",poolName, executor);

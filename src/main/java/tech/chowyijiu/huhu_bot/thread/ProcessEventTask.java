@@ -2,9 +2,9 @@ package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.message.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.event.Event;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;

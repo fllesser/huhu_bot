@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.message.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.event.Event;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.annotation.PostConstruct;
@@ -128,7 +128,7 @@ public class DispatcherCore {
         private final Object plugin;
         private final Method method;
 
-        public Class<?> eventType = Event.class; //用于isAssignableFrom 匹配事件类型
+        public Class<?> eventType; //用于isAssignableFrom 匹配事件类型
         public String name; //Handler注解里的name
         public int priority;
         public boolean block;
@@ -165,14 +165,12 @@ public class DispatcherCore {
             return handler;
         }
 
-        public Object execute(Object... args) {
-            Object result = null;
+        public void execute(Object... args) {
             try {
-                result = method.invoke(plugin, args);
+                method.invoke(plugin, args);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-            return result;
         }
     }
 
