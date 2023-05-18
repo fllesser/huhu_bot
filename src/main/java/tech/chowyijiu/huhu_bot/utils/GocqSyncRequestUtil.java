@@ -42,12 +42,12 @@ public class GocqSyncRequestUtil {
      * @param timeout
      * @return
      */
-    public static MessageResp getMsg(Bot bot, String messageId, long timeout) {
+    public static WsResp getMsg(Bot bot, String messageId, long timeout) {
         Map<String, Object> map = new HashMap<>(1);
         map.put("message_id", messageId);
         JSONObject jsonObject = sendSyncRequest(bot, GocqActionEnum.GET_MSG, map, timeout);
         if (jsonObject != null) {
-            return JSONObject.parseObject(jsonObject.getString("data"), MessageResp.class);
+            return JSONObject.parseObject(jsonObject.getString("data"), WsResp.class);
         }
         return null;
     }

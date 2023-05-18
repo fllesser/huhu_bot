@@ -1,11 +1,10 @@
 package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhu_bot.constant.EventTypeEnum;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
@@ -40,18 +39,11 @@ public class ProcessEventTask implements Runnable {
     @Override
     public void run() {
         try {
-            EventTypeEnum eventTypeEnum = EventTypeEnum.valueOf(event.getClass().getSimpleName());
             //log.info("[{}] {} will be preProcessed", this.getClass().getSimpleName(), eventTypeEnum);
-            switch (eventTypeEnum) {
-                case GroupMessageEvent:
-                case PrivateMessageEvent:
-                    //todo 命令传参数 args
-                    DISPATCHER_CORE.matchMessageHandler(bot, ((MessageEvent) event));
-                    break;
-                case NoticeEvent:
-                    DISPATCHER_CORE.matchNoticeHandler(bot, ((NoticeEvent) event));
-                default:
-                    break;
+            if (event instanceof MessageEvent) {
+                DISPATCHER_CORE.matchMessageHandler(bot, ((MessageEvent) event));
+            } else if (event instanceof NoticeEvent) {
+                DISPATCHER_CORE.matchNoticeHandler(bot, ((NoticeEvent) event));
             }
         } catch (Exception e) {
             log.error("[{}] Exception occurred in preprocessing event, Exception:", this.getClass().getSimpleName(), e);

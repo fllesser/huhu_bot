@@ -7,11 +7,9 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.message.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.notice.NoticeHandler;
-import tech.chowyijiu.huhu_bot.annotation.notice.NotifyNoticeHandler;
-import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.NoticeEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.annotation.PostConstruct;
@@ -54,10 +52,6 @@ public class DispatcherCore {
                         messageHandlers.add(handler);
                     } else if (method.isAnnotationPresent(NoticeHandler.class)) {
                         Handler handler = Handler.buildNoticeHandler(plugin, method);
-                        handlerNames.add(handler.name);
-                        noticeHandlers.add(handler);
-                    } else if (method.isAnnotationPresent(NotifyNoticeHandler.class)) {
-                        Handler handler = Handler.buildNotifyNoticeHandler(plugin, method);
                         handlerNames.add(handler.name);
                         noticeHandlers.add(handler);
                     }
@@ -113,52 +107,34 @@ public class DispatcherCore {
 
     public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
         String noticeType = event.getNoticeType();
-        String subtype = event.getSubType();
-        log.info("[{}] NoticeEvent[type:{}, subtype:{}] start match handler",
-                this.getClass().getSimpleName(), noticeType, subtype);
+        log.info("[{}] NoticeEvent[type:{}] start match handler",
+                this.getClass().getSimpleName(), noticeType);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            if (Objects.equals(handler.noticeType, noticeType)) {
-                if (Objects.equals(noticeType, NoticeTypeEnum.notify.name())) {
-                    if (Objects.equals(handler.subType, subtype)) {
-                        log.info("[DispatcherCore] NoticeEvent[notice_type:{},sub_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
-                                noticeType, subtype, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
-                        handler.execute(bot, event);
-                        if (handler.block) {
-                            break;
-                        }
-                    }
-                } else {
-                    log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
-                            noticeType, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
-                    handler.execute(bot, event);
-                    if (handler.block) {
-                        break;
-                    }
+            if (handler.eventType.isAssignableFrom(event.getClass())) {
+                log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
+                        noticeType, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
+                handler.execute(bot, event);
+                if (handler.block) {
+                    break;
                 }
             }
         }
+        log.info("[{}] NoticeEvent[type:{}] match handler end",
+                this.getClass().getSimpleName(), noticeType);
     }
-
 
 
     static class Handler {
         private final Object plugin;
         private final Method method;
 
-        //用于 isAssignableFrom 匹配事件类型
-        public Class<?> eventType = Event.class;
-        public String name;
+        public Class<?> eventType = Event.class; //用于isAssignableFrom 匹配事件类型
+        public String name; //Handler注解里的name
         public int priority;
         public boolean block;
 
         //MessageHandler
         public String[] commands;
-
-        //NoticeHandler
-        public String noticeType;
-
-        //NotifyNoticeHandler
-        public String subType;
 
         private Handler(Object plugin, Method method) {
             this.plugin = plugin;
@@ -186,16 +162,6 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
-            handler.noticeType = nh.type().name();
-            return handler;
-        }
-
-        public static Handler buildNotifyNoticeHandler(Object plugin, Method method) {
-            Handler handler = new Handler(plugin, method);
-            NotifyNoticeHandler nnh = method.getAnnotation(NotifyNoticeHandler.class);
-            handler.name = nnh.name();
-            handler.priority = nnh.priority();
-            handler.subType = nnh.subType().name();
             return handler;
         }
 

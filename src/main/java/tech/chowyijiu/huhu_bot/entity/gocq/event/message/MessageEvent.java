@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.gocq.event;
+package tech.chowyijiu.huhu_bot.entity.gocq.event.message;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.WsResp;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Sender;
 
 import java.util.Objects;
@@ -18,9 +19,9 @@ import java.util.Objects;
 
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString
 @NoArgsConstructor
-public class MessageEvent extends Event {
+public abstract class MessageEvent extends Event {
 
     private final String postType = PostTypeEnum.message.name();
 
@@ -35,11 +36,11 @@ public class MessageEvent extends Event {
     private Sender sender;
 
 
-    public static MessageEvent respToEvent(MessageResp messageResp) {
-        if (Objects.equals(messageResp.getMessageType(), MessageTypeEnum.private_.getType())) {
-            return new PrivateMessageEvent(messageResp);
-        } else if (Objects.equals(messageResp.getMessageType(), MessageTypeEnum.group.getType())) {
-            return new GroupMessageEvent(messageResp);
+    public static MessageEvent respToEvent(WsResp wsResp) {
+        if (Objects.equals(wsResp.getMessageType(), MessageTypeEnum.private_.getType())) {
+            return new PrivateMessageEvent(wsResp);
+        } else if (Objects.equals(wsResp.getMessageType(), MessageTypeEnum.group.getType())) {
+            return new GroupMessageEvent(wsResp);
         }
         return null;
     }

@@ -13,6 +13,8 @@ public enum PostTypeEnum {
     // 事件
     meta_event,
     // bot通知
-    notice
+    notice,
+    // 请求上报
+    request
 
 }

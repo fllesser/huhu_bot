@@ -11,7 +11,7 @@ import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.event.MetaEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.WsResp;
 import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
 
 import java.util.ArrayList;
@@ -66,8 +66,8 @@ public class Server extends TextWebSocketHandler {
     public void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
         final String json = message.getPayload();
         try {
-            MessageResp messageResp = JSONObject.parseObject(json, MessageResp.class);
-            Event event = Event.respToEvent(messageResp);
+            WsResp wsResp = JSONObject.parseObject(json, WsResp.class);
+            Event event = Event.respToEvent(wsResp);
             if (event == null) return;
             if (Objects.equals(event.getClass().getSimpleName(), EventTypeEnum.MetaEvent.name())) {
                 MetaEvent metaEvent = (MetaEvent) event;
@@ -83,9 +83,7 @@ public class Server extends TextWebSocketHandler {
                     return;
                 }
             }
-            //log.info("json: {}", json);
-            //log.info("messageResp: {}", messageResp);
-            //log.info("event: {}", event);
+            log.info("[Server] Accepted {}", event);
             for (Bot bot : bots) {
                 if (bot.getSession() == session) {
                     ProcessEventTask.execute(bot, event, json);

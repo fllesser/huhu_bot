@@ -9,9 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.GroupMessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.MessageEvent;
-import tech.chowyijiu.huhu_bot.entity.gocq.event.PrivateMessageEvent;
+import tech.chowyijiu.huhu_bot.entity.gocq.event.Event;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 
@@ -30,6 +28,7 @@ public class Bot {
 
     /**
      * 发送群消息
+     *
      * @param groupId    群号
      * @param message    消息
      * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
@@ -50,6 +49,7 @@ public class Bot {
 
     /**
      * 发送私聊消息
+     *
      * @param userId     对方qq
      * @param message    消息
      * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
@@ -66,11 +66,13 @@ public class Bot {
         sendMessage(JSONObject.toJSONString(paramsRequestBox));
     }
 
-    public void sendMessage(MessageEvent event, String message, boolean autoEscape) {
-        if (event instanceof PrivateMessageEvent) {
-            sendPrivateMessage(event.getUserId(), message, autoEscape);
-        } else if (event instanceof GroupMessageEvent) {
-            sendGroupMessage(((GroupMessageEvent) event).getGroupId(), message, autoEscape);
+    public void sendMessage(Event event, String message, boolean autoEscape) {
+        if (event.getGroupId() != null) {
+            sendGroupMessage(event.getGroupId(), message, autoEscape);
+        } else {
+            if (event.getUserId() != null) {
+                sendPrivateMessage(event.getUserId(), message, autoEscape);
+            }
         }
     }
 

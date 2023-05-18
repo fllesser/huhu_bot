@@ -30,7 +30,7 @@ public class MessageSegment {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("[CQ:").append(type.getType());
+            sb.append("[CQ:").append(type.name());
             params.keySet().forEach(key -> sb.append(",").append(key).append("=").append(params.get(key)));
             sb.append("]");
             return sb.toString();

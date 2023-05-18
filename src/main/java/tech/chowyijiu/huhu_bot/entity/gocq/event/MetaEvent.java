@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.BeanUtils;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
+import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.WsResp;
 
 /**
  * @author elastic chow
@@ -13,16 +14,17 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString
 @NoArgsConstructor
 public class MetaEvent extends Event {
 
+    private final String postType = PostTypeEnum.meta_event.name();
     private String metaEventType;
     private String subType;
 
-    public static MetaEvent respToEvent(MessageResp messageResp) {
+    public static MetaEvent respToEvent(WsResp wsResp) {
         MetaEvent metaEvent = new MetaEvent();
-        BeanUtils.copyProperties(messageResp, metaEvent);
+        BeanUtils.copyProperties(wsResp, metaEvent);
         return metaEvent;
     }
 }

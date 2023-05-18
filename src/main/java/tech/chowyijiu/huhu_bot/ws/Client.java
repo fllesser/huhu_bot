@@ -7,7 +7,7 @@ import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.Params;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.MessageResp;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.WsResp;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class Client {
     public void onMessage(String json) {
         log.info("accepted message, message: {}", json);
         try {
-            MessageResp message = JSONObject.parseObject(json, MessageResp.class);
+            WsResp message = JSONObject.parseObject(json, WsResp.class);
             //if ("message".equals(message.getPostType())) {
             //    sendMessage(new Params().setMessage(message.getMessage()).setUserId(message.getUserId()));
             //}

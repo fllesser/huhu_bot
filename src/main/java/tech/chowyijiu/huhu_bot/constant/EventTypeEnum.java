@@ -7,10 +7,22 @@ package tech.chowyijiu.huhu_bot.constant;
 public enum EventTypeEnum {
 
     Event,
+    MetaEvent,
     MessageEvent,
+    NoticeEvent,
+
     GroupMessageEvent,
     PrivateMessageEvent,
-    NoticeEvent,
-    MetaEvent
+
+    FriendAddNoticeEvent,
+    FriendRecallNoticeEvent,
+    GroupAdminNoticeEvent,
+    GroupBanNoticeEvent,
+    GroupCardNoticeEvent,
+    GroupDecreaseNoticeEvent,
+    GroupIncreaseNoticeEvent,
+    GroupRecallNoticeEvent,
+    GroupUploadNoticeEvent,
+    NotifyNoticeEvent
 
 }

@@ -1,7 +1,5 @@
 package tech.chowyijiu.huhu_bot.annotation.notice;
 
-import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
-
 import java.lang.annotation.*;
 
 /**
@@ -14,7 +12,7 @@ import java.lang.annotation.*;
 public @interface NoticeHandler {
 
     String name() default "";
-    NoticeTypeEnum type();
-    int priority() default 0; //默认按方法定义顺序匹配 0~9, 值越小, 优先级越高
+    //NoticeTypeEnum type();    //取消支持
+    int priority() default 0;   //默认按方法定义顺序匹配 0~9, 值越小, 优先级越高
 
 }

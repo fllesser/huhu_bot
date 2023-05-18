@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Data
 @ToString
-public class MessageResp implements Serializable {
+public class WsResp implements Serializable {
 
     @JSONField(name = "post_type")
     private String postType;
@@ -24,7 +24,7 @@ public class MessageResp implements Serializable {
     private String noticeType;
     // 操作人id 比如群管理员a踢了一个人,那么该值为a的qq号
     @JSONField(name = "operator_id")
-    private String operatorId;
+    private Long operatorId;
     private Long time;
     @JSONField(name = "self_id")
     private Long selfId;
@@ -48,4 +48,9 @@ public class MessageResp implements Serializable {
     @JSONField(name = "message_seq")
     private Integer messageSeq;
     private String anonymous;
+    private Long duration; //禁言时长
+    @JSONField(name = "card_new")
+    private String cardNew;
+    @JSONField(name = "cardOld")
+    private String cardOld;
 }
