@@ -10,7 +10,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
  * @author elastic chow
  * @date 14/5/2023
  */
-@EnableWebSocket
+@EnableWebSocket //开启websocket
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer {
 

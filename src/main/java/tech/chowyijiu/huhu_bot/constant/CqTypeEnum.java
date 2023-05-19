@@ -5,6 +5,8 @@ package tech.chowyijiu.huhu_bot.constant;
  * @date 14/5/2023
  */
 public enum CqTypeEnum {
+    text,
+
     image,
     reply,
     poke,
@@ -22,6 +24,6 @@ public enum CqTypeEnum {
     shake,
     contact,
     location,
-    anonymous
+    anonymous;
 
 }

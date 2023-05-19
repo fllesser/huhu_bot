@@ -37,6 +37,10 @@ public class Bot {
         this.session = session;
     }
 
+    public void update() {
+        groups = this.getGroupList();
+    }
+
     /**
      * 私有 callApi
      */
@@ -121,12 +125,8 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = callGetApi(GocqActionEnum.GET_GROUP_LIST, "no_cache", noCache);
-        List<GroupInfo> groupInfos = JSONArray.parseArray(data, GroupInfo.class);
-        if (this.groups == null) {
-            this.groups = groupInfos;
-        }
-        return groupInfos;
+        String data = this.callGetApi(GocqActionEnum.GET_GROUP_LIST, "no_cache", noCache);
+        return JSONArray.parseArray(data, GroupInfo.class);
     }
 
     /**
@@ -134,7 +134,10 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList() {
-        return this.getGroupList(true);
+        //todo 想想再哪里更新groups最好, 目前感觉最好是 入群/退群更新,
+        // 或者GroupMessageEvent进来,看看groups里有没有这个groupId
+        groups = this.getGroupList(true);
+        return groups;
     }
 
     /**

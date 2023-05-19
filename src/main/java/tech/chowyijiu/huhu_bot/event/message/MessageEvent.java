@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Sender;
 import tech.chowyijiu.huhu_bot.event.Event;
 
@@ -26,6 +25,7 @@ import java.util.Objects;
 public class MessageEvent extends Event {
 
     private final String postType = PostTypeEnum.message.name();
+    private Message msg;
 
     private String subType;
     private Long userId;
@@ -39,17 +39,18 @@ public class MessageEvent extends Event {
 
     public static MessageEvent jsonToMessageEvent(JSONObject jsonObject) {
         String messageType = jsonObject.getString("message_type");
+        MessageEvent event;
         if (Objects.equals(messageType, MessageTypeEnum.private_.getType())) {
-            return jsonObject.toJavaObject(PrivateMessageEvent.class);
+            event = jsonObject.toJavaObject(PrivateMessageEvent.class);
+            event.msg = Message.toMessage(event.message);
         } else {
-            GroupMessageEvent event = jsonObject.toJavaObject(GroupMessageEvent.class);
-            MessageSegment.CqCode cqCode = MessageSegment.toCqCode(event.getMessage());
-            if (cqCode != null && Objects.equals(cqCode.getType(), CqTypeEnum.at)
-                    && Objects.equals(cqCode.getParams().get("qq"), event.getSelfId().toString())) {
-                event.setToMe(true);
+            event = jsonObject.toJavaObject(GroupMessageEvent.class);
+            event.msg = Message.toMessage(event.message);
+            if (event.msg.isToMe(event.getSelfId())) {
+                ((GroupMessageEvent) event).setToMe(true);
             }
-            return event;
         }
+        return event;
     }
 
 }

@@ -9,7 +9,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.event.MetaEvent;
+import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
 
 import java.util.ArrayList;

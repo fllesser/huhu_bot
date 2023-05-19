@@ -3,9 +3,9 @@ package tech.chowyijiu.huhu_bot.thread;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
-import tech.chowyijiu.huhu_bot.event.EchoEvent;
+import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.event.RequestEvent;
+import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
@@ -43,9 +43,9 @@ public class ProcessEventTask implements Runnable {
         try {
             //log.info(" {} will be preProcessed", eventTypeEnum);
             if (event instanceof MessageEvent) {
-                DISPATCHER_CORE.matchMessageHandler(bot, ((MessageEvent) event));
+                DISPATCHER_CORE.matchMessageHandler(bot, (MessageEvent) this.event);
             } else if (event instanceof NoticeEvent) {
-                DISPATCHER_CORE.matchNoticeHandler(bot, ((NoticeEvent) event));
+                DISPATCHER_CORE.matchNoticeHandler(bot, ((NoticeEvent) this.event));
             } else if (event instanceof RequestEvent) {
                 log.info("[RequestEvent] {}", event);
             } else if (event instanceof EchoEvent) {

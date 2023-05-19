@@ -35,7 +35,9 @@ public class DispatcherCore {
 
     @PostConstruct
     private void loadPlugin() {
+        //获取所有插件Bean
         Map<String, Object> botPluginMap = ioc.getBeansWithAnnotation(BotPlugin.class);
+        //创建两个临时存储的List
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
@@ -56,7 +58,7 @@ public class DispatcherCore {
                         noticeHandlers.add(handler);
                     }
                 });
-                log.info("[DispatcherCore] Load plugin [{}], progress[{}/{}], function set: {}",
+                log.info("Load plugin [{}], progress[{}/{}], function set: {}",
                         pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()));
             }
         }
@@ -124,7 +126,7 @@ public class DispatcherCore {
         private final Object plugin;
         private final Method method;
 
-        public Class<?> eventType; //用于isAssignableFrom 匹配事件类型
+        public Class<?> eventType;  //用于isAssignableFrom 匹配事件类型
         public String name;         //Handler注解里的name
         public int priority;
         public boolean block;

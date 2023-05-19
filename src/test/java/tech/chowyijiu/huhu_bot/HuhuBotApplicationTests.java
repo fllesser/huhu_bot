@@ -3,7 +3,9 @@ package tech.chowyijiu.huhu_bot;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegmentOld;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +23,7 @@ class HuhuBotApplicationTests {
         String groupMessageJson = "{\"post_type\":\"message\",\"message_type\":\"group\",\"time\":1684228450,\"self_id\":1487248817,\"sub_type\":\"normal\",\"anonymous\":null,\"font\":0,\"message_seq\":6181,\"raw_message\":\"群消息\",\"sender\":{\"age\":0,\"area\":\"\",\"card\":\"ID：Jarid Harris\",\"level\":\"\",\"nickname\":\"Oswald Kan Mon May 15 2023 CST\",\"role\":\"owner\",\"sex\":\"unknown\",\"title\":\"\",\"user_id\":1942422015},\"user_id\":1942422015,\"group_id\":669026253,\"message\":\"群消息\",\"message_id\":-2058339141}";
     }
 
-    @Test
+    //@Test
     public void testRegex() {
         String cq = "[CQ:at,qq=1487248817,file=https://dsfsdfsfsd,image=sdfsdfs.png]sdfsdf[CQ:file,qq=1487817,file=https://dsfsdfsfsd]";
         String regex = "\\[CQ:([a-z]+)((,([a-z]+)=([\\w:/.]+))+)]";
@@ -29,7 +31,7 @@ class HuhuBotApplicationTests {
         Matcher matcher = r.matcher(cq);
         if (matcher.find()) {
             String type = matcher.group(1);
-            MessageSegment.CqCode cqCode = new MessageSegment.CqCode(CqTypeEnum.valueOf(type));
+            MessageSegmentOld.CqCode cqCode = new MessageSegmentOld.CqCode(CqTypeEnum.valueOf(type));
             String[] split = matcher.group(2).replaceFirst(",", "").split(",");
             for (String s : split) {
                 String[] keyValue = s.split("=");
@@ -38,6 +40,19 @@ class HuhuBotApplicationTests {
             System.out.println(cqCode);
         }
 
+    }
+
+    //@Test
+    public void testMessage() {
+        String cq1 = "测试[CQ:image,file=http://baidu.com/1.jpg]";
+        String cq2 = "[CQ:image,file=http://baidu.com/1.jpg]";
+        String cq3 = "[CQ:image,file=http://baidu.com/1.jpg]测试";
+        String cq4 = "测试[CQ:image,file=http://baidu.com/1.jpg][CQ:face,id=123]";
+        Message message = new Message();
+        message.addSegment(MessageSegment.at(1942422015L));
+        message.addText("测试");
+        message.addSegment(MessageSegment.image("https://baidu.com/1.jpg"));
+        System.out.println(message);
     }
 
 }

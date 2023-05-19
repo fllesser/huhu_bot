@@ -5,8 +5,11 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
+import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 
 import java.util.Objects;
 

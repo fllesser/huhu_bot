@@ -2,7 +2,9 @@ package tech.chowyijiu.huhu_bot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
@@ -14,10 +16,10 @@ import tech.chowyijiu.huhu_bot.ws.Server;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
-    private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png");
+    private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png").toString();
 
     @MessageHandler(name = "每日vb图", commands = {"vb", "VB"}, priority = 4)
     public void vb(Bot bot, GroupMessageEvent event) {
@@ -27,6 +29,15 @@ public class FortnitePlugin {
     @MessageHandler(name = "商城", commands = {"商城", "shop"}, priority = 1)
     public void shop(Bot bot, MessageEvent event) {
         bot.sendMessage(event, shop, false);
+    }
+
+    @MessageHandler(name = "商城2", commands = {"shop2"}, priority = 0)
+    public void shop2(Bot bot, GroupMessageEvent event) {
+        Message message = new Message();
+        message.addText("今日商城")
+                .addSegment(MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png"))
+                .addText("由商城2发出");
+        bot.sendMessage(event, message.toString(), false);
     }
 
     @Scheduled(cron = "0 1 8 * * * ")
