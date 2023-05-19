@@ -14,6 +14,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -28,12 +29,23 @@ public class GroupCoquettishOperationPlugin {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 10:00", formatter);
         Duration duration = Duration.between(LocalDateTime.now(), shitTime);
-        String card = "距离答辩还有 " + duration.toMinutes() + " 分钟";
+        long days = duration.toDays();
+        duration = duration.minusDays(days);
+        long hours = duration.toHours();
+        duration = duration.minusHours(hours);
+        long minutes = duration.toMinutes();
+        String card = "距离答辩还有" + days + "天" + hours + "时" + minutes + "分";
         Server.getBots().forEach(bot -> {
-            bot.getGroupList(true).stream().map(GroupInfo::getGroupId).forEach(groupId -> {
-                bot.callApi(GocqActionEnum.SET_GROUP_CARD,
-                        "group_id", groupId, "user_id", bot.getUserId(), "card", card);
-            });
+            Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+                    .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
+                        bot.callApi(GocqActionEnum.SET_GROUP_CARD,
+                                "group_id", groupId, "user_id", bot.getUserId(), "card", card);
+                        try {
+                            Thread.sleep(2000L);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    });
         });
     }
 
@@ -42,7 +54,7 @@ public class GroupCoquettishOperationPlugin {
         //先判断bot是不是群主
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), bot.getUserId(), true);
         if (!"owner".equals(groupMember.getRole())) {
-            log.info("{} {} 机器人不是群主, 忽略", this.getClass().getSimpleName(), "头衔自助");
+            log.info("{} 机器人不是群主, 忽略", "头衔自助");
             return;
         }
         String title = event.getMessage().replace(" ", "").replace("sgst", "");

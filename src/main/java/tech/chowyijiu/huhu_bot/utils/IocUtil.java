@@ -12,15 +12,15 @@ import javax.annotation.Resource;
 @Component
 public class IocUtil {
 
-    private static ApplicationContext ioc;
+    private static ApplicationContext applicationContext;
 
     @Resource
-    public void setIoc(ApplicationContext ioc) {
-        IocUtil.ioc = ioc;
+    public void setIoc(ApplicationContext applicationContext) {
+        IocUtil.applicationContext = applicationContext;
     }
 
     public static <T> T getBean(Class<T> clazz) {
-        return ioc.getBean(clazz);
+        return applicationContext.getBean(clazz);
     }
 
 

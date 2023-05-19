@@ -57,7 +57,7 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
-        log.info("[Server] GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), getConnections() + 1);
+        log.info("GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), getConnections() + 1);
     }
 
     @Override
@@ -77,26 +77,26 @@ public class Server extends TextWebSocketHandler {
                             && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     addBot(event.getSelfId(), session);
-                    log.info("[{}] RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE ", this.getClass().getSimpleName(), metaEvent.getSelfId());
+                    log.info("RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE ", metaEvent.getSelfId());
                     return;
                 }
             }
-            log.info("[Server] Accepted {}", event);
+            log.info("Accepted {}", event);
             for (Bot bot : bots) {
-                if (bot.getSession() == session) {
+                if (Objects.equals(bot.getSession(), session)) {
                     ProcessEventTask.execute(bot, event);
                 }
             }
 
         } catch (Exception e) {
-            log.error("[{}] Parsing payload exception:{}", this.getClass().getSimpleName(), e);
+            log.error("Parsing payload exception", e);
         }
     }
 
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        log.error("[{}] connect exception sessionId: {} exception: {}", this.getClass().getSimpleName(), session.getId(), exception);
+        log.error("connect exception sessionId: {} exception: {}", session.getId(), exception);
         removeClient(session);
     }
 

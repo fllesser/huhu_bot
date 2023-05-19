@@ -76,9 +76,8 @@ public class DispatcherCore {
     public void matchMessageHandler(final Bot bot, final MessageEvent event) {
         String briefMessage = event.getMessage().length() <= 10 ? event.getMessage()
                 : (event.getMessage().substring(0, 10) + "......");
-        log.info("[{}] {}[user_id:{},message:{}] start match handler",
-                this.getClass().getSimpleName(), event.getClass().getSimpleName(),
-                event.getUserId(), briefMessage);
+        log.info("{}[user_id:{},message:{}] start match handler",
+                event.getClass().getSimpleName(), event.getUserId(), briefMessage);
         outer:
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             String[] commands = handler.commands;
@@ -88,7 +87,7 @@ public class DispatcherCore {
             for (String command : commands) {
                 if (event.getMessage().startsWith(command)) {
                     if (handler.eventType.isAssignableFrom(event.getClass())) {
-                        log.info("[DispatcherCore] {}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
+                        log.info("{}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
                                 event.getClass().getSimpleName(), event.getUserId(), briefMessage,
                                 handler.plugin.getClass().getSimpleName(), command, handler.priority);
                         handler.execute(bot, event);
@@ -100,18 +99,16 @@ public class DispatcherCore {
                 }
             }
         }
-        log.info("[{}] {}[user_id:{}, message:{}] match handler end",
-                this.getClass().getSimpleName(), event.getClass().getSimpleName(),
-                event.getUserId(), briefMessage);
+        log.info("{}[user_id:{}, message:{}] match handler end",
+                event.getClass().getSimpleName(), event.getUserId(), briefMessage);
     }
 
     public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
         String noticeType = event.getNoticeType();
-        log.info("[{}] NoticeEvent[type:{}] start match handler",
-                this.getClass().getSimpleName(), noticeType);
+        log.info("{} start match handler", event.getClass().getSimpleName());
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                log.info("[DispatcherCore] NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
+                log.info("NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
                         noticeType, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
                 handler.execute(bot, event);
                 if (handler.block) {
@@ -119,8 +116,7 @@ public class DispatcherCore {
                 }
             }
         }
-        log.info("[{}] NoticeEvent[type:{}] match handler end",
-                this.getClass().getSimpleName(), noticeType);
+        log.info("{} match handler end", event.getClass().getSimpleName());
     }
 
 

@@ -41,7 +41,7 @@ public class ProcessEventTask implements Runnable {
     @Override
     public void run() {
         try {
-            //log.info("[{}] {} will be preProcessed", this.getClass().getSimpleName(), eventTypeEnum);
+            //log.info(" {} will be preProcessed", eventTypeEnum);
             if (event instanceof MessageEvent) {
                 DISPATCHER_CORE.matchMessageHandler(bot, ((MessageEvent) event));
             } else if (event instanceof NoticeEvent) {
@@ -56,7 +56,7 @@ public class ProcessEventTask implements Runnable {
                 }
             }
         } catch (Exception e) {
-            log.error("[{}] Exception occurred in preprocessing event, Exception:", this.getClass().getSimpleName(), e);
+            log.error("Exception occurred in preprocessing event, Exception:", e);
         }
 
     }

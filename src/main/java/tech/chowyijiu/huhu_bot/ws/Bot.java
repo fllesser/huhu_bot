@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.ws;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -25,13 +24,18 @@ import java.util.List;
  */
 @Slf4j
 @Getter
-@RequiredArgsConstructor
 @ToString
 public class Bot {
 
     private final Long userId;
     private final WebSocketSession session;
 
+    private List<GroupInfo> groups;
+
+    public Bot(Long userId, WebSocketSession session) {
+        this.userId = userId;
+        this.session = session;
+    }
 
     /**
      * 私有 callApi
@@ -47,8 +51,8 @@ public class Bot {
      * 提供给外部调用的callApi
      * callApi(GocqActionEnum action, key, value, key, value ...)
      *
-     * @param action
-     * @param params
+     * @param action GocqActionEnum
+     * @param params 参数 key, value
      */
     public void callApi(GocqActionEnum action, Object... params) {
         HashMap<String, Object> paramsMap = new HashMap<>();
@@ -63,6 +67,13 @@ public class Bot {
         this.callApi(action, paramsMap);
     }
 
+    /**
+     * 调用 get api 获取数据
+     * @param action GocqActionEnum
+     * @param paramsMap map
+     * @param timeout 超时事件
+     * @return String
+     */
     private String callGetApi(GocqActionEnum action, HashMap<String, Object> paramsMap, Long timeout) {
         RequestBox<HashMap<String, Object>> requestBox = new RequestBox<>();
         requestBox.setAction(action.getAction());
@@ -70,6 +81,12 @@ public class Bot {
         return GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, timeout);
     }
 
+    /**
+     * 调用 get api获取数据, 同步, 10s超时
+     * @param action GocqActionEnum
+     * @param params 参数
+     * @return String
+     */
     public String callGetApi(GocqActionEnum action, Object... params) {
         HashMap<String, Object> paramsMap = new HashMap<>();
         int length = params.length;
@@ -83,7 +100,12 @@ public class Bot {
         return this.callGetApi(action, paramsMap, 10000L);
     }
 
-
+    /**
+     * 获取群成员列表
+     * GocqActionEnum.GET_GROUP_MEMBER_LIST
+     * @param groupId  groupId
+     * @param noCache 为true时, 不使用缓存
+     **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
         String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_LIST,
                 "group_id", groupId, "no_cache", noCache);
@@ -93,11 +115,36 @@ public class Bot {
         return JSONArray.parseArray(data, GroupMember.class);
     }
 
+    /**
+     * 获取群列表
+     * @param noCache 默认false, 使用缓存
+     * @return List<GroupInfo>
+     */
     public List<GroupInfo> getGroupList(boolean noCache) {
         String data = callGetApi(GocqActionEnum.GET_GROUP_LIST, "no_cache", noCache);
-        return JSONArray.parseArray(data, GroupInfo.class);
+        List<GroupInfo> groupInfos = JSONArray.parseArray(data, GroupInfo.class);
+        if (this.groups == null) {
+            this.groups = groupInfos;
+        }
+        return groupInfos;
     }
 
+    /**
+     * 不使用缓存获取群列表
+     * @return List<GroupInfo>
+     */
+    public List<GroupInfo> getGroupList() {
+        return this.getGroupList(true);
+    }
+
+    /**
+     * 获取群成员详细信息
+     * GocqActionEnum.GET_GROUP_MEMBER_INFO
+     * @param groupId  groupId
+     * @param userId userId
+     * @param noCache 为true时, 不使用缓存
+     * @return GroupMember
+     */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
         String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_INFO,
                 "group_id", groupId, "user_id", userId, "no_cache", noCache);
@@ -106,7 +153,6 @@ public class Bot {
         }
         return JSONObject.parseObject(data, GroupMember.class);
     }
-
 
     /**
      * 发送群消息
@@ -158,6 +204,10 @@ public class Bot {
         }
     }
 
+    /**
+     * ws session send
+     * @param text text
+     */
     public void sessionSend(String text) {
         try {
             session.sendMessage(new TextMessage(text));
