@@ -7,6 +7,7 @@ import tech.chowyijiu.huhu_bot.ws.Client;
  * @date 13/5/2023
  */
 //@Component
+@Deprecated
 public class ClientStart /*implements CommandLineRunner*/ {
 
 

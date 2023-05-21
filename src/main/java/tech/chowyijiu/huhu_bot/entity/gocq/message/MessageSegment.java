@@ -2,10 +2,11 @@ package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author elastic chow
@@ -15,11 +16,27 @@ import java.util.Map;
 public class MessageSegment {
     //text, at...
     private final String type;
-    private final Map<String, String> data = new HashMap<>();
+    private final List<Node> data = new ArrayList<>(3);
+
+    @RequiredArgsConstructor
+    static class Node {
+        final String key;
+        final String value;
+    }
+
 
     public void addParam(String key, String value) {
-        data.put(key, value);
+        data.add(new Node(key, value));
     }
+
+    public String getText() {
+        Node node = data.get(0);
+        if (node.key.equals("text")) {
+            return node.value;
+        }
+        return null;
+    }
+
 
     public static MessageSegment text(String text) {
         MessageSegment ms = new MessageSegment(CqTypeEnum.text.name());
@@ -50,7 +67,7 @@ public class MessageSegment {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[CQ:").append(type);
-        data.keySet().forEach(key -> sb.append(",").append(key).append("=").append(data.get(key)));
+        data.forEach(node -> sb.append(",").append(node.key).append("=").append(node.value));
         sb.append("]");
         return sb.toString();
     }

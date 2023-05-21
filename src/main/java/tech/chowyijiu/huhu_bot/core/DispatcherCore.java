@@ -76,49 +76,61 @@ public class DispatcherCore {
     }
 
     public void matchMessageHandler(final Bot bot, final MessageEvent event) {
-        String briefMessage = event.getMessage().length() <= 10 ? event.getMessage()
-                : (event.getMessage().substring(0, 10) + "......");
-        log.info("{}[user_id:{},message:{}] start match handler",
-                event.getClass().getSimpleName(), event.getUserId(), briefMessage);
+        log.info("{} start match handler", event);
         outer:
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
-            String[] commands = handler.commands;
-            if (commands == null) {
+            if (handler.commands != null && handler.commands.length > 0) {
+                for (String command : handler.commands) {
+                    if (event.getMessage().startsWith(command)) {
+                        if (handler.eventType.isAssignableFrom(event.getClass())) {
+                            log.info("{} will be handled by Plugin[{}], Command[{}], Priority[{}]",
+                                    event, handler.plugin.getClass().getSimpleName(), command, handler.priority);
+                            handler.execute(bot, event);
+                            if (handler.block) {
+                                //停止向低优先级传递
+                                break outer;
+                            }
+                        }
+                    }
+                }
                 continue;
             }
-            for (String command : commands) {
-                if (event.getMessage().startsWith(command)) {
-                    if (handler.eventType.isAssignableFrom(event.getClass())) {
-                        log.info("{}[user_id:{},message:{}] will be handled by Plugin[{}], Command[{}], Priority[{}]",
-                                event.getClass().getSimpleName(), event.getUserId(), briefMessage,
-                                handler.plugin.getClass().getSimpleName(), command, handler.priority);
-                        handler.execute(bot, event);
-                        if (handler.block) {
-                            //停止向低优先级传递
-                            break outer;
+            if (handler.keywords != null && handler.keywords.length > 0) {
+                for (String keyword : handler.keywords) {
+                    if (event.getMessage().contains(keyword)) {
+                        if (handler.eventType.isAssignableFrom(event.getClass())) {
+                            log.info("{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]",
+                                    event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority);
+                            handler.execute(bot, event);
+                            if (handler.block) {
+                                //停止向低优先级传递
+                                break outer;
+                            }
                         }
                     }
                 }
             }
         }
-        log.info("{}[user_id:{}, message:{}] match handler end",
-                event.getClass().getSimpleName(), event.getUserId(), briefMessage);
+        log.info("{} match handler end", event);
+    }
+
+    private void matchCommand() {
+
     }
 
     public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
-        String noticeType = event.getNoticeType();
-        log.info("{} start match handler", event.getClass().getSimpleName());
+        log.info("{} start match handler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                log.info("NoticeEvent[notice_type:{}] will be handled by Plugin[{}] Function[{}] Priority[{}]",
-                        noticeType, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
+                log.info("{} will be handled by Plugin[{}] Function[{}] Priority[{}]",
+                        event, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
                 handler.execute(bot, event);
                 if (handler.block) {
                     break;
                 }
             }
         }
-        log.info("{} match handler end", event.getClass().getSimpleName());
+        log.info("{} match handler end", event);
     }
 
 
@@ -133,6 +145,7 @@ public class DispatcherCore {
 
         //MessageHandler
         public String[] commands;
+        public String[] keywords;
 
         private Handler(Object plugin, Method method) {
             this.plugin = plugin;
@@ -152,6 +165,7 @@ public class DispatcherCore {
             handler.block = mh.block();
             handler.priority = mh.priority();
             handler.commands = mh.commands();
+            handler.keywords = mh.keywords();
             return handler;
         }
 

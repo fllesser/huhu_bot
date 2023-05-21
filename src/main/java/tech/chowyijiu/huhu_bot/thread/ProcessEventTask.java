@@ -56,7 +56,7 @@ public class ProcessEventTask implements Runnable {
                 }
             }
         } catch (Exception e) {
-            log.error("Exception occurred in preprocessing event, Exception:", e);
+            log.error("Exception occurred in preprocessing {}, Exception:{}", event, e);
         }
 
     }

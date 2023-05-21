@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 
 import java.util.*;
@@ -64,7 +65,7 @@ public class Message {
     public boolean isToMe(Long selfId) {
         for (MessageSegment segment : messageSegments) {
             if (segment.getType().equals(CqTypeEnum.at.name())) {
-                if (Objects.equals(Long.parseLong(segment.getData().get("qq")), selfId)) {
+                if (Objects.equals(Long.parseLong(segment.getData().get(0).value), selfId)) {
                     return true;
                 }
             }
@@ -79,12 +80,11 @@ public class Message {
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this.messageSegments) {
             String type = segment.getType();
-            Map<String, String> data = segment.getData();
             if (Objects.equals(type, "text")) {
-                sb.append(data.get("text"));
+                sb.append(segment.getText());
             } else {
                 sb.append("[CQ:").append(segment.getType());
-                data.keySet().forEach(key -> sb.append(",").append(key).append("=").append(data.get(key)));
+                segment.getData().forEach(node -> sb.append(",").append(node.key).append("=").append(node.value));
                 sb.append("]");
             }
         }
@@ -112,7 +112,9 @@ public class Message {
 
     @Override
     public String toString() {
-        spliceStr();
+        if (Strings.isBlank(this.strMessage)) {
+            spliceStr();
+        }
         return this.strMessage;
     }
 

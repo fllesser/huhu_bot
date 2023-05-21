@@ -2,14 +2,9 @@
 nonebot2, 但是jvav
 
 ## 介绍
-1. java(springboot)基于go-cqhttp, websocket反向连接的qq机器人;
+1. java(springboot), 基于go-cqhttp, websocket反向连接的qq机器人;
 2. 支持被多个go-cqhttp连接;
 3. 类似于nonebot2的插件编写方式
-
-## 架构
-Spring Boot
-go-cqhttp
-websocket
 
 ## 使用要点
 go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
@@ -104,4 +99,4 @@ public class GroupCoquettishOperationPlugin {
 }
 ```
 
-参考 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)
+参考项目 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server) [nonebot2](https://github.com/nonebot/nonebot2)

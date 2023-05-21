@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.event.message;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 
 /**
@@ -12,7 +11,6 @@ import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
  */
 @Setter
 @Getter
-@ToString(callSuper = true)
 @NoArgsConstructor
 public class GroupMessageEvent extends MessageEvent {
 
@@ -21,4 +19,15 @@ public class GroupMessageEvent extends MessageEvent {
     private String anonymous;
     private boolean toMe;
 
+
+    @Override
+    public String toString() {
+        return "GroupMessageEvent{" +
+                "groupId=" + groupId +
+                ", userId=" + super.getUserId() +
+                ", message=" + super.getMessage() +
+                ", anonymous=" + anonymous +
+                ", toMe=" + toMe +
+                "}";
+    }
 }

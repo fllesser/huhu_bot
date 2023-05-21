@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * @author elastic chow
  * @date 14/5/2023
  */
-
+@Deprecated
 public class MessageSegmentOld {
 
     @Data
