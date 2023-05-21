@@ -15,7 +15,8 @@ import tech.chowyijiu.huhu_bot.constant.NoticeTypeEnum;
 public class GroupBanNoticeEvent extends NoticeEvent {
     private final String noticeType = NoticeTypeEnum.group_ban.name();
 
-    private String subType; //approve、invite 事件子类型, 分别表示管理员已同意入群、管理员邀请入群
+
+    private String subType;
     private Long userId;
     private Long groupId;
     private Long operatorId;

@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
@@ -24,9 +23,9 @@ public class MessageSegment {
         final String value;
     }
 
-
-    public void addParam(String key, String value) {
+    public MessageSegment addParam(String key, String value) {
         data.add(new Node(key, value));
+        return this;
     }
 
     public String getText() {
@@ -37,32 +36,6 @@ public class MessageSegment {
         return null;
     }
 
-
-    public static MessageSegment text(String text) {
-        MessageSegment ms = new MessageSegment(CqTypeEnum.text.name());
-        ms.addParam("text", text);
-        return ms;
-    }
-
-    public static MessageSegment at(Long userId) {
-        MessageSegment ms = new MessageSegment(CqTypeEnum.at.name());
-        ms.addParam("qq", userId.toString());
-        return ms;
-    }
-
-    public static MessageSegment image(String url) {
-        MessageSegment ms = new MessageSegment(CqTypeEnum.image.name());
-        ms.addParam("file", url);
-        ms.addParam("subType", "0");
-        return ms;
-    }
-
-
-    public String toJsonString() {
-        return JSONObject.toJSONString(this);
-    }
-
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -71,4 +44,35 @@ public class MessageSegment {
         sb.append("]");
         return sb.toString();
     }
+
+    public static MessageSegment text(String text) {
+        MessageSegment segment = new MessageSegment(CqTypeEnum.text.name());
+        segment.addParam("text", text);
+        return segment;
+    }
+
+    public static MessageSegment at(Long userId) {
+        MessageSegment segment = new MessageSegment(CqTypeEnum.at.name());
+        segment.addParam("qq", userId.toString());
+        return segment;
+    }
+
+    public static MessageSegment image(String url) {
+        MessageSegment segment = new MessageSegment(CqTypeEnum.image.name());
+        segment.addParam("file", url).addParam("subType", "0");
+        return segment;
+    }
+
+    public static MessageSegment poke(Long userId) {
+        MessageSegment segment = new MessageSegment(CqTypeEnum.poke.name());
+        segment.addParam("qq", userId.toString());
+        return segment;
+    }
+
+    public static MessageSegment tts(String text) {
+        MessageSegment segment = new MessageSegment(CqTypeEnum.tts.name());
+        segment.addParam("text", text);
+        return segment;
+    }
+
 }

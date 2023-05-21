@@ -16,7 +16,9 @@ public class GroupMessageEvent extends MessageEvent {
 
     private final String messageType = MessageTypeEnum.group.getType();
     private Long groupId;
+    //匿名信息
     private String anonymous;
+    //是否at bot
     private boolean toMe;
 
 

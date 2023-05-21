@@ -17,6 +17,7 @@ public enum CqTypeEnum {
     at,
     music,
     redbag,
+    tts,            //文本转语音 发 通过TX的TTS接口, 采用的音源与登录账号的性别有关 范围: 仅群聊
 
     //gocq 未支持
     rps,

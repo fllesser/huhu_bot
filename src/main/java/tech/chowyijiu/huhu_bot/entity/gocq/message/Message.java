@@ -93,7 +93,6 @@ public class Message {
 
 
     /**
-     * 注意添加顺序
      * @param text String
      */
     public Message append(String text) {
@@ -102,7 +101,6 @@ public class Message {
     }
 
     /**
-     * 注意添加顺序
      * @param segment  MessageSegment
      */
     public Message append(MessageSegment segment) {

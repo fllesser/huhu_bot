@@ -19,8 +19,8 @@ public class EchoEvent extends Event {
     private String retcode;
 
     //status
-    //ok	api 调用成功
-    //async api 调用已经提交异步处理, 此时 retcode 为 1, 具体 api 调用是否成功无法得知
+    //ok	    api 调用成功
+    //async     api 调用已经提交异步处理, 此时 retcode 为 1, 具体 api 调用是否成功无法得知
     //failed	api 调用失败
     private String status;
 }
