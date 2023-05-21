@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.plugins;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
@@ -32,11 +31,8 @@ public class FortnitePlugin {
 
     @MessageHandler(name = "商城2", commands = {"shop2"}, priority = 0)
     public void shop2(Bot bot, GroupMessageEvent event) {
-        Message message = new Message();
-        message.addText("今日商城")
-                .addSegment(MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png"))
-                .addText("由商城2发出");
-        bot.sendMessage(event, message.toString(), false);
+        String message = "今日商城" + MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png") + "由商城2发出";
+        bot.sendMessage(event, message, false);
     }
 
     @Scheduled(cron = "0 1 8 * * * ")

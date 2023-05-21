@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.plugins;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
@@ -20,12 +19,8 @@ public class PersonalPlugin {
     public void replyJyGroup(Bot bot, PrivateMessageEvent event) {
         //如果不是临时会话
         if (!"group".equals(event.getSubType())) return;
-        Message message = new Message();
-        message.addText("[Bot 代发, 非本人]");
-        message.addSegment(MessageSegment.at(event.getUserId()));
-        message.addText("\n请认真观看教程视频 " +
-                "https://www.bilibili.com/video/BV1Xg411x7S2" +
-                " 不要再发临时会话问我或者其他管理了");
-        bot.sendGroupMessage(event.getSender().getGroupId(), message.toString(),false);
+        String message = "[Bot 代发, 非本人]" + MessageSegment.at(event.getUserId()) +
+                "请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了";
+        bot.sendGroupMessage(event.getSender().getGroupId(), message,false);
     }
 }

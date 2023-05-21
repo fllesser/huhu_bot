@@ -28,7 +28,7 @@ public class Message {
         Message message = new Message();
         message.strMessage = str;
         if (!str.contains("[CQ:")) {
-            message.addText(str);
+            message.append(str);
             return message;
         }
         int fromIndex = 0, start = 0, end = 0;
@@ -38,13 +38,13 @@ public class Message {
             //如果没有cq了, 直接把剩余的部分添加成text
             if (start == -1 ) {
                 if (str.length() > fromIndex) {
-                    message.addText(str.substring(fromIndex));
+                    message.append(str.substring(fromIndex));
                 }
                 break;
             }
             //如果cq的start前面还有字符串, 先把这一部分添加成text
             if (start - fromIndex > 0) {
-                message.addText(str.substring(fromIndex, start));
+                message.append(str.substring(fromIndex, start));
             }
             end = str.indexOf("]", start);
             //添加cq
@@ -55,7 +55,7 @@ public class Message {
                 String[] keyVal = split[i].split("=");
                 segment.addParam(keyVal[0], keyVal[1]);
             }
-            message.addSegment(segment);
+            message.append(segment);
             fromIndex = end + 1;
         }
         return message;
@@ -76,7 +76,7 @@ public class Message {
     /**
      * 拼接str message
      */
-    public void spliceStr() {
+    private void spliceStr() {
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this.messageSegments) {
             String type = segment.getType();
@@ -91,11 +91,12 @@ public class Message {
         this.strMessage = sb.toString();
     }
 
+
     /**
      * 注意添加顺序
      * @param text String
      */
-    public Message addText(String text) {
+    public Message append(String text) {
         messageSegments.add(MessageSegment.text(text));
         return this;
     }
@@ -104,7 +105,7 @@ public class Message {
      * 注意添加顺序
      * @param segment  MessageSegment
      */
-    public Message addSegment(MessageSegment segment) {
+    public Message append(MessageSegment segment) {
         messageSegments.add(segment);
         return this;
     }

@@ -30,6 +30,7 @@ public class DispatcherCore {
 
     private final ApplicationContext ioc;
 
+    //todo 看看有没有办法换成map
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
@@ -78,8 +79,8 @@ public class DispatcherCore {
     public void matchMessageHandler(final Bot bot, final MessageEvent event) {
         log.info("{} start match handler", event);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
-            //先匹配事件类型
-            if (handler.eventType.isAssignableFrom(event.getClass())) continue;
+            //判断事件类型
+            if (!handler.eventType.isAssignableFrom(event.getClass())) continue;
             if (handler.commands != null && handler.commands.length > 0) {
                 if (matchCommand(bot, event, handler)) break;
                 continue;

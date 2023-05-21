@@ -23,7 +23,7 @@ public class RequestEvent extends Event {
     private String flag;    //请求 flag, 在调用处理请求的 API 时需要传入
 
     //group 特有
-    private String subType; //add、invite	请求子类型, 分别表示加群请求、邀请登录号入群
+    private String subType; //append、invite	请求子类型, 分别表示加群请求、邀请登录号入群
     private Long groupId;
 
 }
