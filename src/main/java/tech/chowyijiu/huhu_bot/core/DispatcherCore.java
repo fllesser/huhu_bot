@@ -77,45 +77,50 @@ public class DispatcherCore {
 
     public void matchMessageHandler(final Bot bot, final MessageEvent event) {
         log.info("{} start match handler", event);
-        outer:
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
+            //先匹配事件类型
+            if (handler.eventType.isAssignableFrom(event.getClass())) continue;
             if (handler.commands != null && handler.commands.length > 0) {
-                for (String command : handler.commands) {
-                    if (event.getMessage().startsWith(command)) {
-                        if (handler.eventType.isAssignableFrom(event.getClass())) {
-                            log.info("{} will be handled by Plugin[{}], Command[{}], Priority[{}]",
-                                    event, handler.plugin.getClass().getSimpleName(), command, handler.priority);
-                            handler.execute(bot, event);
-                            if (handler.block) {
-                                //停止向低优先级传递
-                                break outer;
-                            }
-                        }
-                    }
-                }
+                if (matchCommand(bot, event, handler)) break;
                 continue;
             }
             if (handler.keywords != null && handler.keywords.length > 0) {
-                for (String keyword : handler.keywords) {
-                    if (event.getMessage().contains(keyword)) {
-                        if (handler.eventType.isAssignableFrom(event.getClass())) {
-                            log.info("{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]",
-                                    event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority);
-                            handler.execute(bot, event);
-                            if (handler.block) {
-                                //停止向低优先级传递
-                                break outer;
-                            }
-                        }
-                    }
-                }
+                if (matchKeyword(bot, event, handler)) break;
+                //continue;
             }
         }
         log.info("{} match handler end", event);
     }
 
-    private void matchCommand() {
+    /**
+     * 前缀匹配
+     */
+    private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
+        for (String command : handler.commands) {
+            //前缀匹配
+            if (event.getMessage().startsWith(command)) {
+                log.info("{} will be handled by Plugin[{}], Command[{}], Priority[{}]",
+                        event, handler.plugin.getClass().getSimpleName(), command, handler.priority);
+                handler.execute(bot, event);
+                return handler.block;
+            }
+        }
+        return false;
+    }
 
+    /**
+     * 关键词匹配
+     */
+    private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
+        for (String keyword : handler.keywords) {
+            if (event.getMessage().contains(keyword)) {
+                log.info("{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]",
+                        event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority);
+                handler.execute(bot, event);
+                return handler.block; //
+            }
+        }
+        return false;
     }
 
     public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
@@ -141,7 +146,7 @@ public class DispatcherCore {
         public Class<?> eventType;  //用于isAssignableFrom 匹配事件类型
         public String name;         //Handler注解里的name
         public int priority;
-        public boolean block;
+        public boolean block;       //false 为不阻断
 
         //MessageHandler
         public String[] commands;
