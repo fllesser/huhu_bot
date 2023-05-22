@@ -79,12 +79,12 @@ public class DispatcherCore {
                 .collect(Collectors.toList()));
     }
 
-    public void matchMessageHandler(final Bot bot, final MessageEvent event) {
-        log.info("{} start match handler", event);
+    public void onMessage(final Bot bot, final MessageEvent event) {
+        log.info("{} Start Match MessageHandler", event);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.eventType.isAssignableFrom(event.getClass())) continue;
-            //因为注解中的commands和keywords 默认为{}, 所以无需判断是否为空
+            //因为注解中的commands和keywords 默认为{}, 无需判空
             if (handler.commands.length > 0) {
                 if (matchCommand(bot, event, handler)) break;
                 continue;
@@ -94,17 +94,15 @@ public class DispatcherCore {
                 //continue;
             }
         }
-        log.info("{} match handler end", event);
+        log.info("{} Match MessageHandler End", event);
     }
 
-    /**
-     * 前缀匹配
-     */
     private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
         String message = event.getMessage();
+        //如果配置了命令前缀
         if (botConfig.getCommandPrefixes().length > 0) {
-           if (Arrays.stream(botConfig.getCommandPrefixes()).noneMatch(message::startsWith)) {
-               return true; //未匹配到命令前缀直接阻断
+           if (Arrays.stream(botConfig.getCommandPrefixes()).map(Object::toString).noneMatch(message::startsWith)) {
+               return true; //没有命令前缀直接阻断
            } else {
                message = message.substring(1);
            }
@@ -138,8 +136,8 @@ public class DispatcherCore {
         return false;
     }
 
-    public void matchNoticeHandler(final Bot bot, final NoticeEvent event) {
-        log.info("{} start match handler", event);
+    public void onNotice(final Bot bot, final NoticeEvent event) {
+        log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
                 log.info("{} will be handled by Plugin[{}] Function[{}] Priority[{}]",
@@ -150,12 +148,12 @@ public class DispatcherCore {
                 }
             }
         }
-        log.info("{} match handler end", event);
+        log.info("{} Match NoticeHandler End", event);
     }
 
 
     static class Handler {
-        private final Object plugin;
+        private final Object plugin; //ioc容器中的插件Bean
         private final Method method;
 
         public Class<?> eventType;  //用于isAssignableFrom 匹配事件类型
@@ -170,6 +168,7 @@ public class DispatcherCore {
         private Handler(Object plugin, Method method) {
             this.plugin = plugin;
             this.method = method;
+            //在method的形参中定位事件类型
             for (Class<?> clazz : method.getParameterTypes()) {
                 if (Event.class.isAssignableFrom(clazz)) {
                     eventType = clazz;

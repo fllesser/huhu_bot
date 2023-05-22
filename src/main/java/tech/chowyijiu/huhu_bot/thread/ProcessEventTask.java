@@ -1,13 +1,13 @@
 package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
-import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
+import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
@@ -41,17 +41,16 @@ public class ProcessEventTask implements Runnable {
     @Override
     public void run() {
         try {
-            //log.info(" {} will be preProcessed", eventTypeEnum);
             if (event instanceof MessageEvent) {
-                DISPATCHER_CORE.matchMessageHandler(bot, (MessageEvent) this.event);
+                DISPATCHER_CORE.onMessage(bot, (MessageEvent) this.event);
             } else if (event instanceof NoticeEvent) {
-                DISPATCHER_CORE.matchNoticeHandler(bot, ((NoticeEvent) this.event));
+                DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) this.event));
             } else if (event instanceof RequestEvent) {
                 log.info("[RequestEvent] {}", event);
             } else if (event instanceof EchoEvent) {
                 EchoEvent echoEvent = (EchoEvent) this.event;
                 String echo = echoEvent.getEcho();
-                if (Strings.isNotBlank(echo)) {
+                if (StringUtils.hasLength(echo)) {
                     GocqSyncRequestUtil.putEchoResult(echo, echoEvent.getData());
                 }
             }

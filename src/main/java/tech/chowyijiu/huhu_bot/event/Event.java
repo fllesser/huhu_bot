@@ -11,8 +11,6 @@ import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 
-import java.util.Objects;
-
 /**
  * @author elastic chow
  * @date 16/5/2023
@@ -33,14 +31,19 @@ public abstract class Event {
         if (postType == null && jsonObject.getString("echo") != null) {
             event = jsonObject.toJavaObject(EchoEvent.class);
         } else {
-            if (Objects.equals(postType, PostTypeEnum.message.name())) {
-                event = MessageEvent.jsonToMessageEvent(jsonObject);
-            } else if (Objects.equals(postType, PostTypeEnum.notice.name())) {
-                event = NoticeEvent.jsonToNoticeEvent(jsonObject);
-            } else if (Objects.equals(postType, PostTypeEnum.request.name())) {
-                event = jsonObject.toJavaObject(RequestEvent.class);
-            } else if (Objects.equals(postType, PostTypeEnum.meta_event.name())) {
-                event = jsonObject.toJavaObject(MetaEvent.class);
+            switch (PostTypeEnum.valueOf(postType)) {
+                case message:
+                    event = MessageEvent.jsonToMessageEvent(jsonObject);
+                    break;
+                case notice:
+                    event = NoticeEvent.jsonToNoticeEvent(jsonObject);
+                    break;
+                case request:
+                    event = jsonObject.toJavaObject(RequestEvent.class);
+                    break;
+                case meta_event:
+                    event = jsonObject.toJavaObject(MetaEvent.class);
+                    break;
             }
         }
         if (event != null) {
