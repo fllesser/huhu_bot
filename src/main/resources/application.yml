@@ -2,3 +2,9 @@ server:
   port: 8888
   servlet:
     context-path: /huhu
+bot:
+  super-users: [1942422015]
+  command-prefixes: ["/", "!"]
+
+
+

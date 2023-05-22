@@ -2,10 +2,14 @@ package tech.chowyijiu.huhu_bot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
+@ConfigurationPropertiesScan("tech.chowyijiu.huhu_bot.config")
+@EnableConfigurationProperties
 public class HuhuBotApplication {
 
     public static void main(String[] args) {

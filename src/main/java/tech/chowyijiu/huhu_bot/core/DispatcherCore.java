@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
+import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class DispatcherCore {
 
     private final ApplicationContext ioc;
+    private final BotConfig botConfig;
 
     //todo 看看有没有办法换成map
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
@@ -42,7 +44,7 @@ public class DispatcherCore {
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("[DispatcherCore] Start Load Plugin...");
+            log.info("[HUHUBOT] Start Load Plugin...");
             int count = 1;
             for (String pluginName : botPluginMap.keySet()) {
                 Object plugin = botPluginMap.get(pluginName);
@@ -64,9 +66,10 @@ public class DispatcherCore {
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            throw new RuntimeException("[DispatcherCore] No plugins were found");
+            //throw new RuntimeException("[DispatcherCore] No plugins were found");
+            log.info("No plugins were found");
         }
-        //根据weight对handler进行排序, 并全部加入到handlerContainer中
+        //根据priority对handler进行排序, 并全部加入到handlerContainer中
         MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority))
                 .collect(Collectors.toList())
@@ -81,11 +84,12 @@ public class DispatcherCore {
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.eventType.isAssignableFrom(event.getClass())) continue;
-            if (handler.commands != null && handler.commands.length > 0) {
+            //因为注解中的commands和keywords 默认为{}, 所以无需判断是否为空
+            if (handler.commands.length > 0) {
                 if (matchCommand(bot, event, handler)) break;
                 continue;
             }
-            if (handler.keywords != null && handler.keywords.length > 0) {
+            if (handler.keywords.length > 0) {
                 if (matchKeyword(bot, event, handler)) break;
                 //continue;
             }
@@ -97,11 +101,21 @@ public class DispatcherCore {
      * 前缀匹配
      */
     private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
+        String message = event.getMessage();
+        if (botConfig.getCommandPrefixes().length > 0) {
+           if (Arrays.stream(botConfig.getCommandPrefixes()).noneMatch(message::startsWith)) {
+               return true; //未匹配到命令前缀直接阻断
+           } else {
+               message = message.substring(1);
+           }
+        }
         for (String command : handler.commands) {
-            //前缀匹配
-            if (event.getMessage().startsWith(command)) {
+            //匹配前缀命令
+            if (message.startsWith(command)) {
                 log.info("{} will be handled by Plugin[{}], Command[{}], Priority[{}]",
                         event, handler.plugin.getClass().getSimpleName(), command, handler.priority);
+                //去除触发的command, 并去掉头尾空格
+                event.setMessage(message.replace(command, "").trim());
                 handler.execute(bot, event);
                 return handler.block;
             }

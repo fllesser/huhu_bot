@@ -14,8 +14,9 @@ import java.util.Objects;
  * @author elastic chow
  * @date 21/5/2023
  */
-@BotPlugin(name = "机器人接管QQ")
+
 @Slf4j
+@BotPlugin(name = "机器人接管QQ")
 public class PersonalPlugin {
 
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
@@ -28,14 +29,12 @@ public class PersonalPlugin {
     }
 
 
-    @MessageHandler(name = "文字转语音测试", commands = {"tts"})
+    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
-        //todo 这步操作, 加在执行handler方法前, MessageEvent要不再加一个字段
-        String tts = event.getMessage().replace("tts", "").trim();
         if (!Objects.equals(event.getUserId(), 1942422015L)) {
             return;
         }
-        bot.sendMessage(event, MessageSegment.tts(tts) + "", false);
+        bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
     }
 
 }
