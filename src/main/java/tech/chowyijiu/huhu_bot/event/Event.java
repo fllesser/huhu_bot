@@ -4,6 +4,7 @@ package tech.chowyijiu.huhu_bot.event;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
@@ -28,10 +29,9 @@ public abstract class Event {
     public static Event jsonToEvent(JSONObject jsonObject) {
         String postType = jsonObject.getString("post_type");
         Event event = null;
-        if (postType == null && jsonObject.getString("echo") != null) {
-            event = jsonObject.toJavaObject(EchoEvent.class);
-        } else {
+        if (StringUtils.hasLength(postType)) {
             switch (PostTypeEnum.valueOf(postType)) {
+                case message_sent:
                 case message:
                     event = MessageEvent.jsonToMessageEvent(jsonObject);
                     break;
@@ -44,6 +44,10 @@ public abstract class Event {
                 case meta_event:
                     event = jsonObject.toJavaObject(MetaEvent.class);
                     break;
+            }
+        } else {
+            if (jsonObject.getString("echo") != null) {
+                event = jsonObject.toJavaObject(EchoEvent.class);
             }
         }
         if (event != null) {

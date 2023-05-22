@@ -4,7 +4,7 @@ server:
     context-path: /huhu
 bot:
   super-users: [1942422015]
-  command-prefixes: ['!', '.']
+  command-prefixes:
 
 
 

@@ -29,7 +29,7 @@ public class PersonalPlugin {
     }
 
 
-    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
+    //@MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
         if (!Objects.equals(event.getUserId(), 1942422015L)) {
             return;

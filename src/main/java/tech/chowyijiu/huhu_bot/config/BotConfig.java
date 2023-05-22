@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "bot")
 public class BotConfig {
 
-    private Long[] superUsers;
-    private Character[] commandPrefixes;
+    private Long[] superUsers = {};
+    private Character[] commandPrefixes = {};
 
 
 }
