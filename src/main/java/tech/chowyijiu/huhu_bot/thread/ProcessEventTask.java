@@ -45,14 +45,14 @@ public class ProcessEventTask implements Runnable {
                 DISPATCHER_CORE.onMessage(bot, (MessageEvent) this.event);
             } else if (event instanceof NoticeEvent) {
                 DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) this.event));
-            } else if (event instanceof RequestEvent) {
-                log.info("[RequestEvent] {}", event);
             } else if (event instanceof EchoEvent) {
                 EchoEvent echoEvent = (EchoEvent) this.event;
                 String echo = echoEvent.getEcho();
                 if (StringUtils.hasLength(echo)) {
                     GocqSyncRequestUtil.putEchoResult(echo, echoEvent.getData());
                 }
+            } else if (event instanceof RequestEvent) {
+                log.info("{}", event);
             }
         } catch (Exception e) {
             log.error("Exception occurred in preprocessing {}, Exception:{}", event, e);
