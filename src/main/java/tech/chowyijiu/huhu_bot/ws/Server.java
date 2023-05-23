@@ -6,6 +6,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
@@ -57,7 +58,8 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
-        log.info("GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), getConnections() + 1);
+        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
+                session.getRemoteAddress(), getConnections() + 1, ANSI.RESET);
     }
 
     @Override
@@ -77,7 +79,8 @@ public class Server extends TextWebSocketHandler {
                             && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     addBot(event.getSelfId(), session);
-                    log.info("RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE ", metaEvent.getSelfId());
+                    log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}",ANSI.YELLOW,
+                            metaEvent.getSelfId(), ANSI.RESET);
                     return;
                 }
             }
@@ -102,7 +105,8 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.info("connect close, sessionId:{},{}", session.getId(), closeStatus.toString());
+        log.info("{}connect close, sessionId:{},{}{}",ANSI.YELLOW,
+                session.getId(), closeStatus.toString(), ANSI.RESET);
         removeClient(session);
     }
 

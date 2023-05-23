@@ -8,6 +8,7 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
+import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -32,7 +33,6 @@ public class DispatcherCore {
     private final ApplicationContext ioc;
     private final BotConfig botConfig;
 
-    //todo 看看有没有办法换成map
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
@@ -44,7 +44,7 @@ public class DispatcherCore {
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("[HUHUBOT] Start Load Plugin...");
+            log.info("{}[HUHUBOT] Start Load Plugin...{}", ANSI.YELLOW, ANSI.RESET);
             int count = 1;
             for (String pluginName : botPluginMap.keySet()) {
                 Object plugin = botPluginMap.get(pluginName);
@@ -61,13 +61,14 @@ public class DispatcherCore {
                         noticeHandlers.add(handler);
                     }
                 });
-                log.info("Load plugin [{}], progress[{}/{}], function set: {}",
-                        pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()));
+
+                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", ANSI.BLUE,
+                        pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()), ANSI.RESET);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
             //throw new RuntimeException("[DispatcherCore] No plugins were found");
-            log.info("No plugins were found");
+            log.info("{}No plugins were found{}", ANSI.YELLOW, ANSI.RESET);
         }
         //根据priority对handler进行排序, 并全部加入到handlerContainer中
         MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
@@ -77,6 +78,7 @@ public class DispatcherCore {
         NOTICE_HANDLER_CONTAINER.addAll(noticeHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority))
                 .collect(Collectors.toList()));
+        log.info("{}[HUHUBOT] Running...{}", ANSI.YELLOW, ANSI.RESET);
     }
 
     public void onMessage(final Bot bot, final MessageEvent event) {
@@ -101,19 +103,19 @@ public class DispatcherCore {
         String message = event.getMessage();
         //如果配置了命令前缀
         if (botConfig.getCommandPrefixes().length > 0) {
-           if (Arrays.stream(botConfig.getCommandPrefixes()).map(Object::toString).noneMatch(message::startsWith)) {
-               return true; //没有命令前缀直接阻断
-           } else {
-               message = message.substring(1);
-           }
+            if (Arrays.stream(botConfig.getCommandPrefixes()).map(Object::toString).noneMatch(message::startsWith)) {
+                return true; //没有命令前缀直接阻断
+            } else {
+                message = message.substring(1);
+            }
         }
         for (String command : handler.commands) {
             //匹配前缀命令
             if (message.startsWith(command)) {
-                log.info("{} will be handled by Plugin[{}], Command[{}], Priority[{}]",
-                        event, handler.plugin.getClass().getSimpleName(), command, handler.priority);
+                log.info("{}{} will be handled by Plugin[{}], Command[{}], Priority[{}]{}", ANSI.GREEN,
+                        event, handler.plugin.getClass().getSimpleName(), command, handler.priority, ANSI.RESET);
                 //去除触发的command, 并去掉头尾空格
-                event.setMessage(message.replace(command, "").trim());
+                event.setMessage(message.replaceFirst(command, "").trim());
                 handler.execute(bot, event);
                 return handler.block;
             }
@@ -127,8 +129,8 @@ public class DispatcherCore {
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
             if (event.getMessage().contains(keyword)) {
-                log.info("{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]",
-                        event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority);
+                log.info("{}{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]{}", ANSI.GREEN,
+                        event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority, ANSI.RESET);
                 handler.execute(bot, event);
                 return handler.block; //
             }
@@ -140,8 +142,8 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                log.info("{} will be handled by Plugin[{}] Function[{}] Priority[{}]",
-                        event, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority);
+                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.GREEN,
+                        event, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority, ANSI.RESET);
                 handler.execute(bot, event);
                 if (handler.block) {
                     break;

@@ -2,9 +2,16 @@ server:
   port: 8888
   servlet:
     context-path: /huhu
+
+spring:
+  output:
+    ansi:
+      enabled: always
+
 bot:
   super-users: [1942422015]
   command-prefixes:
+
 
 
 

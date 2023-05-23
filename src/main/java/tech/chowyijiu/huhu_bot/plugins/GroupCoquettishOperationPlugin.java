@@ -61,8 +61,6 @@ public class GroupCoquettishOperationPlugin {
             log.info("{} 机器人不是群主, 忽略", "头衔自助");
             return;
         }
-        //匹配到handler的时候, 如果是command, 就会对event.message进行去command,和trim()
-        //String title = event.getMessage().replace("sgst", "").trim();
         if (event.getMessage().length() > 6) {
             bot.sendGroupMessage(event.getGroupId(), "群头衔最多为6位", true);
             return;
