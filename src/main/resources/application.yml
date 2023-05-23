@@ -10,7 +10,6 @@ spring:
 
 bot:
   super-users: [1942422015]
-  command-prefixes:
 
 
 

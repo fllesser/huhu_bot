@@ -16,11 +16,9 @@ import tech.chowyijiu.huhu_bot.ws.Bot;
  */
 
 @Slf4j
-@BotPlugin(name = "机器人接管QQ")
+@BotPlugin(name = "杂七杂八")
 @RequiredArgsConstructor
 public class PersonalPlugin {
-
-    private final BotConfig botConfig;
 
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
     public void replyJyGroup(Bot bot, PrivateMessageEvent event) {
@@ -34,7 +32,7 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
-        if (!botConfig.isSuperUser(event.getUserId())) {
+        if (!BotConfig.isSuperUser(event.getUserId())) {
             return;
         }
         bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);

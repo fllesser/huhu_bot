@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 public class DispatcherCore {
 
     private final ApplicationContext ioc;
-    private final BotConfig botConfig;
 
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
@@ -62,7 +61,7 @@ public class DispatcherCore {
                     }
                 });
 
-                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", ANSI.BLUE,
+                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", ANSI.YELLOW,
                         pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()), ANSI.RESET);
             }
         }
@@ -102,8 +101,8 @@ public class DispatcherCore {
     private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
         String message = event.getMessage();
         //如果配置了命令前缀
-        if (botConfig.getCommandPrefixes().length > 0) {
-            if (Arrays.stream(botConfig.getCommandPrefixes()).map(Object::toString).noneMatch(message::startsWith)) {
+        if (BotConfig.commandPrefixes.size() > 0) {
+            if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(message::startsWith)) {
                 return true; //没有命令前缀直接阻断
             } else {
                 message = message.substring(1);
@@ -112,7 +111,7 @@ public class DispatcherCore {
         for (String command : handler.commands) {
             //匹配前缀命令
             if (message.startsWith(command)) {
-                log.info("{}{} will be handled by Plugin[{}], Command[{}], Priority[{}]{}", ANSI.GREEN,
+                log.info("{}{} will be handled by Plugin[{}], Command[{}], Priority[{}]{}", ANSI.YELLOW,
                         event, handler.plugin.getClass().getSimpleName(), command, handler.priority, ANSI.RESET);
                 //去除触发的command, 并去掉头尾空格
                 event.setMessage(message.replaceFirst(command, "").trim());
@@ -129,7 +128,7 @@ public class DispatcherCore {
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
             if (event.getMessage().contains(keyword)) {
-                log.info("{}{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]{}", ANSI.GREEN,
+                log.info("{}{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]{}", ANSI.YELLOW,
                         event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority, ANSI.RESET);
                 handler.execute(bot, event);
                 return handler.block; //
@@ -142,7 +141,7 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.GREEN,
+                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.YELLOW,
                         event, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority, ANSI.RESET);
                 handler.execute(bot, event);
                 if (handler.block) {
