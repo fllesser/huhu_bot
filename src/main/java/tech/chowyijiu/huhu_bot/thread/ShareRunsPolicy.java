@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhu_bot.thread;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.RejectedExecutionHandler;

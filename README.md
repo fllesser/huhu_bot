@@ -9,56 +9,13 @@ nonebot2, 但是jvav
 ## 使用要点
 go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 
+## TODO
+1. 连续对话
+2. 自定义合并转发
+3. 把整个项目,做成springboot-starter, 使之和plugin分离
+
 
 ## 示例插件
-```Java
-@Slf4j
-@BotPlugin(name = "测试插件")
-public class TestPlugin {
-
-    @MessageHandler(name = "测试消息", commands = {"测试", "test"})
-    public void test1(Bot bot, MessageEvent event) {
-        bot.sendMessage(event, "测试消息", false);
-    }
-
-    @MessageHandler(name = "群聊测试1", commands = {"echo"}, priority = 3)
-    public void test2(Bot bot, GroupMessageEvent event) {
-        bot.sendGroupMessage(event.getGroupId(), "群聊测试111", true);
-    }
-
-    @MessageHandler(name = "群聊测试2", commands = {"echo"}, priority = 2, block = true)
-    public void test3(Bot bot, GroupMessageEvent event) {
-        bot.sendGroupMessage(event.getGroupId(), "群聊测试222", true);
-    }
-
-    @MessageHandler(name = "群聊测试3", commands = {"echo"}, priority = 1)
-    public void test7(Bot bot, GroupMessageEvent event) {
-        bot.sendGroupMessage(event.getGroupId(), "群聊测试333", true);
-    }
-
-    @MessageHandler(name = "私聊测试", commands = {"echo"})
-    public void test4(Bot bot, PrivateMessageEvent event) {
-        bot.sendPrivateMessage(event.getUserId(), "测试私聊", true);
-    }
-
-    @NoticeHandler(name = "群聊撤回1", priority = 2)
-    public void test5(Bot bot, GroupRecallNoticeEvent event) {
-        bot.sendMessage(event, "群聊撤回1 优先级2", true);
-    }
-    @NoticeHandler(name = "群聊撤回2", priority = 1)
-    public void test8(Bot bot, GroupRecallNoticeEvent event) {
-        bot.sendMessage(event, "群聊撤回2 优先级1", true);
-    }
-
-    @NoticeHandler(name = "群头衔变更")
-    public void test6(Bot bot, NotifyNoticeEvent event) {
-        if (SubTypeEnum.title.name().equals(event.getSubType())) {
-            bot.sendMessage(event, "群头衔变更", true);
-        }
-    }
-}
-
-```
 
 ```Java
 @Slf4j
@@ -95,6 +52,14 @@ public class GroupCoquettishOperationPlugin {
         bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
                 "group_id", event.getGroupId(), "user_id", event.getUserId(),
                 "special_title", title);
+    }
+
+    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
+    public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
+        if (!BotConfig.isSuperUser(event.getUserId())) {
+            return;
+        }
+        bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
     }
 }
 ```

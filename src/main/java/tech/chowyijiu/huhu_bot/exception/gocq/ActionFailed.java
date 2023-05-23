@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class ActionFailed extends RuntimeException {
 
-    public ActionFailed(String message, Throwable cause) {
-        super(message, cause);
-        log.error(message, cause);
+    public ActionFailed(String message) {
+        super(message);
+        log.error(message);
     }
 }

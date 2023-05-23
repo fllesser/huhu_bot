@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
-import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Sender;
 import tech.chowyijiu.huhu_bot.event.Event;
@@ -24,17 +23,17 @@ import java.util.Objects;
 @NoArgsConstructor
 public class MessageEvent extends Event {
 
-    private final String postType = PostTypeEnum.message.name();
+    private String postType; //message message_sent
     private Message msg;
 
     private String subType;
     private Long userId;
     private String messageType;
-    private String messageId;
+    private Integer messageId;
     private String message;
     private String rawMessage;
 
-    private Integer font;
+    private Integer font; //0
     private Sender sender;
 
     public static MessageEvent jsonToMessageEvent(JSONObject jsonObject) {

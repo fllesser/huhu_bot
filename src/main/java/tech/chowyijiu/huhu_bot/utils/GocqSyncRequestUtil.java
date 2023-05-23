@@ -1,17 +1,13 @@
 package tech.chowyijiu.huhu_bot.utils;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import org.springframework.util.CollectionUtils;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
@@ -39,40 +35,6 @@ public class GocqSyncRequestUtil {
         resultMap.put(key, val);
     }
 
-
-    public static SelfInfo getLoginInfo(Bot bot, long timeout) {
-        String responseStr = sendSyncRequest(bot, GocqActionEnum.GET_LOGIN_INGO, null, timeout);
-        if (responseStr != null) {
-            return JSONObject.parseObject(responseStr, SelfInfo.class);
-        }
-        return null;
-    }
-
-    /**
-     * 获取群成员
-     *
-     * @param groupId 群号
-     * @param exclude 需要排除的成员qq号
-     * @return
-     */
-    public static List<GroupMember> getGroupMemberList(Bot bot, Long groupId, List<Long> exclude, long timeout) {
-        Map<String, Object> params = new HashMap<>(1);
-        params.put("group_id", groupId);
-        String dataStr = sendSyncRequest(bot, GocqActionEnum.GET_GROUP_MEMBER_LIST, params, timeout);
-        if (dataStr == null) {
-            return null;
-        }
-        if (Strings.isBlank(dataStr)) {
-            return null;
-        }
-        List<GroupMember> data = JSONArray.parseArray(dataStr, GroupMember.class);
-        if (!CollectionUtils.isEmpty(exclude) && !CollectionUtils.isEmpty(data)) {
-            data.removeIf(next -> exclude.contains(next.getUserId()));
-        }
-        return data;
-    }
-
-
     /***
      * 发送同步消息
      * @param action 终结点
@@ -92,8 +54,10 @@ public class GocqSyncRequestUtil {
                 action.getAction() + "_" +
                 UUID.randomUUID().toString().replace("-","");
         requestBox.setEcho(echo);
+        //发送请求
         bot.sessionSend(JSONObject.toJSONString(requestBox));
         log.info("futureTask echo: {}", echo);
+        //提交task等待gocq传回数据
         FutureTask<String> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
         pool.submit(futureTask);
         try {

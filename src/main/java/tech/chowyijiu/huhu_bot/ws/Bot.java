@@ -5,14 +5,19 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.FriendInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
+import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.event.Event;
+import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 
 import java.util.HashMap;
@@ -72,24 +77,29 @@ public class Bot {
     }
 
     /**
-     * 调用 get api 获取数据
+     * 用于有响应数据的gocq api
      * @param action GocqActionEnum
      * @param paramsMap map
-     * @param timeout 超时事件
-     * @return String
+     * @return json 字符串数据
      */
-    private String callGetApi(GocqActionEnum action, HashMap<String, Object> paramsMap, Long timeout) {
+    private String callGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
         RequestBox<HashMap<String, Object>> requestBox = new RequestBox<>();
         requestBox.setAction(action.getAction());
-        requestBox.setParams(paramsMap);
-        return GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, timeout);
+        if (paramsMap != null) {
+            requestBox.setParams(paramsMap);
+        }
+        String responseStr = GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, 5000L);
+        if (StringUtils.hasLength(responseStr)) {
+            return responseStr;
+        }
+        throw new ActionFailed("action:" + action.getAction() + " 获取数据为空");
     }
 
     /**
      * 调用 get api获取数据, 同步, 10s超时
      * @param action GocqActionEnum
-     * @param params 参数
-     * @return String
+     * @param params 参数 key, value, key, value
+     * @return json 字符串数据
      */
     public String callGetApi(GocqActionEnum action, Object... params) {
         HashMap<String, Object> paramsMap = new HashMap<>();
@@ -101,8 +111,31 @@ public class Bot {
         for (int i = 0; i < params.length; i += 2) {
             paramsMap.put(params[i].toString(), params[i + 1]);
         }
-        return this.callGetApi(action, paramsMap, 10000L);
+        return this.callGetApi(action, paramsMap);
     }
+
+    /**
+     * 获取bot信息
+     * @return SelfInfo
+     */
+    public SelfInfo getLoginInfo() {
+        String data = this.callGetApi(GocqActionEnum.GET_LOGIN_INGO, (HashMap<String, Object>) null);
+        return JSONObject.parseObject(data, SelfInfo.class);
+    }
+
+    /**
+     * 获取好友列表
+     * @return List<FriendInfo>
+     */
+    public List<FriendInfo> getFriendList() {
+        String data = this.callGetApi(GocqActionEnum.GET_FRIEND_LIST, (HashMap<String, Object>) null);
+        return JSONArray.parseArray(data, FriendInfo.class);
+    }
+
+    public void deleteFriend(Long userId) {
+        this.callApi(GocqActionEnum.DELETE_FRIEND, (HashMap<String, Object>) null);
+    }
+
 
     /**
      * 获取群成员列表
@@ -113,9 +146,6 @@ public class Bot {
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
         String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_LIST,
                 "group_id", groupId, "no_cache", noCache);
-        if (Strings.isBlank(data)) {
-            return null;
-        }
         return JSONArray.parseArray(data, GroupMember.class);
     }
 
@@ -151,9 +181,6 @@ public class Bot {
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
         String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_INFO,
                 "group_id", groupId, "user_id", userId, "no_cache", noCache);
-        if (Strings.isBlank(data)) {
-            return null;
-        }
         return JSONObject.parseObject(data, GroupMember.class);
     }
 
@@ -185,6 +212,48 @@ public class Bot {
         paramsMap.put("message", message);
         paramsMap.put("auto_escape", autoEscape);
         this.callApi(GocqActionEnum.SEND_PRIVATE_MSG, paramsMap);
+    }
+
+    /**
+     * 撤回消息
+     * @param messageId Integer
+     */
+    public void deleteMsg(Integer messageId) {
+        this.callApi(GocqActionEnum.DELETE_MSG, (HashMap<String, Object>) null);
+    }
+
+    /**
+     * 标记消息为已读
+     * @param messageId Integer
+     */
+    public void markMsgAsRead(Integer messageId) {
+        this.callApi(GocqActionEnum.MARK_MSG_AS_READ, (HashMap<String, Object>) null);
+    }
+
+    /**
+     * 获取转发消息
+     * @param messageId Integer
+     */
+    public void getForwardMsg(Integer messageId) {
+        String data = this.callGetApi(GocqActionEnum.GET_FORWARD_MSG, "message_id", messageId);
+    }
+
+    /**
+     * 发送群合并转发消息
+     * @param groupId
+     * @param nodes
+     */
+    public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
+        //String messages = JSONArray.toJSONString(nodes);
+        //log.info("messages: {}", messages);
+        this.callApi(GocqActionEnum.SEND_GROUP_FORWARD_MSG,
+                "group_id", groupId, "messages", nodes);
+    }
+
+    public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
+        //String messages = JSONArray.toJSONString(nodes);
+        this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
+                "user_id", userId, "messages", nodes);
     }
 
     /**
