@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 public class MessageSegment {
     //text, at...
     private final String type;
-    private final List<Node> data = new ArrayList<>(3);
+    private final List<Node> data = new ArrayList<>(5);
 
     @RequiredArgsConstructor
     static class Node {
@@ -57,9 +58,23 @@ public class MessageSegment {
         return segment;
     }
 
-    public static MessageSegment image(String url) {
+    /**
+     * 不使用缓存的普通图片
+     * @param file file://+path | url | base64://
+     * @return MessageSegment
+     */
+    public static MessageSegment image(String file) {
+        if (!StringUtils.hasLength(file)) return null;
         MessageSegment segment = new MessageSegment(CqTypeEnum.image.name());
-        segment.addParam("file", url).addParam("subType", "0");
+        if (file.startsWith("file://")) {
+            segment.addParam("file", file);
+        } else if (file.startsWith("http")) {
+            segment.addParam("file", file).addParam("cache", "0");
+        } else if (file.startsWith("base64://")) {
+            segment.addParam("file", file);
+        } else {
+            return null;
+        }
         return segment;
     }
 

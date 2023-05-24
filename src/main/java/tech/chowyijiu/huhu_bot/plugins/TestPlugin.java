@@ -7,7 +7,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -18,13 +18,14 @@ import java.util.List;
 @BotPlugin(name = "测试插件")
 public class TestPlugin {
 
-
     @MessageHandler(name = "测试发送群转发消息", commands = {"test"})
     public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
-        List<ForwardMessage> nodes = new ArrayList<>();
-        nodes.add(new ForwardMessage("哈哈", bot.getUserId(), "转发消息1"));
-        nodes.add(new ForwardMessage("农场主", bot.getUserId(), "转发消息2"));
-        nodes.add(new ForwardMessage("嘻嘻", bot.getUserId(), "转发消息3"));
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        map.put("1-2", "1.转发消息完全不可信\n2.转发消息完全不可信");
+        map.put("3-4", "3.转发消息完全不可信\n4.转发消息完全不可信");
+        map.put("5-6", "5.转发消息完全不可信\n6.转发消息完全不可信");
+        map.put("7-8", "7.转发消息完全不可信\n8.转发消息完全不可信");
+        List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
         bot.sendGroupForwardMsg(event.getGroupId(), nodes);
     }
 

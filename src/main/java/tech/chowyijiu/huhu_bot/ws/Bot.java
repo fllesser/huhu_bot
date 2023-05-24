@@ -239,19 +239,21 @@ public class Bot {
     }
 
     /**
-     * 发送群合并转发消息
+     * 群组发送合并转发消息
      * @param groupId
      * @param nodes
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
-        //String messages = JSONArray.toJSONString(nodes);
-        //log.info("messages: {}", messages);
         this.callApi(GocqActionEnum.SEND_GROUP_FORWARD_MSG,
                 "group_id", groupId, "messages", nodes);
     }
 
+    /**
+     * 私聊发送合并转发消息
+     * @param userId
+     * @param nodes
+     */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
-        //String messages = JSONArray.toJSONString(nodes);
         this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
                 "user_id", userId, "messages", nodes);
     }
