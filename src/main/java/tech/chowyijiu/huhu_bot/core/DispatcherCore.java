@@ -161,6 +161,9 @@ public class DispatcherCore {
         public String name;         //Handler注解里的name
         public int priority;
         public boolean block;       //false 为不阻断
+        //todo cd 令牌桶限流等
+        public int cutdown;         //cd 单位秒
+        public long lastExecuteTime;//上次调用时间戳
 
         //MessageHandler
         public String[] commands;

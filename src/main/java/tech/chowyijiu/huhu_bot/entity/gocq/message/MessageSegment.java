@@ -37,14 +37,7 @@ public class MessageSegment {
         return null;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("[CQ:").append(type);
-        data.forEach(node -> sb.append(",").append(node.key).append("=").append(node.value));
-        sb.append("]");
-        return sb.toString();
-    }
+
 
     public static MessageSegment text(String text) {
         MessageSegment segment = new MessageSegment(CqTypeEnum.text.name());
@@ -73,7 +66,7 @@ public class MessageSegment {
         } else if (file.startsWith("base64://")) {
             segment.addParam("file", file);
         } else {
-            return null;
+            segment.addParam("error", "Invalid parameters");
         }
         return segment;
     }
@@ -88,6 +81,15 @@ public class MessageSegment {
         MessageSegment segment = new MessageSegment(CqTypeEnum.tts.name());
         segment.addParam("text", text);
         return segment;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[CQ:").append(type);
+        data.forEach(node -> sb.append(",").append(node.key).append("=").append(node.value));
+        sb.append("]");
+        return sb.toString();
     }
 
 }

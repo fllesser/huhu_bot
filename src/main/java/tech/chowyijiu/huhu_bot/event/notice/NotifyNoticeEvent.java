@@ -17,6 +17,9 @@ public class NotifyNoticeEvent extends NoticeEvent {
     private final String noticeType = NoticeTypeEnum.notify.name();
     private String subType;
     private Long userId;
+
     private Long groupId;
+    private Long senderId;
+    private Long targetId;
     //private String title;
 }

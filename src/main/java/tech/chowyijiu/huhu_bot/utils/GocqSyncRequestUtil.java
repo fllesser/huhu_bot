@@ -2,9 +2,9 @@ package tech.chowyijiu.huhu_bot.utils;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
@@ -27,7 +27,7 @@ public class GocqSyncRequestUtil {
     public static long sleep = 5000L;
     public static final ExecutorService pool =
             new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
-            new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
+                    new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
 
     private static final Map<String, String> resultMap = new ConcurrentHashMap<>();
 
@@ -40,25 +40,23 @@ public class GocqSyncRequestUtil {
      * @param action 终结点
      * @param params 参数
      * @param timeout 超时 ms
-     * @param <T>
-     * @return
+     * @param <T> T
+     * @return String
      */
     public static <T> String sendSyncRequest(Bot bot, GocqActionEnum action, T params, long timeout) {
         RequestBox<T> requestBox = new RequestBox<>();
-        if (params != null) {
-            requestBox.setParams(params);
-        }
+        Optional.ofNullable(params).ifPresent(requestBox::setParams);
         requestBox.setAction(action.getAction());
         String echo = Thread.currentThread().getName() + "_" +
                 bot.getUserId() + "_" +
                 action.getAction() + "_" +
-                UUID.randomUUID().toString().replace("-","");
+                UUID.randomUUID().toString().replace("-", "");
         requestBox.setEcho(echo);
         //发送请求
         bot.sessionSend(JSONObject.toJSONString(requestBox));
-        log.info("futureTask echo: {}", echo);
+        //log.info("futureTask echo: {}", echo);
         //提交task等待gocq传回数据
-        FutureTask<String> futureTask = new FutureTask<>(new GocqSyncRequestUtil.Task(echo));
+        FutureTask<String> futureTask = new FutureTask<>(new Task(echo));
         pool.submit(futureTask);
         try {
             String res;
@@ -70,7 +68,7 @@ public class GocqSyncRequestUtil {
             //log.info("echo: {}, result: {}", echo, res);
             return res;
         } catch (InterruptedException e) {
-            log.error("发送同步消息线程中断异常,echo:{}", echo, e);
+            log.error("发送同步消息线程中断异常, echo:{}", echo, e);
         } catch (ExecutionException e) {
             log.error("发送同步消息执行异常,echo:{}", echo, e);
         } catch (TimeoutException e) {
@@ -88,7 +86,7 @@ public class GocqSyncRequestUtil {
         private final String echo;
 
         Task(String echo) {
-            if (Strings.isBlank(echo)) {
+            if (StringUtils.hasLength(echo)) {
                 throw new IllegalArgumentException("echo is blank");
             }
             this.echo = echo;
@@ -111,12 +109,14 @@ public class GocqSyncRequestUtil {
 
     /**
      * 发送私聊文件
+     *
      * @param userId
-     * @param filePath 该文件必须与gocqhttp在同一主机上
+     * @param filePath 该文件必须与go-cqhttp在同一主机上
      * @param fileName
      * @param timeout
      * @return
      */
+    @Deprecated
     public static SyncResponse uploadPrivateFile(Bot bot, Long userId, String filePath, String fileName, long timeout) {
         Map<String, Object> param = new HashMap<>(3);
         param.put("user_id", userId);
@@ -132,12 +132,14 @@ public class GocqSyncRequestUtil {
 
     /**
      * 用gocq去下载文件
+     *
      * @param url
      * @param threadCount
      * @param httpHeaders
      * @param timeout
      * @return 返回gocq下载到的文件绝对路径
      */
+    @Deprecated
     public static DownloadFileResp downloadFile(Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
 
         Map<String, Object> param = new HashMap<>(3);

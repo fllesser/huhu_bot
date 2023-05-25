@@ -4,10 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
+import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -68,5 +72,18 @@ public class GroupCoquettishOperationPlugin {
         bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
                 "group_id", event.getGroupId(), "user_id", event.getUserId(),
                 "special_title", event.getMessage());
+    }
+
+    //todo 添加cd, rule
+    @NoticeHandler(name = "群内回戳", priority = 0)
+    public void replyPoke(Bot bot, NotifyNoticeEvent event) {
+        if (SubTypeEnum.poke.name().equals(event.getSubType())
+            && bot.getUserId().equals(event.getTargetId())
+            && !bot.getUserId().equals(event.getUserId())) {
+            Optional.ofNullable(event.getGroupId())
+                    .ifPresent(groupId -> bot.sendGroupMessage(
+                            groupId, MessageSegment.poke(event.getUserId()) + "", false)
+                    );
+        }
     }
 }
