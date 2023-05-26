@@ -86,7 +86,7 @@ public class GocqSyncRequestUtil {
         private final String echo;
 
         Task(String echo) {
-            if (StringUtils.hasLength(echo)) {
+            if (!StringUtils.hasLength(echo)) {
                 throw new IllegalArgumentException("echo is blank");
             }
             this.echo = echo;

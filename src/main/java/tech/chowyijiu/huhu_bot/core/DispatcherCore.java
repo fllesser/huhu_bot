@@ -111,11 +111,10 @@ public class DispatcherCore {
         for (String command : handler.commands) {
             //匹配前缀命令
             if (message.startsWith(command)) {
-                log.info("{}{} will be handled by Plugin[{}], Command[{}], Priority[{}]{}", ANSI.YELLOW,
-                        event, handler.plugin.getClass().getSimpleName(), command, handler.priority, ANSI.RESET);
                 //去除触发的command, 并去掉头尾空格
                 event.setMessage(message.replaceFirst(command, "").trim());
-                handler.execute(bot, event);
+                if (handler.checkCutdown()) handler.execute(bot, event); //else bot.sendMessage
+                else bot.sendMessage(event, "别玩太快啦", true);
                 return handler.block;
             }
         }
@@ -128,9 +127,8 @@ public class DispatcherCore {
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
             if (event.getMessage().contains(keyword)) {
-                log.info("{}{} will be handled by Plugin[{}], Keyword[{}], Priority[{}]{}", ANSI.YELLOW,
-                        event, handler.plugin.getClass().getSimpleName(), keyword, handler.priority, ANSI.RESET);
-                handler.execute(bot, event);
+                if (handler.checkCutdown()) handler.execute(bot, event);
+                else bot.sendMessage(event, "别玩太快啦", true);
                 return handler.block; //
             }
         }
@@ -141,17 +139,13 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.YELLOW,
-                        event, handler.plugin.getClass().getSimpleName(), handler.name, handler.priority, ANSI.RESET);
-                handler.execute(bot, event);
-                if (handler.block) {
-                    break;
-                }
+                if (handler.checkCutdown()) handler.execute(bot, event);
+                else bot.sendMessage(event, "别玩太快啦", true);
+                if (handler.block) break;
             }
         }
         log.info("{} Match NoticeHandler End", event);
     }
-
 
     static class Handler {
         private final Object plugin; //ioc容器中的插件Bean
@@ -161,7 +155,7 @@ public class DispatcherCore {
         public String name;         //Handler注解里的name
         public int priority;
         public boolean block;       //false 为不阻断
-        //todo cd 令牌桶限流等
+
         public int cutdown;         //cd 单位秒
         public long lastExecuteTime;//上次调用时间戳
 
@@ -189,6 +183,7 @@ public class DispatcherCore {
             handler.priority = mh.priority();
             handler.commands = mh.commands();
             handler.keywords = mh.keywords();
+            handler.cutdown = mh.cutdown();
             return handler;
         }
 
@@ -197,11 +192,20 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
+            handler.cutdown = nh.cutdown();
             return handler;
+        }
+
+        public boolean checkCutdown() {
+            if (this.cutdown <= 0) return true; //设置小于0, 防止用户设置负数cutdown, 徒增以下计算
+            return System.currentTimeMillis() - this.lastExecuteTime > this.cutdown * 1000L;
         }
 
         public void execute(Object... args) {
             try {
+                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.YELLOW,
+                        args[1].getClass(), this.plugin.getClass().getSimpleName(), this.name, this.priority, ANSI.RESET);
+                this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, args);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();

@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
@@ -14,10 +15,10 @@ import java.util.List;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "测试插件")
+@BotPlugin(name = "测试插件")
 public class TestPlugin {
 
-    @MessageHandler(name = "测试发送群转发消息", commands = {"test"})
+    @MessageHandler(name = "测试发送群转发消息", commands = {"转发"})
     public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("1-2", "1.转发消息完全不可信\n2.转发消息完全不可信");
@@ -26,6 +27,11 @@ public class TestPlugin {
         map.put("7-8", "7.转发消息完全不可信\n8.转发消息完全不可信");
         List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
         bot.sendGroupForwardMsg(event.getGroupId(), nodes);
+    }
+
+    @MessageHandler(name = "测试cutdown", keywords = {"cd"}, priority = 0, cutdown = 60)
+    public void testCutDown(Bot bot, GroupMessageEvent event) {
+        bot.sendMessage(event, "测试cutdown", true);
     }
 
     //@MessageHandler(name = "测试消息", commands = {"测试", "test"})
