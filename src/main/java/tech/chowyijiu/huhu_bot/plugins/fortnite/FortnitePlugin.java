@@ -17,7 +17,6 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 //@BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
-
     private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png") + "";
 
     @MessageHandler(name = "每日vb图", commands = {"vb", "VB"}, priority = 4)
@@ -25,22 +24,10 @@ public class FortnitePlugin {
         bot.sendGroupMessage(event.getGroupId(), "vb图", true);
     }
 
-    @MessageHandler(name = "商城", commands = {"商城", "shop"}, priority = 1, cutdown = 60)
+    @MessageHandler(name = "商城", commands = {"商城", "shop"}, priority = 1)
     public void shop(Bot bot, MessageEvent event) {
         bot.sendMessage(event, shop, false);
     }
-
-    //@MessageHandler(name = "商城2", commands = {"shop2"}, priority = 0)
-    //public void shop2(Bot bot, GroupMessageEvent event) {
-    //    String message = "今日商城" + MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png") + "由商城2发出";
-    //    bot.sendMessage(event, message, false);
-    //}
-    //
-    //@MessageHandler(name = "商城3", keywords = {"商城"}, priority = 3)
-    //public void shop3(Bot bot, GroupMessageEvent event) {
-    //    MessageSegment image = MessageSegment.image("file:///home/chow/shop.png");
-    //    bot.sendMessage(event, image + "", false);
-    //}
 
     @Scheduled(cron = "0 1 8 * * * ")
     public void scheduleShop() {

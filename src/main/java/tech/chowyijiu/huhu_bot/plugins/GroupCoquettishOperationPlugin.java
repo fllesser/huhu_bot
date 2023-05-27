@@ -47,14 +47,14 @@ public class GroupCoquettishOperationPlugin {
 
     private String buildDateCard() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 10:00", formatter);
-        Duration duration = Duration.between(LocalDateTime.now(), shitTime);
+        LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 17:00", formatter);
+        Duration duration = Duration.between(shitTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);
         long hours = duration.toHours();
         duration = duration.minusHours(hours);
         long minutes = duration.toMinutes();
-        return "距离答辩还有" + days + "天" + hours + "时" + minutes + "分";
+        return "失业第" + days + "天" + hours + "时" + minutes + "分";
     }
 
     @MessageHandler(name = "头衔自助", commands = {"sgst"})
@@ -74,7 +74,7 @@ public class GroupCoquettishOperationPlugin {
                 "special_title", event.getMessage());
     }
 
-    //todo 添加cd, rule
+
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(Bot bot, NotifyNoticeEvent event) {
         if (SubTypeEnum.poke.name().equals(event.getSubType())

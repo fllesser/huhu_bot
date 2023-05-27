@@ -19,6 +19,7 @@ public @interface MessageHandler {
     String[] commands() default {}; //命令前缀匹配, event的message字段会自动去除触发的command和前后空白符
     String[] keywords() default {}; //关键词匹配
 
-    int cutdown() default 0;    // cd 单位 s
+    //int cutdown() default 0;    // cd 单位 s
     //todo 自定义cd消息
+    //String cdMsg() default "";
 }

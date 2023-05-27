@@ -35,6 +35,7 @@ public class DispatcherCore {
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
+
     @PostConstruct
     private void loadPlugin() {
         //获取所有插件Bean
@@ -113,8 +114,8 @@ public class DispatcherCore {
             if (message.startsWith(command)) {
                 //去除触发的command, 并去掉头尾空格
                 event.setMessage(message.replaceFirst(command, "").trim());
-                if (handler.checkCutdown()) handler.execute(bot, event); //else bot.sendMessage
-                else bot.sendMessage(event, "别玩太快啦", true);
+                //if (handler.checkCutdown(bot, event))
+                handler.execute(bot, event);
                 return handler.block;
             }
         }
@@ -127,8 +128,8 @@ public class DispatcherCore {
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
             if (event.getMessage().contains(keyword)) {
-                if (handler.checkCutdown()) handler.execute(bot, event);
-                else bot.sendMessage(event, "别玩太快啦", true);
+                //if (handler.checkCutdown(bot, event))
+                handler.execute(bot, event);
                 return handler.block; //
             }
         }
@@ -139,8 +140,8 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                if (handler.checkCutdown()) handler.execute(bot, event);
-                else bot.sendMessage(event, "别玩太快啦", true);
+                //if (handler.checkCutdown(bot, event))
+                handler.execute(bot, event);
                 if (handler.block) break;
             }
         }
@@ -156,8 +157,10 @@ public class DispatcherCore {
         public int priority;
         public boolean block;       //false 为不阻断
 
-        public int cutdown;         //cd 单位秒
-        public long lastExecuteTime;//上次调用时间戳
+
+        //public int cutdown;         //cd 单位秒
+        //public long lastExecuteTime;//上次调用时间戳
+        //public String cdMsg;
 
         //MessageHandler
         public String[] commands;
@@ -183,7 +186,8 @@ public class DispatcherCore {
             handler.priority = mh.priority();
             handler.commands = mh.commands();
             handler.keywords = mh.keywords();
-            handler.cutdown = mh.cutdown();
+            //handler.cutdown = mh.cutdown();
+            //handler.cdMsg = mh.cdMsg();
             return handler;
         }
 
@@ -192,20 +196,31 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
-            handler.cutdown = nh.cutdown();
+            //handler.cutdown = nh.cutdown();
+            //handler.cdMsg = nh.cdMsg();
             return handler;
         }
 
-        public boolean checkCutdown() {
-            if (this.cutdown <= 0) return true; //设置小于0, 防止用户设置负数cutdown, 徒增以下计算
-            return System.currentTimeMillis() - this.lastExecuteTime > this.cutdown * 1000L;
-        }
+        //@Deprecated
+        //public boolean checkCutdown(final Bot bot, final Event event) {
+        //    if (this.cutdown <= 0) return true; //设置小于0, 防止用户设置负数cutdown, 徒增以下计算
+        //    if (System.currentTimeMillis() - this.lastExecuteTime > this.cutdown * 1000L) {
+        //        return true;
+        //    } else {
+        //        //cd 没好发送cdMsg
+        //        if (StringUtils.hasLength(this.cdMsg)) {
+        //            bot.sendMessage(event, this.cdMsg, true);
+        //        }
+        //        return false;
+        //    }
+        //}
 
         public void execute(Object... args) {
             try {
-                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}", ANSI.YELLOW,
-                        args[1].getClass(), this.plugin.getClass().getSimpleName(), this.name, this.priority, ANSI.RESET);
-                this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
+                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
+                        , ANSI.YELLOW, args[1].getClass(), this.plugin.getClass().getSimpleName()
+                        , this.name, this.priority, ANSI.RESET);
+                //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, args);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
