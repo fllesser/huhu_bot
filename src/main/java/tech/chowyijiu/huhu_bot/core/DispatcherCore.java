@@ -35,6 +35,7 @@ public class DispatcherCore {
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
+    private final Map<String, Handler> HANDLER_CALL_RECORD = new HashMap<>();
 
     @PostConstruct
     private void loadPlugin() {
@@ -69,6 +70,7 @@ public class DispatcherCore {
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
             //throw new RuntimeException("[DispatcherCore] No plugins were found");
             log.info("{}No plugins were found{}", ANSI.YELLOW, ANSI.RESET);
+            return;
         }
         //根据priority对handler进行排序, 并全部加入到handlerContainer中
         MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
@@ -104,7 +106,8 @@ public class DispatcherCore {
         //如果配置了命令前缀
         if (BotConfig.commandPrefixes.size() > 0) {
             if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(message::startsWith)) {
-                return true; //没有命令前缀直接阻断
+                //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
+                return false;
             } else {
                 message = message.substring(1);
             }
@@ -114,7 +117,6 @@ public class DispatcherCore {
             if (message.startsWith(command)) {
                 //去除触发的command, 并去掉头尾空格
                 event.setMessage(message.replaceFirst(command, "").trim());
-                //if (handler.checkCutdown(bot, event))
                 handler.execute(bot, event);
                 return handler.block;
             }
@@ -128,7 +130,6 @@ public class DispatcherCore {
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
             if (event.getMessage().contains(keyword)) {
-                //if (handler.checkCutdown(bot, event))
                 handler.execute(bot, event);
                 return handler.block; //
             }
@@ -140,7 +141,6 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                //if (handler.checkCutdown(bot, event))
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
@@ -186,8 +186,6 @@ public class DispatcherCore {
             handler.priority = mh.priority();
             handler.commands = mh.commands();
             handler.keywords = mh.keywords();
-            //handler.cutdown = mh.cutdown();
-            //handler.cdMsg = mh.cdMsg();
             return handler;
         }
 
@@ -196,8 +194,6 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
-            //handler.cutdown = nh.cutdown();
-            //handler.cdMsg = nh.cdMsg();
             return handler;
         }
 

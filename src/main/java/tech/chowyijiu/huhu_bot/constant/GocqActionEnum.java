@@ -21,11 +21,13 @@ public enum GocqActionEnum {
 
     SET_GROUP_CARD("set_group_card", "设置群名片"),
     SET_GROUP_SPECIAL_TITLE("set_group_special_title", "设置群专属头衔"),
+    SET_GROUP_KICK("set_group_kick", "群组踢人"),
 
     DELETE_FRIEND("delete_friend", "删除好友"),
     DELETE_MSG("delete_msg","撤回消息"),
 
     MARK_MSG_AS_READ("mark_msg_as_read", "标记消息为已读"),
+
 
 
     //get 有响应数据 需要使用 bot.callGetApi

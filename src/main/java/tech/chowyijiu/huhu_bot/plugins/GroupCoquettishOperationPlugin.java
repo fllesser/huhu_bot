@@ -11,6 +11,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
@@ -85,5 +86,21 @@ public class GroupCoquettishOperationPlugin {
                             groupId, MessageSegment.poke(event.getUserId()) + "", false)
                     );
         }
+    }
+
+
+    @NoticeHandler(name = "清代肝")
+    public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {
+        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
+        Optional.ofNullable(groupMember.getNickname()).ifPresent(nickname -> {
+            if (nickname.contains("代肝")) {
+                bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
+            }
+        });
+        Optional.ofNullable(groupMember.getCard()).ifPresent(card -> {
+            if (card.contains("代肝")) {
+                bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
+            }
+        });
     }
 }

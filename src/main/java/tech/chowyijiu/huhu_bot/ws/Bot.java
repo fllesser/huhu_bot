@@ -278,6 +278,15 @@ public class Bot {
         }
     }
 
+
+    public void kickGroupMember(Long groupId, Long userId, boolean rejectAddRequest) {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("group_id", groupId);
+        paramsMap.put("user_id", userId);
+        paramsMap.put("reject_add_request", rejectAddRequest);
+        this.callApi(GocqActionEnum.SET_GROUP_KICK, paramsMap);
+    }
+
     /**
      * ws session send
      * @param text text
