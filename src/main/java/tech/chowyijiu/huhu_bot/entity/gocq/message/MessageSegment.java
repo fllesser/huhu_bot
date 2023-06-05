@@ -38,7 +38,6 @@ public class MessageSegment {
     }
 
 
-
     public static MessageSegment text(String text) {
         MessageSegment segment = new MessageSegment(CqTypeEnum.text.name());
         segment.addParam("text", text);
@@ -53,6 +52,7 @@ public class MessageSegment {
 
     /**
      * 不使用缓存的普通图片
+     *
      * @param file file://+path | url | base64://
      * @return MessageSegment
      */
@@ -68,6 +68,13 @@ public class MessageSegment {
         } else {
             segment.addParam("error", "Invalid parameters");
         }
+        return segment;
+    }
+
+    public static MessageSegment image(String file, int cache, int threadNum) {
+        if (!StringUtils.hasLength(file)) return null;
+        MessageSegment segment = new MessageSegment(CqTypeEnum.image.name());
+        segment.addParam("file", file).addParam("cache", cache + "").addParam("c", threadNum + "");
         return segment;
     }
 
