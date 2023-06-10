@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
@@ -86,7 +85,7 @@ public class GocqSyncRequestUtil {
         private final String echo;
 
         Task(String echo) {
-            if (!StringUtils.hasLength(echo)) {
+            if (!StringUtil.hasLength(echo)) {
                 throw new IllegalArgumentException("echo is blank");
             }
             this.echo = echo;

@@ -9,12 +9,14 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
+import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -141,6 +143,8 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
+                //todo
+
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
@@ -157,7 +161,6 @@ public class DispatcherCore {
         public int priority;
         public boolean block;       //false 为不阻断
 
-
         //public int cutdown;         //cd 单位秒
         //public long lastExecuteTime;//上次调用时间戳
         //public String cdMsg;
@@ -165,6 +168,8 @@ public class DispatcherCore {
         //MessageHandler
         public String[] commands;
         public String[] keywords;
+
+        public Rule rule;
 
         private Handler(Object plugin, Method method) {
             this.plugin = plugin;
@@ -186,6 +191,7 @@ public class DispatcherCore {
             handler.priority = mh.priority();
             handler.commands = mh.commands();
             handler.keywords = mh.keywords();
+            handler.initRule();
             return handler;
         }
 
@@ -194,6 +200,7 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
+            handler.initRule();
             return handler;
         }
 
@@ -211,16 +218,32 @@ public class DispatcherCore {
         //    }
         //}
 
-        public void execute(Object... args) {
+        public void execute(Bot bot, Event event) {
             try {
+                if (rule != null && !rule.check(bot, event)) {
+                    log.info("rule check failed, execute end");
+                    return;
+                }
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
-                        , ANSI.YELLOW, args[1].getClass(), this.plugin.getClass().getSimpleName()
+                        , ANSI.YELLOW, event.getClass(), this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
-                method.invoke(plugin, args);
+                method.invoke(plugin, bot, event);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void initRule()  {
+            String RuleName = method.getName() + "Rule";
+            try {
+                Field field = plugin.getClass().getDeclaredField(RuleName);
+                field.setAccessible(true);
+                rule = ((Rule) field.get(plugin));
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+
+            }
+
         }
     }
 

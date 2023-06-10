@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.plugins.fortnite;
 
 import lombok.extern.slf4j.Slf4j;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 public class FortnitePlugin {
 
     private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png") + "";
@@ -68,6 +69,11 @@ public class FortnitePlugin {
         if (Arrays.stream(groups).collect(Collectors.toList()).contains(event.getGroupId())) {
             bot.sendGroupForwardMsg(event.getGroupId(), nodes);
         }
+    }
+
+    @MessageHandler(name = "文字加图片测试", commands = {"shop"}, priority = 0, block = true)
+    public void shop(Bot bot, GroupMessageEvent event) {
+        bot.sendMessage(event, "今日商城" + shop, false);
     }
 
 }

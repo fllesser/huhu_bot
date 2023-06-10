@@ -7,6 +7,7 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
+import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
@@ -76,16 +77,20 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
+    Rule replyPokeRule = (bot, event) -> {
+        NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
+        return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType())
+            && bot.getUserId().equals(notifyNoticeEvent.getTargetId())
+            && !bot.getUserId().equals(notifyNoticeEvent.getUserId());
+    };
+
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(Bot bot, NotifyNoticeEvent event) {
-        if (SubTypeEnum.poke.name().equals(event.getSubType())
-            && bot.getUserId().equals(event.getTargetId())
-            && !bot.getUserId().equals(event.getUserId())) {
-            Optional.ofNullable(event.getGroupId())
-                    .ifPresent(groupId -> bot.sendGroupMessage(
-                            groupId, MessageSegment.poke(event.getUserId()) + "", false)
-                    );
-        }
+        Optional.ofNullable(event.getGroupId())
+                .ifPresent(groupId -> bot.sendGroupMessage(
+                        groupId, MessageSegment.poke(event.getUserId()) + "", false)
+                );
+
     }
 
 
