@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhu_bot.annotation;
 
-import tech.chowyijiu.huhu_bot.core.rule.DefaultRule;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
 
 import java.lang.annotation.*;

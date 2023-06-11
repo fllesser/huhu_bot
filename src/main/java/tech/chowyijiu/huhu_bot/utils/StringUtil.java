@@ -17,6 +17,7 @@ public class StringUtil {
         if (hasLength(str)) consumer.accept(str);
     }
 
+
     public static <R> R hasLengthReturn(String str, Function<String, R> function) {
         if (hasLength(str)) return function.apply(str);
         else return null;

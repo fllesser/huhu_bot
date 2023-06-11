@@ -42,15 +42,13 @@ public class ProcessEventTask implements Runnable {
     public void run() {
         try {
             if (event instanceof MessageEvent) {
-                DISPATCHER_CORE.onMessage(bot, (MessageEvent) this.event);
+                DISPATCHER_CORE.onMessage(bot, (MessageEvent) event);
             } else if (event instanceof NoticeEvent) {
-                DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) this.event));
+                DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) event));
             } else if (event instanceof EchoEvent) {
-                EchoEvent echoEvent = (EchoEvent) this.event;
+                EchoEvent echoEvent = (EchoEvent) event;
                 String echo = echoEvent.getEcho();
-                if (StringUtils.hasLength(echo)) {
-                    GocqSyncRequestUtil.putEchoResult(echo, echoEvent.getData());
-                }
+                if (StringUtils.hasLength(echo)) GocqSyncRequestUtil.putEchoResult(echo, echoEvent.getData());
             } else if (event instanceof RequestEvent) {
                 log.info("{}", event);
             }

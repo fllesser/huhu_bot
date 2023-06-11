@@ -15,6 +15,7 @@ import java.util.List;
  */
 @Slf4j
 //@BotPlugin(name = "测试插件")
+@SuppressWarnings("unused")
 public class TestPlugin {
 
     @MessageHandler(name = "测试发送群转发消息", commands = {"转发"})

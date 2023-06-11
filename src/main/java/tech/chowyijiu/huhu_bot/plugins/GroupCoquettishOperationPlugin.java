@@ -28,6 +28,7 @@ import java.util.Optional;
  */
 @Slf4j
 @BotPlugin("群组骚操作")
+@SuppressWarnings("unused")
 public class GroupCoquettishOperationPlugin {
 
     @Scheduled(cron = "0 * * * * *  ")
@@ -59,21 +60,30 @@ public class GroupCoquettishOperationPlugin {
         return "失业第" + days + "天" + hours + "时" + minutes + "分";
     }
 
+
+    //校验机器人是否是群主
+    Rule sgstRule = (bot, event) -> {
+        GroupMember groupMember = bot.getGroupMember(((GroupMessageEvent) event).getGroupId(), bot.getUserId(), true);
+        return "owner".equals(groupMember.getRole());
+    };
+
     @MessageHandler(name = "头衔自助", commands = {"sgst"})
     public void sgst(Bot bot, GroupMessageEvent event) {
-        //先判断bot是不是群主
-        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), bot.getUserId(), true);
-        if (!"owner".equals(groupMember.getRole())) {
-            log.info("{} 机器人不是群主, 忽略", "头衔自助");
-            return;
-        }
-        if (event.getMessage().length() > 6) {
+        String message = event.getMessage();
+        if (message.length() > 6) {
             bot.sendGroupMessage(event.getGroupId(), "群头衔最多为6位", true);
             return;
         }
+        String[] ignored = new String[]{"群主", "管理员"};
+        for (String s : ignored) {
+            if (message.contains(s)) {
+                message = "群猪";
+                break;
+            }
+        }
         bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
                 "group_id", event.getGroupId(), "user_id", event.getUserId(),
-                "special_title", event.getMessage());
+                "special_title", message);
     }
 
 
@@ -90,9 +100,7 @@ public class GroupCoquettishOperationPlugin {
                 .ifPresent(groupId -> bot.sendGroupMessage(
                         groupId, MessageSegment.poke(event.getUserId()) + "", false)
                 );
-
     }
-
 
     @NoticeHandler(name = "清代肝")
     public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {

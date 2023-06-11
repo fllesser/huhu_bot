@@ -37,7 +37,7 @@ public class DispatcherCore {
     private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
     private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
 
-    private final Map<String, Handler> HANDLER_CALL_RECORD = new HashMap<>();
+    //private final Map<String, Handler> HANDLER_CALL_RECORD = new HashMap<>();
 
     @PostConstruct
     private void loadPlugin() {
@@ -220,10 +220,7 @@ public class DispatcherCore {
 
         public void execute(Bot bot, Event event) {
             try {
-                if (rule != null && !rule.check(bot, event)) {
-                    log.info("rule check failed, execute end");
-                    return;
-                }
+                if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
                         , ANSI.YELLOW, event.getClass(), this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
