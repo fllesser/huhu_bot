@@ -9,7 +9,7 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
-import tech.chowyijiu.huhu_bot.core.rule.Rule;
+import tech.chowyijiu.huhu_bot.rule.Rule;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -222,7 +222,7 @@ public class DispatcherCore {
             try {
                 if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
-                        , ANSI.YELLOW, event.getClass(), this.plugin.getClass().getSimpleName()
+                        , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
@@ -240,7 +240,6 @@ public class DispatcherCore {
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
 
             }
-
         }
     }
 

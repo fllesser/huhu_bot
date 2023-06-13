@@ -7,13 +7,14 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
-import tech.chowyijiu.huhu_bot.core.rule.Rule;
+import tech.chowyijiu.huhu_bot.rule.Rule;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -34,18 +35,16 @@ public class GroupCoquettishOperationPlugin {
     @Scheduled(cron = "0 * * * * *  ")
     public void dateGroupCard() {
         String card = buildDateCard();
-        Server.getBots().forEach(bot -> {
-            Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
-                    .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
-                        bot.callApi(GocqActionEnum.SET_GROUP_CARD,
-                                "group_id", groupId, "user_id", bot.getUserId(), "card", card);
-                        try {
-                            Thread.sleep(2000L);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    });
-        });
+        Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+                .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
+                    bot.callApi(GocqActionEnum.SET_GROUP_CARD,
+                            "group_id", groupId, "user_id", bot.getUserId(), "card", card);
+                    try {
+                        Thread.sleep(2000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }));
     }
 
     private String buildDateCard() {
@@ -61,59 +60,50 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    //校验机器人是否是群主
+    //机器人->群主
     Rule sgstRule = (bot, event) -> {
-        GroupMember groupMember = bot.getGroupMember(((GroupMessageEvent) event).getGroupId(), bot.getUserId(), true);
+        GroupMember groupMember = bot.getGroupMember(
+                ((GroupMessageEvent) event).getGroupId(), bot.getUserId(), true);
         return "owner".equals(groupMember.getRole());
     };
 
     @MessageHandler(name = "头衔自助", commands = {"sgst"})
     public void sgst(Bot bot, GroupMessageEvent event) {
-        String message = event.getMessage();
-        if (message.length() > 6) {
-            bot.sendGroupMessage(event.getGroupId(), "群头衔最多为6位", true);
+        String title = event.getMessage();
+        if (title.length() > 6) {
+            bot.sendGroupMessage(event.getGroupId(), "[bot]群头衔最多为6位", true);
             return;
         }
-        String[] ignored = new String[]{"群主", "管理员"};
-        for (String s : ignored) {
-            if (message.contains(s)) {
-                message = "群猪";
+        for (String filter : new String[]{"群主", "管理员"}) {
+            if (title.contains(filter)) {
+                title = "群猪";
                 break;
             }
         }
         bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
                 "group_id", event.getGroupId(), "user_id", event.getUserId(),
-                "special_title", message);
+                "special_title", title);
     }
 
 
     Rule replyPokeRule = (bot, event) -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
         return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType())
-            && bot.getUserId().equals(notifyNoticeEvent.getTargetId())
-            && !bot.getUserId().equals(notifyNoticeEvent.getUserId());
+                && bot.getUserId().equals(notifyNoticeEvent.getTargetId())
+                && !bot.getUserId().equals(notifyNoticeEvent.getUserId());
     };
 
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(Bot bot, NotifyNoticeEvent event) {
-        Optional.ofNullable(event.getGroupId())
-                .ifPresent(groupId -> bot.sendGroupMessage(
-                        groupId, MessageSegment.poke(event.getUserId()) + "", false)
-                );
+        if (event.getGroupId() != null) bot.sendGroupMessage(
+                event.getGroupId(), MessageSegment.poke(event.getUserId()) + "", false);
     }
 
     @NoticeHandler(name = "清代肝")
     public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
-        Optional.ofNullable(groupMember.getNickname()).ifPresent(nickname -> {
-            if (nickname.contains("代肝")) {
+        for (String name : new String[]{groupMember.getNickname(), groupMember.getCard()})
+            if (StringUtil.hasLength(name) && name.contains("代肝"))
                 bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
-            }
-        });
-        Optional.ofNullable(groupMember.getCard()).ifPresent(card -> {
-            if (card.contains("代肝")) {
-                bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
-            }
-        });
     }
 }

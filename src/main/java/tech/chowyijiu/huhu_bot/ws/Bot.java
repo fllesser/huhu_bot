@@ -30,6 +30,7 @@ import java.util.List;
 @Slf4j
 @Getter
 @ToString
+@SuppressWarnings("unused")
 public class Bot {
 
     private final Long userId;

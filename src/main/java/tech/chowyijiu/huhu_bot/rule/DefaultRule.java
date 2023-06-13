@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.core.rule;
+package tech.chowyijiu.huhu_bot.rule;
 
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.ws.Bot;
@@ -9,7 +9,7 @@ import tech.chowyijiu.huhu_bot.ws.Bot;
  */
 public class DefaultRule implements Rule {
 
-    public static final DefaultRule defaultRule = new DefaultRule();
+    public static final DefaultRule instance = new DefaultRule();
 
     private DefaultRule() {
 

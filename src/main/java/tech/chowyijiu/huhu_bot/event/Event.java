@@ -4,13 +4,13 @@ package tech.chowyijiu.huhu_bot.event;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
 import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 /**
  * @author elastic chow
@@ -29,7 +29,7 @@ public abstract class Event {
     public static Event jsonToEvent(JSONObject jsonObject) {
         String postType = jsonObject.getString("post_type");
         Event event = null;
-        if (StringUtils.hasLength(postType)) {
+        if (StringUtil.hasLength(postType)) {
             switch (PostTypeEnum.valueOf(postType)) {
                 case message_sent:
                 case message:
