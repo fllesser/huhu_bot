@@ -23,7 +23,7 @@ public class GocqSyncRequestUtil {
     }
 
     public static int poolSize = Runtime.getRuntime().availableProcessors() + 1;
-    public static long sleep = 5000L;
+    public static long sleep = 3000L;
     public static final ExecutorService pool =
             new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
                     new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
@@ -42,7 +42,8 @@ public class GocqSyncRequestUtil {
      * @param <T> T
      * @return String
      */
-    public static <T> String sendSyncRequest(Bot bot, GocqActionEnum action, T params, long timeout) {
+    public static <T> String sendSyncRequest(
+            Bot bot, GocqActionEnum action, T params, long timeout) {
         RequestBox<T> requestBox = new RequestBox<>();
         Optional.ofNullable(params).ifPresent(requestBox::setParams);
         requestBox.setAction(action.getAction());
@@ -91,6 +92,7 @@ public class GocqSyncRequestUtil {
             this.echo = echo;
         }
 
+        @SuppressWarnings("BusyWait")
         @Override
         public String call() throws Exception {
             String res = null;
@@ -109,22 +111,23 @@ public class GocqSyncRequestUtil {
     /**
      * 发送私聊文件
      *
-     * @param userId
+     * @param userId userId
      * @param filePath 该文件必须与go-cqhttp在同一主机上
-     * @param fileName
-     * @param timeout
-     * @return
+     * @param fileName 文件名
+     * @param timeout timeout
+     * @return SyncResponse
      */
     @Deprecated
-    public static SyncResponse uploadPrivateFile(Bot bot, Long userId, String filePath, String fileName, long timeout) {
+    public static SyncResponse uploadPrivateFile(
+            Bot bot, Long userId, String filePath, String fileName, long timeout) {
         Map<String, Object> param = new HashMap<>(3);
         param.put("user_id", userId);
         param.put("file", filePath);
         param.put("name", fileName);
         String responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
         if (responseStr != null) {
-            SyncResponse response = JSONObject.parseObject(responseStr, SyncResponse.class);
-            return response;
+            return JSONObject.parseObject(responseStr, SyncResponse.class);
+
         }
         return null;
     }
@@ -132,14 +135,15 @@ public class GocqSyncRequestUtil {
     /**
      * 用gocq去下载文件
      *
-     * @param url
-     * @param threadCount
-     * @param httpHeaders
-     * @param timeout
+     * @param url url
+     * @param threadCount 下载线程数
+     * @param httpHeaders http头
+     * @param timeout timeout
      * @return 返回gocq下载到的文件绝对路径
      */
     @Deprecated
-    public static DownloadFileResp downloadFile(Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
+    public static DownloadFileResp downloadFile(
+            Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
 
         Map<String, Object> param = new HashMap<>(3);
         param.put("url", url);

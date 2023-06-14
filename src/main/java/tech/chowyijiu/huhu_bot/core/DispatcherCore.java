@@ -91,11 +91,11 @@ public class DispatcherCore {
             //判断事件类型
             if (!handler.eventType.isAssignableFrom(event.getClass())) continue;
             //因为注解中的commands和keywords 默认为{}, 无需判空
-            if (handler.commands.length > 0) {
+            if (handler.commandsHasLength()) {
                 if (matchCommand(bot, event, handler)) break;
                 continue;
             }
-            if (handler.keywords.length > 0) {
+            if (handler.keyWordsHasLength()) {
                 if (matchKeyword(bot, event, handler)) break;
                 //continue;
             }
@@ -156,20 +156,20 @@ public class DispatcherCore {
         private final Object plugin; //ioc容器中的插件Bean
         private final Method method;
 
-        public Class<?> eventType;  //用于isAssignableFrom 匹配事件类型
-        public String name;         //Handler注解里的name
-        public int priority;
-        public boolean block;       //false 为不阻断
+        private Class<?> eventType;  //用于isAssignableFrom 匹配事件类型
+        private String name;         //Handler注解里的name
+        private int priority;
+        private boolean block;       //false 为不阻断
 
         //public int cutdown;         //cd 单位秒
         //public long lastExecuteTime;//上次调用时间戳
         //public String cdMsg;
 
         //MessageHandler
-        public String[] commands;
-        public String[] keywords;
+        private String[] commands;
+        private String[] keywords;
 
-        public Rule rule;
+        private Rule rule;
 
         private Handler(Object plugin, Method method) {
             this.plugin = plugin;
@@ -240,6 +240,14 @@ public class DispatcherCore {
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
 
             }
+        }
+
+        public boolean keyWordsHasLength() {
+            return keywords.length > 0;
+        }
+
+        public boolean commandsHasLength() {
+            return commands.length > 0;
         }
     }
 

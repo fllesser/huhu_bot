@@ -88,9 +88,9 @@ public class GroupCoquettishOperationPlugin {
 
     Rule replyPokeRule = (bot, event) -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
-        return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType())
-                && bot.getUserId().equals(notifyNoticeEvent.getTargetId())
-                && !bot.getUserId().equals(notifyNoticeEvent.getUserId());
+        return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
+                && bot.getUserId().equals(notifyNoticeEvent.getTargetId())    //被戳的是bot
+                && !bot.getUserId().equals(notifyNoticeEvent.getUserId());    //不是bot号自己戳的
     };
 
     @NoticeHandler(name = "群内回戳", priority = 0)

@@ -71,9 +71,10 @@ public class FortnitePlugin {
         }
     }
 
-    @MessageHandler(name = "文字加图片测试", commands = {"shop"}, priority = 0, block = true)
+    @MessageHandler(name = "文字加图片测试", commands = {"商城","shop"}, priority = 0, block = true)
     public void shop(Bot bot, GroupMessageEvent event) {
-        bot.sendMessage(event, "今日商城" + shop, false);
+        //bot.sendMessage(event, "今日商城" + shop, false);
+        bot.sendMessage(event, MessageSegment.image("file:///home/chow/shop.png") + "", false);
     }
 
 }

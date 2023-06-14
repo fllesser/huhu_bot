@@ -34,7 +34,10 @@ public class ThreadPoolUtil {
 
     public static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {
 
-        public ProcessEventThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory, RejectedExecutionHandler handler) {
+        public ProcessEventThreadPoolExecutor(
+                int corePoolSize, int maximumPoolSize, long keepAliveTime,
+                TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
+                RejectedExecutionHandler handler) {
             super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
         }
 

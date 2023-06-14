@@ -10,7 +10,7 @@ import java.util.function.Function;
 public class StringUtil {
 
     public static boolean hasLength(String str) {
-        return str != null && str.length() > 0;
+        return str != null && str.length() != 0;
     }
 
     public static void hasLength(String str, Consumer<String> consumer) {
@@ -19,7 +19,6 @@ public class StringUtil {
 
 
     public static <R> R hasLengthReturn(String str, Function<String, R> function) {
-        if (hasLength(str)) return function.apply(str);
-        else return null;
+        if (hasLength(str)) return function.apply(str);else return null;
     }
 }
