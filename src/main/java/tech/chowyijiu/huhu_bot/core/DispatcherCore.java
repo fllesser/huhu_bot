@@ -236,7 +236,8 @@ public class DispatcherCore {
             try {
                 Field field = plugin.getClass().getDeclaredField(RuleName);
                 field.setAccessible(true);
-                rule = ((Rule) field.get(plugin));
+                Object obj = field.get(plugin);
+                if (obj instanceof Rule) rule = (Rule) obj;
             } catch (NoSuchFieldException | IllegalAccessException ignored) {
 
             }
