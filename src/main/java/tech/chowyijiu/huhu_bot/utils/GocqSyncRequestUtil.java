@@ -23,7 +23,7 @@ public class GocqSyncRequestUtil {
     }
 
     public static int poolSize = Runtime.getRuntime().availableProcessors() + 1;
-    public static long sleep = 3000L;
+    public static long sleep = 5000L;
     public static final ExecutorService pool =
             new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
                     new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));

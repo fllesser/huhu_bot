@@ -22,8 +22,9 @@ public class ShareRunsPolicy implements RejectedExecutionHandler {
         if (!executor.isShutdown()) {
             //ThreadPoolUtil.getSharePool().execute(r);
             //log.info("线程池：{} 执行拒绝策略，本次任务由公共线程池执行, executor: {},",poolName, executor);
-            log.info("线程池：{} 执行拒绝策略", poolName);
+            log.info("线程池：{} 执行拒绝策略, task:{}", poolName, r);
         }
 
     }
+
 }

@@ -13,6 +13,7 @@ import tech.chowyijiu.huhu_bot.rule.Rule;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.annotation.PostConstruct;
@@ -64,9 +65,9 @@ public class DispatcherCore {
                         noticeHandlers.add(handler);
                     }
                 });
-
-                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", ANSI.YELLOW,
-                        pluginName, count++, botPluginMap.size(), Arrays.toString(handlerNames.toArray()), ANSI.RESET);
+                Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, pluginName, count++, botPluginMap.size(),
+                        Arrays.toString(handlerNames.toArray()));
+                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", args);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {

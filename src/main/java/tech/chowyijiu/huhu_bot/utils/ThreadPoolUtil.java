@@ -9,6 +9,7 @@ package tech.chowyijiu.huhu_bot.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.thread.ShareRunsPolicy;
 
 import java.util.concurrent.*;
@@ -28,8 +29,9 @@ public class ThreadPoolUtil {
                 new ArrayBlockingQueue<>(corePoolSize * 4),
                 new CustomizableThreadFactory("pool-process-event"),
                 new ShareRunsPolicy("pool-process-event"));
-        log.info("根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]",
-                corePoolSize - 1, executor.getCorePoolSize(), executor.getMaximumPoolSize());
+        Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, corePoolSize - 1, executor.getCorePoolSize(),
+                executor.getMaximumPoolSize());
+        log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}", args);
     }
 
     public static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {

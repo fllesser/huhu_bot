@@ -25,6 +25,14 @@ public class ProcessEventTask implements Runnable {
     private final Bot bot;
     private final Event event;
 
+    @Override
+    public String toString() {
+        return "ProcessEventTask{" +
+                "bot=" + bot.getUserId() +
+                ", event=" + event +
+                '}';
+    }
+
     private ProcessEventTask(Bot bot, Event event) {
         this.bot = bot;
         this.event = event;

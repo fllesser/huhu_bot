@@ -1,6 +1,9 @@
 package tech.chowyijiu.huhu_bot.plugins.fortnite;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
@@ -10,10 +13,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -21,11 +21,15 @@ import java.util.stream.Collectors;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 @SuppressWarnings("unused")
 public class FortnitePlugin {
 
-    private final String shop = MessageSegment.image("https://cdn.dingpanbao.cn/blzy/shop.png") + "";
+    private final String shopUrl = "https://cdn.dingpanbao.cn/blzy/shop.png";
+    private final String shopPath = "/home/chow/shop.png";
+    private final String shop = MessageSegment.image(shopUrl) + "";
+    private volatile Long lastUpdateTime = 0L;
+
     private List<ForwardMessage> nodes;
     private final Long[] groups = {754044548L, 208248400L};
 
@@ -61,7 +65,7 @@ public class FortnitePlugin {
         }
     }
 
-    @MessageHandler(name = "商城", commands = {"商城", "shop"}, priority = 1)
+    @MessageHandler(name = "商城1", commands = {"商城", "shop"}, priority = 1)
     public void myshop(Bot bot, GroupMessageEvent event) throws InterruptedException {
         if (nodes == null) {
             scheduleShop();
@@ -71,10 +75,21 @@ public class FortnitePlugin {
         }
     }
 
-    @MessageHandler(name = "文字加图片测试", commands = {"商城","shop"}, priority = 0, block = true)
+    @MessageHandler(name = "商城2", commands = {"商城","shop"}, priority = 0, block = true)
     public void shop(Bot bot, GroupMessageEvent event) {
         //bot.sendMessage(event, "今日商城" + shop, false);
-        bot.sendMessage(event, MessageSegment.image("file:///home/chow/shop.png") + "", false);
+        updateShopImage();
+        bot.sendMessage(event, MessageSegment.image("file://" + shopPath) + "", false);
+    }
+
+
+    private void updateShopImage() {
+        long now = System.currentTimeMillis();
+        if (now - lastUpdateTime >= 86400) {
+            lastUpdateTime = now; //直接修改, 其他线程可见它的最新值
+            HttpResponse resp = HttpRequest.get(shopUrl).execute();
+            resp.sync().writeBody(shopPath);
+        }
     }
 
 }
