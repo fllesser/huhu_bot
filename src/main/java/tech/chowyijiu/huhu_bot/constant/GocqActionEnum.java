@@ -30,7 +30,7 @@ public enum GocqActionEnum {
 
 
 
-    //get 有响应数据 需要使用 bot.callGetApi
+    //get 有响应数据 需要使用 bot.callSyncGetApi
     GET_GROUP_MEMBER_INFO("get_group_member_info", "获取群成员信息"),
     GET_FRIEND_LIST("get_friend_list", "获取好友列表"),
     GET_GROUP_MEMBER_LIST("get_group_member_list","获取群成员列表"),

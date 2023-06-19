@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhu_bot.ws;
 
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
@@ -83,12 +85,7 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
-    private String callGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
-        RequestBox<HashMap<String, Object>> requestBox = new RequestBox<>();
-        requestBox.setAction(action.getAction());
-        if (paramsMap != null) {
-            requestBox.setParams(paramsMap);
-        }
+    private String callSyncGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
         String responseStr = GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, 5000L);
         if (StringUtils.hasLength(responseStr)) {
             return responseStr;
@@ -96,13 +93,34 @@ public class Bot {
         throw new ActionFailed("action:" + action.getAction() + " 获取数据为空");
     }
 
+    private String callGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
+        String url = "http://localhost/" + action.getAction();
+        HttpRequest request = HttpRequest.get(url).form(paramsMap);
+        HttpResponse response = request.execute();
+        switch (response.getStatus()) {
+            case 401:
+                throw new ActionFailed("action" + action.getAction() + " access token 未提供");
+            case 403:
+                throw new ActionFailed("action" + action.getAction() + " access token 不符合");
+            case 406:
+                throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持(非 application/json 或 application/x-www-form-urlencoded");
+            case 404:
+                throw new ActionFailed("action:" + action.getAction() + " API 不存在");
+            case 200:
+                return response.body(); //除上述情况外所有情况 (具体 API 调用是否成功, 需要看 API 的 响应数据
+            default:
+                throw new ActionFailed("action:" + action.getAction() + " 获取数据失败");
+        }
+    }
+
     /**
      * 调用 get api获取数据, 同步, 10s超时
      * @param action GocqActionEnum
      * @param params 参数 key, value, key, value
+     * @param synced true 为同步, 默认false
      * @return json 字符串数据
      */
-    public String callGetApi(GocqActionEnum action, Object... params) {
+    public String callGetApi(GocqActionEnum action, boolean synced, Object... params) {
         HashMap<String, Object> paramsMap = new HashMap<>();
         int length = params.length;
         if (length % 2 != 0) {
@@ -112,7 +130,12 @@ public class Bot {
         for (int i = 0; i < params.length; i += 2) {
             paramsMap.put(params[i].toString(), params[i + 1]);
         }
-        return this.callGetApi(action, paramsMap);
+        if (synced) return this.callSyncGetApi(action, paramsMap);
+        else return this.callGetApi(action, paramsMap);
+    }
+
+    public void deleteFriend(Long userId) {
+        this.callSyncGetApi(GocqActionEnum.DELETE_FRIEND, null);
     }
 
     /**
@@ -120,7 +143,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callGetApi(GocqActionEnum.GET_LOGIN_INGO, (HashMap<String, Object>) null);
+        String data = this.callSyncGetApi(GocqActionEnum.GET_LOGIN_INGO, null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -129,12 +152,8 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callGetApi(GocqActionEnum.GET_FRIEND_LIST, (HashMap<String, Object>) null);
+        String data = this.callSyncGetApi(GocqActionEnum.GET_FRIEND_LIST, null);
         return JSONArray.parseArray(data, FriendInfo.class);
-    }
-
-    public void deleteFriend(Long userId) {
-        this.callApi(GocqActionEnum.DELETE_FRIEND, (HashMap<String, Object>) null);
     }
 
 
@@ -145,7 +164,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_LIST,
+        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_LIST, true,
                 "group_id", groupId, "no_cache", noCache);
         return JSONArray.parseArray(data, GroupMember.class);
     }
@@ -156,7 +175,7 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callGetApi(GocqActionEnum.GET_GROUP_LIST, "no_cache", noCache);
+        String data = this.callGetApi(GocqActionEnum.GET_GROUP_LIST, true, "no_cache", noCache);
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
@@ -180,7 +199,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_INFO,
+        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_INFO, false,
                 "group_id", groupId, "user_id", userId, "no_cache", noCache);
         return JSONObject.parseObject(data, GroupMember.class);
     }
@@ -236,7 +255,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callGetApi(GocqActionEnum.GET_FORWARD_MSG, "message_id", messageId);
+        String data = this.callGetApi(GocqActionEnum.GET_FORWARD_MSG, false, "message_id", messageId);
     }
 
     /**

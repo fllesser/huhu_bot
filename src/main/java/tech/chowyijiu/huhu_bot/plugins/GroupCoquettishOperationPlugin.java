@@ -49,7 +49,7 @@ public class GroupCoquettishOperationPlugin {
 
     private String buildDateCard() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 17:00", formatter);
+        LocalDateTime shitTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
         Duration duration = Duration.between(shitTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);

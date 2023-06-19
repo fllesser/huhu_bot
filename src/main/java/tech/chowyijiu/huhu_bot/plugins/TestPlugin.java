@@ -85,7 +85,7 @@ public class TestPlugin {
     //}
     //
     //
-    //@MessageHandler(name = "测试call get api", commands = {"callGetApi"})
+    //@MessageHandler(name = "测试call get api", commands = {"callSyncGetApi"})
     //public void testCallGetApi(Bot bot, MessageEvent event) {
     //
     //}
