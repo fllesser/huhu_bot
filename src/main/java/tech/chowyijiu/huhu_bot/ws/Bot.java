@@ -5,6 +5,7 @@ import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -24,6 +25,7 @@ import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author elastic chow
@@ -33,18 +35,13 @@ import java.util.List;
 @Getter
 @ToString
 @SuppressWarnings("unused")
+@RequiredArgsConstructor
 public class Bot {
 
     private final Long userId;
     private final WebSocketSession session;
 
     private List<GroupInfo> groups;
-
-    public Bot(Long userId, WebSocketSession session) {
-        this.userId = userId;
-        this.session = session;
-    }
-
 
     public void update() {
         groups = this.getGroupList();
@@ -53,8 +50,8 @@ public class Bot {
     /**
      * 私有 callApi
      */
-    private void callApi(GocqActionEnum action, HashMap<String, Object> paramsMap) {
-        RequestBox<HashMap<String, Object>> requestBox = new RequestBox<>();
+    private void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
+        RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
         requestBox.setAction(action.getAction());
         requestBox.setParams(paramsMap);
         sessionSend(JSONObject.toJSONString(requestBox));
@@ -71,7 +68,7 @@ public class Bot {
         HashMap<String, Object> paramsMap = new HashMap<>();
         int length = params.length;
         if (length % 2 != 0) {
-            log.info("[Bot] callApi invalid params, canceled");
+            log.warn("[Bot] callApi invalid params, canceled");
             return;
         }
         for (int i = 0; i < params.length; i += 2) {
@@ -86,11 +83,9 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
-    private String callApiWithResp(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
+    private String callApiWithResp(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
         String responseStr = GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, 5000L);
-        if (StringUtils.hasLength(responseStr)) {
-            return responseStr;
-        }
+        if (StringUtils.hasLength(responseStr)) return responseStr;
         throw new ActionFailed("action:" + action.getAction() + " 获取数据为空");
     }
 
@@ -101,7 +96,7 @@ public class Bot {
      * @return json String
      */
     @Deprecated
-    private String callGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
+    private String callGetApi(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
         String url = "http://127.0.0.1:8899/" + action.getAction();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
@@ -128,7 +123,7 @@ public class Bot {
      * @return json 字符串数据
      */
     public String callApiWithResp(GocqActionEnum action, Object... params) {
-        HashMap<String, Object> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         int length = params.length;
         if (length % 2 != 0) {
             log.info("[Bot] callApi invalid params, canceled");
@@ -141,7 +136,7 @@ public class Bot {
     }
 
     public void deleteFriend(Long userId) {
-        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND, (HashMap<String, Object>) null);
+        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND, (Map<String, Object>) null);
     }
 
     /**
@@ -149,7 +144,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INGO, (HashMap<String, Object>) null);
+        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INGO, (Map<String, Object>) null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -158,7 +153,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST, (HashMap<String, Object>) null);
+        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST, (Map<String, Object>) null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -190,10 +185,10 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList() {
-        //todo 想想再哪里更新groups最好, 目前感觉最好是 入群/退群更新,
+        //todo 想想在哪里更新groups最好, 目前感觉最好是 入群/退群更新,
         // 或者GroupMessageEvent进来,看看groups里有没有这个groupId
-        groups = this.getGroupList(true);
-        return groups;
+        this.groups = this.getGroupList(true);
+        return this.groups;
     }
 
     /**
@@ -218,7 +213,7 @@ public class Bot {
      * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendGroupMessage(Long groupId, String message, boolean autoEscape) {
-        HashMap<String, Object> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("group_id", groupId);
         paramsMap.put("message", message);
         paramsMap.put("auto_escape", autoEscape);
@@ -233,7 +228,7 @@ public class Bot {
      * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendPrivateMessage(Long userId, String message, boolean autoEscape) {
-        HashMap<String, Object> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("user_id", userId);
         paramsMap.put("message", message);
         paramsMap.put("auto_escape", autoEscape);
@@ -285,7 +280,7 @@ public class Bot {
     }
 
     /**
-     * 根据事件场景, 来发送对应的消息
+     * 根据事件, 来发送对应的消息
      *
      * @param event      event object
      * @param message    消息
@@ -298,15 +293,14 @@ public class Bot {
             sendGroupMessage(groupId, message, autoEscape);
         } else {
             Long userId = jsonObject.getLong("user_id");
-            if (userId != null) {
-                sendPrivateMessage(userId, message, autoEscape);
-            }
+            //if (this.userId.equals(userId)) return;
+            if (userId != null) sendPrivateMessage(userId, message, autoEscape);
         }
     }
 
 
     public void kickGroupMember(Long groupId, Long userId, boolean rejectAddRequest) {
-        HashMap<String, Object> paramsMap = new HashMap<>();
+        Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put("group_id", groupId);
         paramsMap.put("user_id", userId);
         paramsMap.put("reject_add_request", rejectAddRequest);

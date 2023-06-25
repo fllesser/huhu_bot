@@ -7,14 +7,14 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
-import tech.chowyijiu.huhu_bot.rule.Rule;
+import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
-import tech.chowyijiu.huhu_bot.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
@@ -42,9 +42,7 @@ public class GroupCoquettishOperationPlugin {
                             "group_id", groupId, "user_id", bot.getUserId(), "card", card);
                     try {
                         Thread.sleep(2000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (InterruptedException ignored){}
                 }));
     }
 
@@ -63,20 +61,16 @@ public class GroupCoquettishOperationPlugin {
     @Scheduled(cron = "1 0 0 * * ? ")
     public void dailyClockIn() {
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
-                .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
+                .stream().filter(groupInfo -> !groupInfo.getGroupMemo().startsWith("[学校]"))
+                .map(GroupInfo::getGroupId).forEach(groupId -> {
                     bot.callApi(GocqActionEnum.SEND_GROUP_SIGN, "group_id", groupId);
                     try {
                         Thread.sleep(2000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (InterruptedException ignored){}
                 }));
     }
 
-    //机器人->群主
-    Rule sgstRule = RuleEnum.owner.getRule();
-
-    @MessageHandler(name = "头衔自助", commands = {"sgst"})
+    @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getMessage();
         if (title.length() > 6) {

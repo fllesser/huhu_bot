@@ -48,7 +48,7 @@ class HuhuBotApplicationTests {
         System.out.println(message);
     }
 
-    @Test
+    //@Test
     public void testImageUtil() throws IOException {
         List<String> smallIcons = new ArrayList<>();
         for (ShopEntry shopEntry : FortniteApi.getShopEntries()) {

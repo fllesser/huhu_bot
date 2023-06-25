@@ -6,11 +6,27 @@ import lombok.extern.slf4j.Slf4j;
  * @author elastic chow
  * @date 14/5/2023
  */
+@SuppressWarnings("unused")
 @Slf4j
 //@BotPlugin(name = "测试插件")
-@SuppressWarnings("unused")
 public class TestPlugin {
 
+    //@MessageHandler(name = "测试rule, 注解", keywords = "rule1", rule = RuleEnum.tome)
+    //public void testRule1(Bot bot, GroupMessageEvent event) {
+    //    bot.sendMessage(event, "测试rule, 注解", true);
+    //}
+    //
+    //Rule testRule2Rule = (bot, event) -> {
+    //    if (event instanceof GroupMessageEvent) {
+    //        return bot.getUserId().equals(((GroupMessageEvent) event).getUserId());
+    //    }
+    //    return false;
+    //};
+    //
+    //@MessageHandler(name = "测试rule, 属性", keywords = "rule2")
+    //public void testRule2(Bot bot, GroupMessageEvent event) {
+    //    bot.sendMessage(event, "测试rule, 属性", true);
+    //}
 
 
     //失败

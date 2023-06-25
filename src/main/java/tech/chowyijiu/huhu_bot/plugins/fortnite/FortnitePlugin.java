@@ -3,7 +3,9 @@ package tech.chowyijiu.huhu_bot.plugins.fortnite;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
  * @date 14/5/2023
  */
 @Slf4j
-//@BotPlugin(name = "堡垒之夜")
+@BotPlugin(name = "堡垒之夜")
 @SuppressWarnings("unused")
 public class FortnitePlugin {
 
@@ -67,7 +69,7 @@ public class FortnitePlugin {
         }
     }
 
-    @MessageHandler(name = "商城1", commands = {"商城", "shop"}, priority = 1)
+    @MessageHandler(name = "商城1", commands = "shop", priority = 1, block = true, rule = RuleEnum.superuser)
     public void myshop(Bot bot, GroupMessageEvent event) throws InterruptedException {
         if (nodes == null) {
             scheduleShop();
@@ -77,7 +79,7 @@ public class FortnitePlugin {
         }
     }
 
-    @MessageHandler(name = "商城2", commands = {"商城","shop"}, priority = 0, block = true)
+    //@MessageHandler(name = "商城2", commands = {"商城","shop"}, priority = 0, block = true)
     public void shop(Bot bot, GroupMessageEvent event) {
         //bot.sendMessage(event, "今日商城" + shop, false);
         updateShopImage();

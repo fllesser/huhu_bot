@@ -9,10 +9,11 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
-import tech.chowyijiu.huhu_bot.rule.Rule;
+import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
@@ -190,7 +191,7 @@ public class DispatcherCore {
             handler.priority = mh.priority();
             handler.commands = mh.commands();
             handler.keywords = mh.keywords();
-            handler.initRule();
+            handler.initRule(mh.rule());
             return handler;
         }
 
@@ -199,7 +200,7 @@ public class DispatcherCore {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             handler.name = nh.name();
             handler.priority = nh.priority();
-            handler.initRule();
+            handler.initRule(nh.rule());
             return handler;
         }
 
@@ -230,15 +231,18 @@ public class DispatcherCore {
             }
         }
 
-        public void initRule()  {
-            String RuleName = method.getName() + "Rule";
-            try {
-                Field field = plugin.getClass().getDeclaredField(RuleName);
-                field.setAccessible(true);
-                Object obj = field.get(plugin);
-                if (obj instanceof Rule) rule = (Rule) obj;
-            } catch (NoSuchFieldException | IllegalAccessException ignored) {
-
+        public void initRule(RuleEnum rule)  {
+            if (!rule.equals(RuleEnum.default_)) {
+                this.rule = rule.getRule();
+            } else {
+                String RuleName = method.getName() + "Rule";
+                try {
+                    Field field = plugin.getClass().getDeclaredField(RuleName);
+                    field.setAccessible(true);
+                    Object obj = field.get(plugin);
+                    if (obj instanceof Rule) this.rule = (Rule) obj;
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
             }
         }
 

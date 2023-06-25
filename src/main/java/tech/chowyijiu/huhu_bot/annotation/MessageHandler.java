@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhu_bot.annotation;
 
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -20,6 +22,8 @@ public @interface MessageHandler {
     String[] keywords() default {}; //关键词匹配
 
     //int cutdown() default 0;    // cd 单位 s
-    //todo 自定义cd消息
+    //todo 自定义cd消息 放弃
     //String cdMsg() default "";
+    //todo 属性和注解同时使用
+    RuleEnum rule() default RuleEnum.default_;
 }

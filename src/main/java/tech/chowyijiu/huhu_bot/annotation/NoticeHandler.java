@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhu_bot.annotation;
 
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+
 import java.lang.annotation.*;
 
 /**
@@ -17,4 +19,5 @@ public @interface NoticeHandler {
 
     //int cutdown() default 0;    // 单位 s
     //String cdMsg() default "";
+    RuleEnum rule() default RuleEnum.default_;
 }

@@ -3,14 +3,13 @@ package tech.chowyijiu.huhu_bot.plugins;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.config.BotConfig;
+import tech.chowyijiu.huhu_bot.core.rule.Rule;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
-import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
-import tech.chowyijiu.huhu_bot.rule.Rule;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhu_bot.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.LinkedHashMap;
@@ -20,13 +19,10 @@ import java.util.List;
  * @author elastic chow
  * @date 21/5/2023
  */
-
-
 @Slf4j
 @BotPlugin(name = "杂七杂八")
 @SuppressWarnings("unused")
 public class PersonalPlugin {
-
 
     Rule replyJyGroupRule = (bot, event) -> "group".equals(((PrivateMessageEvent) event).getSubType());
 
@@ -37,17 +33,12 @@ public class PersonalPlugin {
         bot.sendGroupMessage(event.getSender().getGroupId(), message,false);
     }
 
-
-    Rule replyTtsMessageRule = (bot, event) -> BotConfig.isSuperUser(((GroupMessageEvent) event).getUserId());
-
-    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
+    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
         bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
     }
 
-    Rule testSendGroupForwardMsgRule = RuleEnum.superuser.getRule();
-
-    @MessageHandler(name = "测试发送群转发消息", commands = {"转发"})
+    @MessageHandler(name = "测试发送群转发消息", commands = {"转发"}, rule = RuleEnum.superuser)
     public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("1-2", "1.转发消息完全不可信\n2.转发消息完全不可信");
@@ -58,9 +49,7 @@ public class PersonalPlugin {
         bot.sendGroupForwardMsg(event.getGroupId(), nodes);
     }
 
-    Rule testEcho = RuleEnum.superuser.getRule();
-    //todo 把Rule加到注解中
-    @MessageHandler(name = "echo", commands = "echo")
+    @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
     public void echo(Bot bot, MessageEvent event) {
         bot.sendMessage(event, event.getMessage(), true);
     }
