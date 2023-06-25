@@ -19,18 +19,18 @@ public class ThreadPoolUtil {
     private ThreadPoolUtil() {
     }
 
-    private final static ThreadPoolExecutor executor;
+    private final static ThreadPoolExecutor eventExecutor;
 
     static {
         int corePoolSize = Runtime.getRuntime().availableProcessors() + 1;
         assert corePoolSize > 0;
-        executor = new ProcessEventThreadPoolExecutor(corePoolSize, corePoolSize * 2,
+        eventExecutor = new ProcessEventThreadPoolExecutor(corePoolSize, corePoolSize * 2,
                 1, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(corePoolSize * 4),
                 new CustomizableThreadFactory("pool-process-event"),
                 new ShareRunsPolicy("pool-process-event"));
-        Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, corePoolSize - 1, executor.getCorePoolSize(),
-                executor.getMaximumPoolSize());
+        Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, corePoolSize - 1, eventExecutor.getCorePoolSize(),
+                eventExecutor.getMaximumPoolSize());
         log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}", args);
     }
 
@@ -51,8 +51,8 @@ public class ThreadPoolUtil {
 
     }
 
-    public static ThreadPoolExecutor getExecutor() {
-        return executor;
+    public static ThreadPoolExecutor getEventExecutor() {
+        return eventExecutor;
     }
 
 }

@@ -1,9 +1,20 @@
 package tech.chowyijiu.huhu_bot;
 
+import cn.hutool.http.HttpRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
+import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
+import tech.chowyijiu.huhu_bot.utils.ImageUtil;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest
 class HuhuBotApplicationTests {
@@ -29,13 +40,35 @@ class HuhuBotApplicationTests {
         String cq1 = "测试[CQ:image,file=http://baidu.com/1.jpg]";
         String cq2 = "[CQ:image,file=http://baidu.com/1.jpg]";
         String cq3 = "[CQ:image,file=http://baidu.com/1.jpg]测试";
-        String cq4 = "测试[CQ:image,file=http://baidu.com/1.jpg][CQ:face,id=123]";
+        String cq4 = "测试[CQ:image,file=https://baidu.com/1.jpg][CQ:face,id=123]";
         Message message = new Message();
         message.append(MessageSegment.at(1942422015L));
         message.append("测试");
         message.append(MessageSegment.image("https://baidu.com/1.jpg"));
         System.out.println(message);
     }
+
+    @Test
+    public void testImageUtil() throws IOException {
+        List<String> smallIcons = new ArrayList<>();
+        for (ShopEntry shopEntry : FortniteApi.getShopEntries()) {
+            for (ShopEntry.Item item : shopEntry.getItems()) {
+                smallIcons.add(item.getImages().getSmallIcon());
+            }
+        }
+        BufferedImage[] imgs = smallIcons.stream().map(url -> {
+            InputStream inputStream = HttpRequest.get(url).execute().bodyStream();
+            try {
+                return ImageIO.read(inputStream);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }).toArray(BufferedImage[]::new);
+        ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
+    }
+
+
 
 
 

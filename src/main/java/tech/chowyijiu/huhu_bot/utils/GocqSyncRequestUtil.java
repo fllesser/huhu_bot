@@ -23,7 +23,7 @@ public class GocqSyncRequestUtil {
     }
 
     public static int poolSize = Runtime.getRuntime().availableProcessors() + 1;
-    public static long sleep = 5000L;
+    public static long sleep = 1000L;
     public static final ExecutorService pool =
             new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
                     new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
@@ -77,6 +77,7 @@ public class GocqSyncRequestUtil {
             log.error("发送同步消息异常,echo:{}", echo, e);
         } finally {
             futureTask.cancel(true);
+            //这里似乎不一定能删掉
             resultMap.remove(echo);
         }
         return null;
@@ -95,15 +96,12 @@ public class GocqSyncRequestUtil {
         @SuppressWarnings("BusyWait")
         @Override
         public String call() throws Exception {
-            String res = null;
-            while (!Thread.currentThread().isInterrupted()) {
-                res = resultMap.get(echo);
-                if (res != null) {
-                    break;
-                } else {
-                    Thread.sleep(GocqSyncRequestUtil.sleep);
-                }
-            }
+            String res;
+            do {
+                res = GocqSyncRequestUtil.resultMap.get(echo);
+                if (res != null) break;
+                else Thread.sleep(GocqSyncRequestUtil.sleep);
+            } while (!Thread.currentThread().isInterrupted());
             return res;
         }
     }
@@ -111,10 +109,10 @@ public class GocqSyncRequestUtil {
     /**
      * 发送私聊文件
      *
-     * @param userId userId
+     * @param userId   userId
      * @param filePath 该文件必须与go-cqhttp在同一主机上
      * @param fileName 文件名
-     * @param timeout timeout
+     * @param timeout  timeout
      * @return SyncResponse
      */
     @Deprecated
@@ -135,10 +133,10 @@ public class GocqSyncRequestUtil {
     /**
      * 用gocq去下载文件
      *
-     * @param url url
+     * @param url         url
      * @param threadCount 下载线程数
      * @param httpHeaders http头
-     * @param timeout timeout
+     * @param timeout     timeout
      * @return 返回gocq下载到的文件绝对路径
      */
     @Deprecated

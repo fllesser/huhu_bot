@@ -144,8 +144,6 @@ public class DispatcherCore {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventType.isAssignableFrom(event.getClass())) {
-                //todo
-
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
@@ -228,7 +226,7 @@ public class DispatcherCore {
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
             } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
+                e.printStackTrace();//todo
             }
         }
 

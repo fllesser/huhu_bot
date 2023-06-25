@@ -45,6 +45,7 @@ public class Bot {
         this.session = session;
     }
 
+
     public void update() {
         groups = this.getGroupList();
     }
@@ -85,7 +86,7 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
-    private String callSyncGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
+    private String callApiWithResp(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
         String responseStr = GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, 5000L);
         if (StringUtils.hasLength(responseStr)) {
             return responseStr;
@@ -93,8 +94,15 @@ public class Bot {
         throw new ActionFailed("action:" + action.getAction() + " 获取数据为空");
     }
 
+    /**
+     * HTTP request API method
+     * @param action action
+     * @param paramsMap parameters
+     * @return json String
+     */
+    @Deprecated
     private String callGetApi(GocqActionEnum action, @Nullable HashMap<String, Object> paramsMap) {
-        String url = "http://localhost/" + action.getAction();
+        String url = "http://127.0.0.1:8899/" + action.getAction();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
         switch (response.getStatus()) {
@@ -117,10 +125,9 @@ public class Bot {
      * 调用 get api获取数据, 同步, 10s超时
      * @param action GocqActionEnum
      * @param params 参数 key, value, key, value
-     * @param synced true 为同步, 默认false
      * @return json 字符串数据
      */
-    public String callGetApi(GocqActionEnum action, boolean synced, Object... params) {
+    public String callApiWithResp(GocqActionEnum action, Object... params) {
         HashMap<String, Object> paramsMap = new HashMap<>();
         int length = params.length;
         if (length % 2 != 0) {
@@ -130,12 +137,11 @@ public class Bot {
         for (int i = 0; i < params.length; i += 2) {
             paramsMap.put(params[i].toString(), params[i + 1]);
         }
-        if (synced) return this.callSyncGetApi(action, paramsMap);
-        else return this.callGetApi(action, paramsMap);
+        return this.callApiWithResp(action, paramsMap);
     }
 
     public void deleteFriend(Long userId) {
-        this.callSyncGetApi(GocqActionEnum.DELETE_FRIEND, null);
+        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND, (HashMap<String, Object>) null);
     }
 
     /**
@@ -143,7 +149,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callSyncGetApi(GocqActionEnum.GET_LOGIN_INGO, null);
+        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INGO, (HashMap<String, Object>) null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -152,7 +158,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callSyncGetApi(GocqActionEnum.GET_FRIEND_LIST, null);
+        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST, (HashMap<String, Object>) null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -164,7 +170,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_LIST, true,
+        String data = callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_LIST,
                 "group_id", groupId, "no_cache", noCache);
         return JSONArray.parseArray(data, GroupMember.class);
     }
@@ -175,7 +181,7 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callGetApi(GocqActionEnum.GET_GROUP_LIST, true, "no_cache", noCache);
+        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_LIST, "no_cache", noCache);
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
@@ -199,7 +205,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = callGetApi(GocqActionEnum.GET_GROUP_MEMBER_INFO, false,
+        String data = callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_INFO,
                 "group_id", groupId, "user_id", userId, "no_cache", noCache);
         return JSONObject.parseObject(data, GroupMember.class);
     }
@@ -255,7 +261,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callGetApi(GocqActionEnum.GET_FORWARD_MSG, false, "message_id", messageId);
+        String data = this.callApiWithResp(GocqActionEnum.GET_FORWARD_MSG, "message_id", messageId);
     }
 
     /**

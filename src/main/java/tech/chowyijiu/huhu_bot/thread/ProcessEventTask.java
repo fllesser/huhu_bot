@@ -38,11 +38,11 @@ public class ProcessEventTask implements Runnable {
         this.event = event;
     }
 
-    private static final ThreadPoolExecutor THREAD_POOL;
+    private static final ThreadPoolExecutor EVENT_EXECUTOR;
     private static final DispatcherCore DISPATCHER_CORE;
 
     static {
-        THREAD_POOL = ThreadPoolUtil.getExecutor();
+        EVENT_EXECUTOR = ThreadPoolUtil.getEventExecutor();
         DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
     }
 
@@ -67,7 +67,7 @@ public class ProcessEventTask implements Runnable {
     }
 
     public static void execute(final Bot bot, final Event event) {
-        THREAD_POOL.execute(new ProcessEventTask(bot, event));
+        EVENT_EXECUTOR.execute(new ProcessEventTask(bot, event));
     }
 
 

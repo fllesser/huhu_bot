@@ -19,6 +19,8 @@ public enum GocqActionEnum {
     SEND_GROUP_FORWARD_MSG("send_group_forward_msg","转发群合并消息"),
     SEND_PRIVATE_FORWARD_MSG("send_private_forward_msg","转发私聊合并消息"),
 
+    SEND_GROUP_SIGN("send_group_sign", "群打卡"),
+
     SET_GROUP_CARD("set_group_card", "设置群名片"),
     SET_GROUP_SPECIAL_TITLE("set_group_special_title", "设置群专属头衔"),
     SET_GROUP_KICK("set_group_kick", "群组踢人"),
@@ -27,6 +29,7 @@ public enum GocqActionEnum {
     DELETE_MSG("delete_msg","撤回消息"),
 
     MARK_MSG_AS_READ("mark_msg_as_read", "标记消息为已读"),
+
 
 
 

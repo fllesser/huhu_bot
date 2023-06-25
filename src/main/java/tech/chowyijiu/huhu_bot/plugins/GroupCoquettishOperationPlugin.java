@@ -14,6 +14,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
+import tech.chowyijiu.huhu_bot.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
@@ -59,13 +60,21 @@ public class GroupCoquettishOperationPlugin {
         return "失业第" + days + "天" + hours + "时" + minutes + "分";
     }
 
+    @Scheduled(cron = "1 0 0 * * ? ")
+    public void dailyClockIn() {
+        Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+                .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
+                    bot.callApi(GocqActionEnum.SEND_GROUP_SIGN, "group_id", groupId);
+                    try {
+                        Thread.sleep(2000L);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }));
+    }
 
     //机器人->群主
-    Rule sgstRule = (bot, event) -> {
-        GroupMember groupMember = bot.getGroupMember(
-                ((GroupMessageEvent) event).getGroupId(), bot.getUserId(), true);
-        return "owner".equals(groupMember.getRole());
-    };
+    Rule sgstRule = RuleEnum.owner.getRule();
 
     @MessageHandler(name = "头衔自助", commands = {"sgst"})
     public void sgst(Bot bot, GroupMessageEvent event) {

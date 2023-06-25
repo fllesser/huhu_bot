@@ -32,20 +32,20 @@ public class Server extends TextWebSocketHandler {
 
     /**
      * 根据userId获取Bot
+     *
      * @param userId qq号
      * @return Bot
      */
     public static Bot getBot(Long userId) {
-        for (Bot bot : bots) {
-            if (Objects.equals(bot.getUserId(), userId)) {
+        for (Bot bot : bots)
+            if (Objects.equals(bot.getUserId(), userId))
                 return bot;
-            }
-        }
         return null;
     }
 
     /**
      * 获取所有Bot
+     *
      * @return List<Bot>
      */
     public static List<Bot> getBots() {
@@ -58,7 +58,7 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
-        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
+        log.info("{} GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
                 session.getRemoteAddress(), getConnections() + 1, ANSI.RESET);
     }
 
@@ -76,21 +76,18 @@ public class Server extends TextWebSocketHandler {
                     //log.info("[{}] bot[{}] heartbeat ", this.getClass().getSimpleName(), metaEvent.getSelfId());
                     return;
                 } else if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.lifecycle.name())
-                            && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
+                        && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     addBot(event.getSelfId(), session);
-                    log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}",ANSI.YELLOW,
+                    log.info("{} RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
                     return;
                 }
             }
             log.info("Accepted {}", event);
-            for (Bot bot : bots) {
-                if (Objects.equals(bot.getSession(), session)) {
+            for (Bot bot : bots)
+                if (Objects.equals(bot.getSession(), session))
                     ProcessEventTask.execute(bot, event);
-                }
-            }
-
         } catch (Exception e) {
             log.error("Parsing payload exception", e);
         }
@@ -105,7 +102,7 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.info("{}connect close, sessionId:{},{}{}",ANSI.YELLOW,
+        log.info("{}connect close, sessionId:{},{}{}", ANSI.YELLOW,
                 session.getId(), closeStatus.toString(), ANSI.RESET);
         removeClient(session);
     }

@@ -4,11 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.rule.Rule;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhu_bot.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.ws.Bot;
+
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author elastic chow
@@ -37,6 +43,26 @@ public class PersonalPlugin {
     @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
         bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
+    }
+
+    Rule testSendGroupForwardMsgRule = RuleEnum.superuser.getRule();
+
+    @MessageHandler(name = "测试发送群转发消息", commands = {"转发"})
+    public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        map.put("1-2", "1.转发消息完全不可信\n2.转发消息完全不可信");
+        map.put("3-4", "3.转发消息完全不可信\n4.转发消息完全不可信");
+        map.put("5-6", "5.转发消息完全不可信\n6.转发消息完全不可信");
+        map.put("7-8", "7.转发消息完全不可信\n8.转发消息完全不可信");
+        List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
+        bot.sendGroupForwardMsg(event.getGroupId(), nodes);
+    }
+
+    Rule testEcho = RuleEnum.superuser.getRule();
+    //todo 把Rule加到注解中
+    @MessageHandler(name = "echo", commands = "echo")
+    public void echo(Bot bot, MessageEvent event) {
+        bot.sendMessage(event, event.getMessage(), true);
     }
 
 }

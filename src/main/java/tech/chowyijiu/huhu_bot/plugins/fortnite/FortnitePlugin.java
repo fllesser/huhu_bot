@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.plugins.fortnite;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
@@ -13,7 +12,10 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
  * @date 14/5/2023
  */
 @Slf4j
-@BotPlugin(name = "堡垒之夜")
+//@BotPlugin(name = "堡垒之夜")
 @SuppressWarnings("unused")
 public class FortnitePlugin {
 
