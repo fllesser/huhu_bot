@@ -261,8 +261,8 @@ public class Bot {
 
     /**
      * 群组发送合并转发消息
-     * @param groupId
-     * @param nodes
+     * @param groupId 群号
+     * @param nodes nodes
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
         this.callApi(GocqActionEnum.SEND_GROUP_FORWARD_MSG,
@@ -271,8 +271,8 @@ public class Bot {
 
     /**
      * 私聊发送合并转发消息
-     * @param userId
-     * @param nodes
+     * @param userId qq
+     * @param nodes nodes
      */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
         this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
@@ -315,7 +315,7 @@ public class Bot {
         try {
             session.sendMessage(new TextMessage(text));
         } catch (Exception e) {
-            log.error("发送消息发生异常,session:{},消息：{}", session, text, e);
+            log.warn("发送消息发生异常,session:{},消息：{}", session, text, e);
         }
     }
 

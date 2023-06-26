@@ -38,7 +38,7 @@ public class PersonalPlugin {
         bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
     }
 
-    @MessageHandler(name = "测试发送群转发消息", commands = {"转发"}, rule = RuleEnum.superuser)
+    @MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
     public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         map.put("1-2", "1.转发消息完全不可信\n2.转发消息完全不可信");
