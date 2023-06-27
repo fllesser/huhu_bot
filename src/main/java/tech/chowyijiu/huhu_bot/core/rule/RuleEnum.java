@@ -2,9 +2,6 @@ package tech.chowyijiu.huhu_bot.core.rule;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import tech.chowyijiu.huhu_bot.config.BotConfig;
-import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 
 /**
  * @author elastic chow
@@ -14,28 +11,13 @@ import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 @RequiredArgsConstructor
 public enum RuleEnum {
 
-    default_("default", (bot, event) -> true),
-    tome("tome", (bot, event) -> {
-        if (event instanceof GroupMessageEvent) return ((GroupMessageEvent) event).isToMe();
-        else return false;
-    }), //at 机器人
-    superuser("superuser", (bot, event) -> {
-        if (event instanceof MessageEvent) return BotConfig.isSuperUser(((MessageEvent) event).getUserId());
-        else return false;
-    }), //superuser
-    owner("owner", (bot, event) -> {
-        if (event instanceof GroupMessageEvent)
-            return "owner".equals(((GroupMessageEvent) event).getSender().getRole());
-        else return false;
-    }), //群主
-    admin("admin", (bot, event) -> {
-        if (event instanceof GroupMessageEvent) {
-            String role = ((GroupMessageEvent) event).getSender().getRole();
-            return "admin".equals(role) || "owner".equals(role) || superuser.rule.check(bot, event);
-        } else return false;
-    }); //管理 or 群主 or superuser
-
-
-    private final String name;
+    default_("默认", (bot, event) -> true),
+    tome("@机器人", RuleImpl::tome),
+    superuser("使用者为超级用户", RuleImpl::superuser),
+    owner("使用者为群主", RuleImpl::owner),
+    admin("使用者为 管理 or 群主 or 超级用户", RuleImpl::admin),
+    self_owner("机器人号为群主", RuleImpl::selfOwner),
+    self_admin("机器人号为管理 or 群主", RuleImpl::selfAdmin);
+    private final String description;
     private final Rule rule;
 }

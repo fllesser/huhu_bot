@@ -79,7 +79,7 @@ public class GroupCoquettishOperationPlugin {
         log.info("群打卡完毕");
     }
 
-    @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.owner)
+    @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
         if (title.length() > 6) {

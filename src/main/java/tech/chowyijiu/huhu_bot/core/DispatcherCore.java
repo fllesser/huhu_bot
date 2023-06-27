@@ -1,6 +1,8 @@
 package tech.chowyijiu.huhu_bot.core;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -154,6 +156,8 @@ public class DispatcherCore {
         log.info("{} Match NoticeHandler End", event);
     }
 
+    @Accessors(chain = true)
+    @Setter
     static class Handler {
         private final Object plugin; //ioc容器中的插件Bean
         private final Method method;
@@ -188,11 +192,8 @@ public class DispatcherCore {
         public static Handler buildMessageHandler(Object plugin, Method method) {
             Handler handler = new Handler(plugin, method);
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
-            handler.name = mh.name();
-            handler.block = mh.block();
-            handler.priority = mh.priority();
-            handler.commands = mh.commands();
-            handler.keywords = mh.keywords();
+            handler.setName(mh.name()).setBlock(mh.block()).setPriority(mh.priority())
+                    .setCommands(mh.commands()).setKeywords(mh.keywords());
             handler.initRule(mh.rule());
             return handler;
         }
@@ -200,8 +201,7 @@ public class DispatcherCore {
         public static Handler buildNoticeHandler(Object plugin, Method method) {
             Handler handler = new Handler(plugin, method);
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
-            handler.name = nh.name();
-            handler.priority = nh.priority();
+            handler.setName(nh.name()).setPriority(nh.priority());
             handler.initRule(nh.rule());
             return handler;
         }
@@ -229,10 +229,12 @@ public class DispatcherCore {
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.info("{} IllegalAccessException: {}{}",
+                        LogUtil.buildArgsWithColor(ANSI.YELLOW, "handler method must be public"));
             } catch (InvocationTargetException e) {
                 if (e.getTargetException() instanceof FinishedException) {
-                    //ignored
+                    log.info("{} Finished: {}{}{}",
+                            LogUtil.buildArgsWithColor(ANSI.YELLOW, event, " execute forced termination"));
                 } else if (e.getTargetException() instanceof ActionFailed) {
                     log.info("{} ActionFailed: {}{}",
                             LogUtil.buildArgsWithColor(ANSI.YELLOW, e.getTargetException().getMessage()));
@@ -242,7 +244,7 @@ public class DispatcherCore {
             }
         }
 
-        public void initRule(RuleEnum rule) {
+        private void initRule(RuleEnum rule) {
             if (!rule.equals(RuleEnum.default_)) {
                 this.rule = rule.getRule();
             } else {
