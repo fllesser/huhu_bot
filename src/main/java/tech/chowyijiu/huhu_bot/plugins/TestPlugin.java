@@ -8,10 +8,11 @@ import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author elastic chow
@@ -24,17 +25,20 @@ public class TestPlugin {
 
 
     @MessageHandler(name = "callApi", commands = "ca", rule = RuleEnum.superuser)
-    public void apiTest(Bot bot, GroupMessageEvent event) {
+    public void apiTest(Bot bot, MessageEvent event) {
         String[] args = event.getCommandArgs().split(" ");
         if (args.length % 2 != 1) {
-            bot.sendMessage(event, "call api args invalid", true);
+            bot.finish(event, "参数错误");
         }
-        GocqActionEnum action;
-        try {
-            action = GocqActionEnum.valueOf(args[0].toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            bot.sendMessage(event, "Don't have this api: " + args[0], true);
-            return;
+        GocqActionEnum action = null;
+        for (GocqActionEnum value : GocqActionEnum.values()) {
+            if (value.getAction().equals(args[0])) {
+                action = value;
+                break;
+            }
+        }
+        if (action == null) {
+            bot.finish(event, "没有这个API, 或未支持");
         }
         Object[] params = new String[args.length - 1];
         System.arraycopy(args, 1, params, 0, args.length - 1);
@@ -45,7 +49,12 @@ public class TestPlugin {
             List<String> list = JSONArray.parseArray(resp, String.class);
             if (list.size() > 0) {
                 List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), list);
-                bot.sendMessage(event, resp, true);
+                //bot.sendMessage(event, resp, true);
+                if (event instanceof GroupMessageEvent) {
+                    bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
+                } else if (event instanceof PrivateMessageEvent) {
+                    bot.sendPrivateForwardMsg(event.getUserId(), nodes);
+                }
             }
         }
     }

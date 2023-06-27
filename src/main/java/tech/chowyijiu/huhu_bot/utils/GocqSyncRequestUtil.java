@@ -8,6 +8,7 @@ import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
+import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.*;
@@ -68,19 +69,18 @@ public class GocqSyncRequestUtil {
             //log.info("echo: {}, result: {}", echo, res);
             return res;
         } catch (InterruptedException e) {
-            log.error("发送同步消息线程中断异常, echo:{}", echo, e);
+            throw new ActionFailed("发送同步消息线程中断异常, echo:" + echo);
         } catch (ExecutionException e) {
-            log.error("发送同步消息执行异常,echo:{}", echo, e);
+            throw new ActionFailed("发送同步消息执行异常, echo:" + echo);
         } catch (TimeoutException e) {
-            log.error("发送同步消息超时,echo:{}", echo, e);
+            throw new ActionFailed("发送同步消息超时, 或者该api无响应数据, echo:" + echo);
         } catch (Exception e) {
-            log.error("发送同步消息异常,echo:{}", echo, e);
+            throw new ActionFailed("发送同步消息发生未知异常, echo:" + echo + ", Exception:" + e.getMessage());
         } finally {
             futureTask.cancel(true);
             //这里似乎不一定能删掉
             resultMap.remove(echo);
         }
-        return null;
     }
 
     private static class Task implements Callable<String> {

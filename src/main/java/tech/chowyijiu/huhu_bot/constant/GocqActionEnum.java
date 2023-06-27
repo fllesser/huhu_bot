@@ -16,8 +16,8 @@ public enum GocqActionEnum {
     SEND_MSG("send_msg","发送消息"),
     SEND_PRIVATE_MSG("send_private_msg","发送私聊消息"),
     SEND_GROUP_MSG("send_group_msg","发送群消息"),
-    SEND_GROUP_FORWARD_MSG("send_group_forward_msg","转发群合并消息"),
-    SEND_PRIVATE_FORWARD_MSG("send_private_forward_msg","转发私聊合并消息"),
+    SEND_GROUP_FORWARD_MSG("send_group_forward_msg","群聊转发合并消息"),
+    SEND_PRIVATE_FORWARD_MSG("send_private_forward_msg","私聊转发合并消息"),
 
     SEND_GROUP_SIGN("send_group_sign", "群打卡"),
 
@@ -31,8 +31,6 @@ public enum GocqActionEnum {
     MARK_MSG_AS_READ("mark_msg_as_read", "标记消息为已读"),
 
 
-
-
     //get 有响应数据 需要使用 bot.callSyncGetApi
     GET_GROUP_MEMBER_INFO("get_group_member_info", "获取群成员信息"),
     GET_FRIEND_LIST("get_friend_list", "获取好友列表"),
@@ -40,6 +38,7 @@ public enum GocqActionEnum {
     GET_FORWARD_MSG("get_forward_msg","获取合并转发内容"),
     GET_WORD_SLICES(".get_word_slices","获取中文分词"),
     GET_MSG("get_msg","根据message_id获取消息详情"),
+    GET_GROUP_INFO("get_group_info","获取群详细信息"),
     GET_GROUP_LIST("get_group_list","获取群列表"),
     GET_LOGIN_INFO("get_login_info","获取登录号信息"),
     UPLOAD_PRIVATE_FILE("upload_private_file","上传私聊文件"),

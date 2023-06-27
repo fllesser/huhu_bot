@@ -83,8 +83,7 @@ public class GroupCoquettishOperationPlugin {
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
         if (title.length() > 6) {
-            bot.sendGroupMessage(event.getGroupId(), "[bot]群头衔最多为6位", true);
-            return;
+            bot.finish(event, "[bot]群头衔最多为6位");
         }
         for (String filter : new String[]{"群主", "管理员"}) {
             if (title.contains(filter)) {
@@ -92,9 +91,7 @@ public class GroupCoquettishOperationPlugin {
                 break;
             }
         }
-        bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
-                "group_id", event.getGroupId(), "user_id", event.getUserId(),
-                "special_title", title);
+        bot.setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
     }
 
 

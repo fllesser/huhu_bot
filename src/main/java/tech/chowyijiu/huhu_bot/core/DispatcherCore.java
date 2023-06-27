@@ -10,10 +10,12 @@ import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
-import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
+import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
@@ -226,12 +228,21 @@ public class DispatcherCore {
                         , this.name, this.priority, ANSI.RESET);
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();//todo
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                if (e.getTargetException() instanceof FinishedException) {
+                    //ignored
+                } else if (e.getTargetException() instanceof ActionFailed) {
+                    log.info("{} ActionFailed: {}{}",
+                            LogUtil.buildArgsWithColor(ANSI.YELLOW, e.getTargetException().getMessage()));
+                } else {
+                    e.printStackTrace();
+                }
             }
         }
 
-        public void initRule(RuleEnum rule)  {
+        public void initRule(RuleEnum rule) {
             if (!rule.equals(RuleEnum.default_)) {
                 this.rule = rule.getRule();
             } else {
