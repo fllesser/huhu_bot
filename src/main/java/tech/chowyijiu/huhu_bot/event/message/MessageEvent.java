@@ -24,8 +24,6 @@ import java.util.Objects;
 public class MessageEvent extends Event {
 
     private String postType; //message message_sent
-    private Message msg;
-
     private String subType;
     private Long userId;
     private String messageType;
@@ -35,6 +33,9 @@ public class MessageEvent extends Event {
 
     private Integer font; //0
     private Sender sender;
+
+    private transient Message msg;
+    private transient String commandArgs;
 
     public static MessageEvent jsonToMessageEvent(JSONObject jsonObject) {
         String messageType = jsonObject.getString("message_type");

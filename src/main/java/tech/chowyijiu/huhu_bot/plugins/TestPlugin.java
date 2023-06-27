@@ -1,6 +1,17 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
+import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
+import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
+import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
+import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhu_bot.ws.Bot;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author elastic chow
@@ -8,8 +19,36 @@ import lombok.extern.slf4j.Slf4j;
  */
 @SuppressWarnings("unused")
 @Slf4j
-//@BotPlugin(name = "测试插件")
+@BotPlugin(name = "测试插件")
 public class TestPlugin {
+
+
+    @MessageHandler(name = "callApi", commands = "ca", rule = RuleEnum.superuser)
+    public void apiTest(Bot bot, GroupMessageEvent event) {
+        String[] args = event.getCommandArgs().split(" ");
+        if (args.length % 2 != 1) {
+            bot.sendMessage(event, "call api args invalid", true);
+        }
+        GocqActionEnum action;
+        try {
+            action = GocqActionEnum.valueOf(args[0].toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            bot.sendMessage(event, "Don't have this api: " + args[0], true);
+            return;
+        }
+        Object[] params = new String[args.length - 1];
+        System.arraycopy(args, 1, params, 0, args.length - 1);
+        String resp = bot.callApiWithResp(action, params);
+        if (resp.startsWith("{")) {
+            bot.sendMessage(event, resp, true);
+        } else if (resp.startsWith("[")) {
+            List<String> list = JSONArray.parseArray(resp, String.class);
+            if (list.size() > 0) {
+                List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), list);
+                bot.sendMessage(event, resp, true);
+            }
+        }
+    }
 
     //@MessageHandler(name = "测试rule, 注解", keywords = "rule1", rule = RuleEnum.tome)
     //public void testRule1(Bot bot, GroupMessageEvent event) {

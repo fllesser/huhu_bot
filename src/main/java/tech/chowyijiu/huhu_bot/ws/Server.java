@@ -12,6 +12,7 @@ import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
+import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +97,8 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        log.error("connect exception sessionId: {} exception: {}", session.getId(), exception);
+        log.info("{}connect exception sessionId[{}], exception[{}]{}",
+                LogUtil.buildArgsWithColor(ANSI.YELLOW, session.getId(), exception.getMessage()));
         removeClient(session);
     }
 

@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 public class GroupInfo {
     @JSONField(name = "group_id")
-    private String groupId;
+    private Long groupId;
     @JSONField(name = "group_name")
     private String groupName;
     @JSONField(name = "group_memo")

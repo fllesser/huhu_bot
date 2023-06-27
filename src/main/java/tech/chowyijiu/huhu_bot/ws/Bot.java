@@ -12,6 +12,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
@@ -22,6 +23,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
+import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -144,7 +146,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INGO, (Map<String, Object>) null);
+        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INFO, (Map<String, Object>) null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -315,7 +317,8 @@ public class Bot {
         try {
             session.sendMessage(new TextMessage(text));
         } catch (Exception e) {
-            log.warn("发送消息发生异常,session:{},消息：{}", session, text, e);
+            log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
+                    LogUtil.buildArgsWithColor(ANSI.YELLOW, session.getId(), text, e.getMessage()));
         }
     }
 

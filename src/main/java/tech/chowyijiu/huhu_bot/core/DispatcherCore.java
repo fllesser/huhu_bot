@@ -120,7 +120,7 @@ public class DispatcherCore {
             //匹配前缀命令
             if (message.startsWith(command)) {
                 //去除触发的command, 并去掉头尾空格
-                event.setMessage(message.replaceFirst(command, "").trim());
+                event.setCommandArgs(message.replaceFirst(command, "").trim());
                 handler.execute(bot, event);
                 return handler.block;
             }

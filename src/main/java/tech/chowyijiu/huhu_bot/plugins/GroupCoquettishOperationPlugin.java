@@ -8,13 +8,13 @@ import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
+import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
-import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
@@ -22,7 +22,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author elastic chow
@@ -33,17 +33,21 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class GroupCoquettishOperationPlugin {
 
-    @Scheduled(cron = "0 * * * * *  ")
+
+    @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
         String card = buildDateCard();
+        log.info("时间群昵称开始设置 card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
                     bot.callApi(GocqActionEnum.SET_GROUP_CARD,
                             "group_id", groupId, "user_id", bot.getUserId(), "card", card);
                     try {
                         Thread.sleep(2000L);
-                    } catch (InterruptedException ignored){}
+                    } catch (InterruptedException ignored) {
+                    }
                 }));
+        log.info("时间群昵称设置完毕 card: {}", card);
     }
 
     private String buildDateCard() {
@@ -58,21 +62,26 @@ public class GroupCoquettishOperationPlugin {
         return "失业第" + days + "天" + hours + "时" + minutes + "分";
     }
 
+
     @Scheduled(cron = "1 0 0 * * ? ")
     public void dailyClockIn() {
+        log.info("开始群打卡");
+        List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
-                .stream().filter(groupInfo -> !groupInfo.getGroupMemo().startsWith("[学校]"))
-                .map(GroupInfo::getGroupId).forEach(groupId -> {
+                .stream().map(GroupInfo::getGroupId).filter(clockGroups::contains)
+                .forEach(groupId -> {
                     bot.callApi(GocqActionEnum.SEND_GROUP_SIGN, "group_id", groupId);
                     try {
                         Thread.sleep(2000L);
-                    } catch (InterruptedException ignored){}
+                    } catch (InterruptedException ignored) {
+                    }
                 }));
+        log.info("群打卡完毕");
     }
 
     @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
-        String title = event.getMessage();
+        String title = event.getCommandArgs();
         if (title.length() > 6) {
             bot.sendGroupMessage(event.getGroupId(), "[bot]群头衔最多为6位", true);
             return;

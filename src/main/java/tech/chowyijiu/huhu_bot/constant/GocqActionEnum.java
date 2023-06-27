@@ -41,7 +41,7 @@ public enum GocqActionEnum {
     GET_WORD_SLICES(".get_word_slices","获取中文分词"),
     GET_MSG("get_msg","根据message_id获取消息详情"),
     GET_GROUP_LIST("get_group_list","获取群列表"),
-    GET_LOGIN_INGO("get_login_info","获取登录号信息"),
+    GET_LOGIN_INFO("get_login_info","获取登录号信息"),
     UPLOAD_PRIVATE_FILE("upload_private_file","上传私聊文件"),
     DOWNLOAD_FILE("download_file","下载文件到缓存目录");
 

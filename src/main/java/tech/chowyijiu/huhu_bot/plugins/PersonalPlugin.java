@@ -35,7 +35,7 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
-        bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
+        bot.sendMessage(event, MessageSegment.tts(event.getCommandArgs()) + "", false);
     }
 
     @MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
@@ -51,7 +51,7 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
     public void echo(Bot bot, MessageEvent event) {
-        bot.sendMessage(event, event.getMessage(), true);
+        bot.sendMessage(event, event.getCommandArgs(), true);
     }
 
 }

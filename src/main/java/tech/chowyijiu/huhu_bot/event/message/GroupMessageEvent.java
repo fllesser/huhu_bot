@@ -19,7 +19,7 @@ public class GroupMessageEvent extends MessageEvent {
     //匿名信息
     private String anonymous;
     //是否at bot
-    private boolean toMe;
+    private transient boolean toMe;
 
 
     @Override
