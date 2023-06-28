@@ -24,7 +24,7 @@ import java.util.List;
 public class TestPlugin {
 
 
-    @MessageHandler(name = "callApi", commands = "ca", rule = RuleEnum.superuser)
+    @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)
     public void apiTest(Bot bot, MessageEvent event) {
         String[] args = event.getCommandArgs().split(" ");
         if (args.length % 2 != 1) {

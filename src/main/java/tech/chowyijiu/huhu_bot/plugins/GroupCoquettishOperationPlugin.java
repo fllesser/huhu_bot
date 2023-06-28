@@ -94,7 +94,6 @@ public class GroupCoquettishOperationPlugin {
         bot.setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
     }
 
-
     Rule replyPokeRule = (bot, event) -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
         return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
