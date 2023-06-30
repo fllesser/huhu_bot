@@ -25,9 +25,8 @@ import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author elastic chow
@@ -67,9 +66,25 @@ public class Bot {
      * @return json 字符串数据
      */
     private String callApiWithResp(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
-        return GocqSyncRequestUtil.sendSyncRequest(this, action, paramsMap, 5000L);
+        RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
+        Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
+        requestBox.setAction(action.getAction());
+        String echo = Thread.currentThread().getName() + "_" +
+                this.getUserId() + "_" +
+                action.getAction() + "_" +
+                UUID.randomUUID().toString().replace("-", "");
+        requestBox.setEcho(echo);
+        //发送请求
+        this.sessionSend(JSONObject.toJSONString(requestBox));
+        return GocqSyncRequestUtil.sendSyncRequest(echo,5000L);
     }
 
+    /**
+     * 校验参数, 并转为Map
+     *
+     * @param params params
+     * @return Map
+     */
     private Map<String, Object> checkParamsToMap(Object... params) {
         Map<String, Object> paramsMap = null;
         int length = params.length;
@@ -218,13 +233,47 @@ public class Bot {
 
     /**
      * 设置群头衔, 仅可在机器人为群主时有效
-     * @param groupId group_id
-     * @param userId user_id
+     *
+     * @param groupId      group_id
+     * @param userId       user_id
      * @param specialTitle special_title
      */
     public void setGroupSpecialTitle(Long groupId, Long userId, String specialTitle) {
         this.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
                 "group_id", groupId, "user_id", userId, "special_title", specialTitle);
+    }
+
+    /**
+     * 设置群昵称
+     *
+     * @param groupId group_id
+     * @param userId  user_id
+     * @param card    card
+     */
+    public void setGroupCard(Long groupId, Long userId, String card) {
+        this.callApi(GocqActionEnum.SET_GROUP_CARD,
+                "group_id", groupId, "user_id", userId, "card", card);
+    }
+
+    /**
+     * 群打卡
+     *
+     * @param groupId group_id
+     */
+    public void sendGroupSign(Long groupId) {
+        this.callApi(GocqActionEnum.SEND_GROUP_SIGN,
+                "group_id", groupId);
+    }
+
+    /**
+     * 设置群管理员
+     * @param groupId group_id
+     * @param userId user_id
+     * @param enable true 为设置, false 为取消
+     */
+    public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
+        this.callApi(GocqActionEnum.SET_GROUP_ADMIN,
+                "group_id", groupId, "user_id", userId, "enable", enable);
     }
 
     /**
@@ -250,6 +299,7 @@ public class Bot {
         this.callApi(GocqActionEnum.SEND_PRIVATE_MSG,
                 "user_id", userId, "message", message, "auto_escape", autoEscape);
     }
+
 
     /**
      * 撤回消息
@@ -303,6 +353,8 @@ public class Bot {
                 "user_id", userId, "messages", nodes);
     }
 
+
+
     /**
      * 根据事件, 来发送对应的消息
      *
@@ -335,14 +387,15 @@ public class Bot {
     }
 
     /**
-     * ws session send
+     * call api 最终调用的方法
+     * Send a WebSocket message
      *
      * @param text text
      */
     public void sessionSend(String text) {
         try {
-            session.sendMessage(new TextMessage(text));
-        } catch (Exception e) {
+            this.session.sendMessage(new TextMessage(text));
+        } catch (IOException e) {
             log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
                     LogUtil.buildArgsWithColor(ANSI.YELLOW, this.session.getId(), text, e.getMessage()));
         }

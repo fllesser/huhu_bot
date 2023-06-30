@@ -1,7 +1,9 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 
@@ -16,10 +18,13 @@ import java.util.List;
 public class MessageSegment {
     //text, at...
     private final String type;
+    //todo 需要大改
     private final List<Node> data = new ArrayList<>(5);
 
     @RequiredArgsConstructor
-    static class Node {
+    @Getter
+    @Setter
+    public static class Node {
         final String key;
         final String value;
     }

@@ -68,14 +68,6 @@ class HuhuBotApplicationTests {
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     }
 
-    public void test(Object... args) {
-        System.out.println(args.length);
-    }
-
-    @Test
-    public void testTest() {
-        test();
-    }
 
 
 

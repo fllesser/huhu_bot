@@ -5,10 +5,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
-import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
@@ -22,7 +23,10 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author elastic chow
@@ -36,12 +40,11 @@ public class GroupCoquettishOperationPlugin {
 
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        String card = buildDateCard();
+        final String card = buildDateCard();
         log.info("时间群昵称开始设置 card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
-                    bot.callApi(GocqActionEnum.SET_GROUP_CARD,
-                            "group_id", groupId, "user_id", bot.getUserId(), "card", card);
+                    bot.setGroupCard(groupId, bot.getUserId(), card);
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException ignored) {
@@ -70,7 +73,7 @@ public class GroupCoquettishOperationPlugin {
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).filter(clockGroups::contains)
                 .forEach(groupId -> {
-                    bot.callApi(GocqActionEnum.SEND_GROUP_SIGN, "group_id", groupId);
+                    bot.sendGroupSign(groupId);
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException ignored) {
@@ -113,5 +116,20 @@ public class GroupCoquettishOperationPlugin {
         for (String name : new String[]{groupMember.getNickname(), groupMember.getCard()})
             if (StringUtil.hasLength(name) && name.contains("代肝"))
                 bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
+    }
+
+    //真tm答辩,这是啥啊
+    @MessageHandler(name = "给予管理员", commands = "setadmin", rule = RuleEnum.self_owner)
+    public void giveAdmin(Bot bot, GroupMessageEvent event) {
+        Message msg = event.getMsg();
+        msg.getMessageSegments().forEach(segment -> {
+            if (CqTypeEnum.at.name().equals(segment.getType())) {
+                AtomicReference<Long> userId = new AtomicReference<>();
+                segment.getData().stream().filter(node -> "qq".equals(node.getKey()))
+                        .findFirst().map(MessageSegment.Node::getValue).ifPresent(id -> userId.set(Long.parseLong(id)));
+                bot.setGroupAdmin(event.getGroupId(), userId.get(), true);
+            }
+        });
+
     }
 }

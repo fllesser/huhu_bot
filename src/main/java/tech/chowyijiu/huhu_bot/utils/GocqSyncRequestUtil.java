@@ -1,17 +1,10 @@
 package tech.chowyijiu.huhu_bot.utils;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.DownloadFileResp;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.SyncResponse;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
-import tech.chowyijiu.huhu_bot.ws.Bot;
 
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -37,25 +30,12 @@ public class GocqSyncRequestUtil {
 
     /***
      * 发送同步消息
-     * @param action 终结点
-     * @param params 参数
+     * @param echo echo 回声
      * @param timeout 超时 ms
-     * @param <T> T
      * @return String
      */
-    public static <T> String sendSyncRequest(
-            Bot bot, GocqActionEnum action, T params, long timeout) {
-        RequestBox<T> requestBox = new RequestBox<>();
-        Optional.ofNullable(params).ifPresent(requestBox::setParams);
-        requestBox.setAction(action.getAction());
-        String echo = Thread.currentThread().getName() + "_" +
-                bot.getUserId() + "_" +
-                action.getAction() + "_" +
-                UUID.randomUUID().toString().replace("-", "");
-        requestBox.setEcho(echo);
-        //发送请求
-        bot.sessionSend(JSONObject.toJSONString(requestBox));
-        //log.info("futureTask echo: {}", echo);
+    public static String sendSyncRequest(String echo, long timeout) {
+        log.info("futureTask echo: {}", echo);
         //提交task等待gocq传回数据
         FutureTask<String> futureTask = new FutureTask<>(new Task(echo));
         pool.submit(futureTask);
@@ -115,20 +95,20 @@ public class GocqSyncRequestUtil {
      * @param timeout  timeout
      * @return SyncResponse
      */
-    @Deprecated
-    public static SyncResponse uploadPrivateFile(
-            Bot bot, Long userId, String filePath, String fileName, long timeout) {
-        Map<String, Object> param = new HashMap<>(3);
-        param.put("user_id", userId);
-        param.put("file", filePath);
-        param.put("name", fileName);
-        String responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
-        if (responseStr != null) {
-            return JSONObject.parseObject(responseStr, SyncResponse.class);
-
-        }
-        return null;
-    }
+    //@Deprecated
+    //public static SyncResponse uploadPrivateFile(
+    //        Bot bot, Long userId, String filePath, String fileName, long timeout) {
+    //    Map<String, Object> param = new HashMap<>(3);
+    //    param.put("user_id", userId);
+    //    param.put("file", filePath);
+    //    param.put("name", fileName);
+    //    String responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
+    //    if (responseStr != null) {
+    //        return JSONObject.parseObject(responseStr, SyncResponse.class);
+    //
+    //    }
+    //    return null;
+    //}
 
     /**
      * 用gocq去下载文件
@@ -139,30 +119,30 @@ public class GocqSyncRequestUtil {
      * @param timeout     timeout
      * @return 返回gocq下载到的文件绝对路径
      */
-    @Deprecated
-    public static DownloadFileResp downloadFile(
-            Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
-
-        Map<String, Object> param = new HashMap<>(3);
-        param.put("url", url);
-        param.put("thread_count", threadCount);
-
-        if (httpHeaders != null && !httpHeaders.isEmpty()) {
-            List<String> headStrs = new ArrayList<>();
-            for (Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
-                StringBuilder item = new StringBuilder(entry.getKey() + "=");
-                for (String s : entry.getValue()) {
-                    item.append(s).append(";");
-                }
-                headStrs.add(item.toString());
-            }
-            param.put("headers", JSONObject.toJSONString(headStrs));
-
-        }
-        String jsonStr = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
-        if (jsonStr != null) {
-            return JSONObject.parseObject(jsonStr, DownloadFileResp.class);
-        }
-        return null;
-    }
+    //@Deprecated
+    //public static DownloadFileResp downloadFile(
+    //        Bot bot, String url, int threadCount, HttpHeaders httpHeaders, long timeout) {
+    //
+    //    Map<String, Object> param = new HashMap<>(3);
+    //    param.put("url", url);
+    //    param.put("thread_count", threadCount);
+    //
+    //    if (httpHeaders != null && !httpHeaders.isEmpty()) {
+    //        List<String> headStrs = new ArrayList<>();
+    //        for (Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+    //            StringBuilder item = new StringBuilder(entry.getKey() + "=");
+    //            for (String s : entry.getValue()) {
+    //                item.append(s).append(";");
+    //            }
+    //            headStrs.add(item.toString());
+    //        }
+    //        param.put("headers", JSONObject.toJSONString(headStrs));
+    //
+    //    }
+    //    String jsonStr = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
+    //    if (jsonStr != null) {
+    //        return JSONObject.parseObject(jsonStr, DownloadFileResp.class);
+    //    }
+    //    return null;
+    //}
 }

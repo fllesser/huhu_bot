@@ -24,6 +24,7 @@ public enum GocqActionEnum {
     SET_GROUP_CARD("set_group_card", "设置群名片"),
     SET_GROUP_SPECIAL_TITLE("set_group_special_title", "设置群专属头衔"),
     SET_GROUP_KICK("set_group_kick", "群组踢人"),
+    SET_GROUP_ADMIN("set_group_admin", "设置群管理员"),
 
     DELETE_FRIEND("delete_friend", "删除好友"),
     DELETE_MSG("delete_msg","撤回消息"),
