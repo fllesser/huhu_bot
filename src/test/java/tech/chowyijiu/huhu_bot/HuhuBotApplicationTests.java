@@ -5,19 +5,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.event.Event;
+import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
+import tech.chowyijiu.huhu_bot.plugins.TestPlugin;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
 import tech.chowyijiu.huhu_bot.utils.ImageUtil;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
-class HuhuBotApplicationTests {
+public class HuhuBotApplicationTests {
 
     @Test
     void contextLoads() {
@@ -66,6 +72,19 @@ class HuhuBotApplicationTests {
             return null;
         }).toArray(BufferedImage[]::new);
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
+    }
+
+
+    //@Resource
+    private TestPlugin testPlugin;
+
+    //@Test
+    public void test() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Bot bot = new Bot(1923123123L, null);
+        MessageEvent event = new MessageEvent();
+        event.setMessage("测试");
+        Method method = testPlugin.getClass().getMethod("handle", Bot.class, Event.class);
+        method.invoke(testPlugin, bot, event);
     }
 
 

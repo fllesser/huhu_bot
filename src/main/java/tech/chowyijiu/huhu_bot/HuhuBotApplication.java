@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 @ConfigurationPropertiesScan({"tech.chowyijiu.huhu_bot.config", "tech.chowyijiu.huhu_bot.plugins"})
+//@EnableAspectJAutoProxy
 public class HuhuBotApplication {
 
     public static void main(String[] args) {
