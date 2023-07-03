@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.event.message;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,18 +35,20 @@ public class MessageEvent extends Event {
     private Integer font; //0
     private Sender sender;
 
-    private transient Message msg;
-    private transient String commandArgs;
+    @JsonIgnore
+    private Message msg;
+    @JsonIgnore
+    private String commandArgs;
 
     public static MessageEvent jsonToMessageEvent(JSONObject jsonObject) {
         String messageType = jsonObject.getString("message_type");
         MessageEvent event;
         if (Objects.equals(messageType, MessageTypeEnum.private_.getType())) {
             event = jsonObject.toJavaObject(PrivateMessageEvent.class);
-            event.msg = Message.toMessage(event.message);
+            event.msg = Message.build(event.message);
         } else {
             event = jsonObject.toJavaObject(GroupMessageEvent.class);
-            event.msg = Message.toMessage(event.message);
+            event.msg = Message.build(event.message);
             if (event.msg.isToMe(event.getSelfId())) {
                 ((GroupMessageEvent) event).setToMe(true);
             }

@@ -232,14 +232,15 @@ public class DispatcherCore {
                 log.info("{} IllegalAccessException: {}{}",
                         LogUtil.buildArgsWithColor(ANSI.YELLOW, "handler method must be public"));
             } catch (InvocationTargetException e) {
-                if (e.getTargetException() instanceof FinishedException) {
+                Throwable rawException = e.getTargetException();
+                if (rawException instanceof FinishedException) {
                     log.info("{} Finished: {}{}{}",
                             LogUtil.buildArgsWithColor(ANSI.YELLOW, event, " execute forced termination"));
-                } else if (e.getTargetException() instanceof ActionFailed) {
+                } else if (rawException instanceof ActionFailed) {
                     log.info("{} ActionFailed: {}{}",
-                            LogUtil.buildArgsWithColor(ANSI.YELLOW, e.getTargetException().getMessage()));
+                            LogUtil.buildArgsWithColor(ANSI.YELLOW, rawException.getMessage()));
                 } else {
-                    e.printStackTrace();
+                    rawException.printStackTrace();
                 }
             }
         }

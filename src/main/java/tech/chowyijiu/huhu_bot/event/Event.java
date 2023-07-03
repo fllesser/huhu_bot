@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.event;
 
 
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
@@ -20,6 +21,7 @@ import tech.chowyijiu.huhu_bot.utils.StringUtil;
 @Setter
 public abstract class Event {
 
+    @JsonIgnore
     private JSONObject jsonObject;
 
     private Long selfId;
@@ -46,13 +48,9 @@ public abstract class Event {
                     break;
             }
         } else {
-            if (jsonObject.getString("echo") != null) {
-                event = jsonObject.toJavaObject(EchoEvent.class);
-            }
+            if (jsonObject.getString("echo") != null) event = jsonObject.toJavaObject(EchoEvent.class);
         }
-        if (event != null) {
-            event.setJsonObject(jsonObject);
-        }
+        if (event != null) event.setJsonObject(jsonObject);
         return event;
     }
 

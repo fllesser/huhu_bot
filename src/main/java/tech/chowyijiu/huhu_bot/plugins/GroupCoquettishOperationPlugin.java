@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author elastic chow
@@ -66,7 +65,7 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    @Scheduled(cron = "1 0 0 * * ? ")
+    @Scheduled(cron = "1 0 0 * * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
         List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
@@ -121,14 +120,11 @@ public class GroupCoquettishOperationPlugin {
     //真tm答辩,这是啥啊
     @MessageHandler(name = "给予管理员", commands = "setadmin", rule = RuleEnum.self_owner)
     public void giveAdmin(Bot bot, GroupMessageEvent event) {
-        Message msg = event.getMsg();
-        msg.getMessageSegments().forEach(segment -> {
-            if (CqTypeEnum.at.name().equals(segment.getType())) {
-                AtomicReference<Long> userId = new AtomicReference<>();
-                segment.getData().stream().filter(node -> "qq".equals(node.getKey()))
-                        .findFirst().map(MessageSegment.Node::getValue).ifPresent(id -> userId.set(Long.parseLong(id)));
-                bot.setGroupAdmin(event.getGroupId(), userId.get(), true);
-            }
+        Message message = event.getMsg();
+        List<MessageSegment> segments = message.getSegmentByType(CqTypeEnum.at.name());
+        segments.forEach(segment -> {
+            long qq = Long.parseLong(segment.get("qq"));
+            bot.setGroupAdmin(event.getGroupId(), qq, true);
         });
 
     }

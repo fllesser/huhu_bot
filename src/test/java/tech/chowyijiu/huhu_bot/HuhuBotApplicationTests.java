@@ -48,9 +48,9 @@ public class HuhuBotApplicationTests {
         String cq3 = "[CQ:image,file=http://baidu.com/1.jpg]测试";
         String cq4 = "测试[CQ:image,file=https://baidu.com/1.jpg][CQ:face,id=123]";
         Message message = new Message();
-        message.append(MessageSegment.at(1942422015L));
-        message.append("测试");
-        message.append(MessageSegment.image("https://baidu.com/1.jpg"));
+        message.add(MessageSegment.at(1942422015L));
+        message.add("测试");
+        message.add(MessageSegment.image("https://baidu.com/1.jpg", 0));
         System.out.println(message);
     }
 

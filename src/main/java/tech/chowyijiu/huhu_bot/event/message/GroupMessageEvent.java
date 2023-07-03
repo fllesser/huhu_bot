@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhu_bot.event.message;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +20,8 @@ public class GroupMessageEvent extends MessageEvent {
     //匿名信息
     private String anonymous;
     //是否at bot
-    private transient boolean toMe;
+    @JsonIgnore
+    private boolean toMe;
 
 
     @Override

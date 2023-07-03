@@ -56,7 +56,7 @@ public class FortnitePlugin {
                 imageUrl = item.getImages().getIcon();
                 name = item.getName();
             }
-            Optional.ofNullable(MessageSegment.image(imageUrl, 1, 5)).ifPresent(segment ->
+            Optional.ofNullable(MessageSegment.image(imageUrl, 1, 1)).ifPresent(segment ->
                     map.put(name + " " + shopEntry.getFinalPrice() + "VB", segment.toString()));
         }
         //System.out.println(map.size());

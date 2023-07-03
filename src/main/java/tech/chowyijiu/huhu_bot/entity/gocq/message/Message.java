@@ -1,34 +1,30 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.logging.log4j.util.Strings;
 import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author elastic chow
- * @date 19/5/2023
+ * @date 3/7/2023
  */
-@Data
-@NoArgsConstructor
-public class Message {
-
-    private List<MessageSegment> messageSegments = new ArrayList<>();
-
-    private String strMessage;
+public class Message extends ArrayList<MessageSegment> {
 
     /**
      * 字符串转Message对象, 用于转换事件的消息
+     *
      * @param str message
      * @return Message
      */
-    public static Message toMessage(String str) {
+    public static Message build(String str) {
         Message message = new Message();
-        message.strMessage = str;
+        //message.strMessage = str;
         if (!str.contains("[CQ:")) {
-            message.append(str);
+            message.add(MessageSegment.text(str));
             return message;
         }
         int fromIndex = 0, start = 0, end = 0;
@@ -36,15 +32,15 @@ public class Message {
         while (true) {
             start = str.indexOf("[CQ:", fromIndex);
             //如果没有cq了, 直接把剩余的部分添加成text
-            if (start == -1 ) {
+            if (start == -1) {
                 if (str.length() > fromIndex) {
-                    message.append(str.substring(fromIndex));
+                    message.add(MessageSegment.text(str.substring(fromIndex)));
                 }
                 break;
             }
             //如果cq的start前面还有字符串, 先把这一部分添加成text
             if (start - fromIndex > 0) {
-                message.append(str.substring(fromIndex, start));
+                message.add(MessageSegment.text(str.substring(fromIndex, start)));
             }
             end = str.indexOf("]", start);
             //添加cq
@@ -53,76 +49,47 @@ public class Message {
             MessageSegment segment = new MessageSegment(CqTypeEnum.valueOf(split[0]).name());
             for (int i = 1; i < split.length; i++) {
                 String[] keyVal = split[i].split("=");
-                segment.addParam(keyVal[0], keyVal[1]);
+                segment.put(keyVal[0], keyVal[1]);
             }
-            message.append(segment);
+            message.add(segment);
             fromIndex = end + 1;
         }
         return message;
     }
 
+    public void add(String text) {
+        this.add(MessageSegment.text(text));
+    }
 
     public boolean isToMe(Long selfId) {
-        for (MessageSegment segment : messageSegments) {
-            if (segment.getType().equals(CqTypeEnum.at.name())) {
-                if (Objects.equals(Long.parseLong(segment.getData().get(0).value), selfId)) {
-                    return true;
-                }
-            }
+        for (MessageSegment segment : this) {
+            if ("at".equals(segment.getType()) &&
+                    Objects.equals(Long.parseLong(segment.get("qq")), selfId)
+            ) return true;
         }
         return false;
     }
 
-    /**
-     * 拼接str message
-     */
-    private void spliceStr() {
-        StringBuilder sb = new StringBuilder();
-        for (MessageSegment segment : this.messageSegments) {
-            String type = segment.getType();
-            if (Objects.equals(type, "text")) {
-                sb.append(segment.getText());
-            } else {
-                sb.append("[CQ:").append(segment.getType());
-                segment.getData().forEach(node -> sb.append(",").append(node.key).append("=").append(node.value));
-                sb.append("]");
-            }
-        }
-        this.strMessage = sb.toString();
-    }
-
-
-    /**
-     * @param text String
-     */
-    public Message append(String text) {
-        messageSegments.add(MessageSegment.text(text));
-        return this;
-    }
-
-    /**
-     * @param segment  MessageSegment
-     */
-    public Message append(MessageSegment segment) {
-        messageSegments.add(segment);
-        return this;
-    }
-
-
     @Override
     public String toString() {
-        if (Strings.isBlank(this.strMessage)) {
-            spliceStr();
+        StringBuilder sb = new StringBuilder();
+        for (MessageSegment segment : this) {
+            String text = segment.getText();
+            if (StringUtil.hasLength(text)) sb.append(text);
+            else sb.append(segment);
         }
-        return this.strMessage;
+        return sb.toString();
     }
 
-    /**
-     * 用于测试, 变成json数组
-     * @return
-     */
+    public List<MessageSegment> getSegmentByType(String type) {
+        List<MessageSegment> segments = new ArrayList<>();
+        for (MessageSegment segment : this) {
+            if (segment.getType().equals(type)) segments.add(segment);
+        }
+        return segments;
+    }
+
     public String toJsonArray() {
-        return Arrays.toString(messageSegments.toArray());
+        return Arrays.toString(this.toArray());
     }
-
 }
