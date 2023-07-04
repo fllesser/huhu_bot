@@ -16,6 +16,12 @@ import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 public class GroupMessageEvent extends MessageEvent {
 
     private final String messageType = MessageTypeEnum.group.getType();
+
+    // 消息子类型, 正常消息是 normal,
+    // 匿名消息是 anonymous,
+    // 系统提示 ( 如「管理员已禁止群内匿名聊天」 ) 是 notice
+    private String subType;
+
     private Long groupId;
     //匿名信息
     private String anonymous;
@@ -23,6 +29,10 @@ public class GroupMessageEvent extends MessageEvent {
     @JsonIgnore
     private boolean toMe;
 
+    public boolean isToMe() {
+        if (this.getMsg().checkToMe(this.getSelfId())) this.toMe = true;
+        return toMe;
+    }
 
     @Override
     public String toString() {
@@ -30,8 +40,6 @@ public class GroupMessageEvent extends MessageEvent {
                 "groupId=" + groupId +
                 ", userId=" + super.getUserId() +
                 ", message=" + super.getMessage() +
-                ", anonymous=" + anonymous +
-                ", toMe=" + toMe +
                 "}";
     }
 }

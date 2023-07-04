@@ -62,7 +62,7 @@ public class BotV2 {
             return GocqSyncRequestUtil.sendSyncRequest(echo,5000L);
         } else {
             this.sessionSend(JSONObject.toJSONString(requestBox));
-            return null;
+            return "";
         }
     }
 

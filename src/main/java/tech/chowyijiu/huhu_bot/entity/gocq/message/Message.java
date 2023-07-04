@@ -1,8 +1,5 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
-import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
-import tech.chowyijiu.huhu_bot.utils.StringUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,38 +12,31 @@ import java.util.Objects;
 public class Message extends ArrayList<MessageSegment> {
 
     /**
-     * 字符串转Message对象, 用于转换事件的消息
-     *
-     * @param str message
+     * @param msg raw_message
      * @return Message
      */
-    public static Message build(String str) {
+    public static Message build(String msg) {
         Message message = new Message();
-        //message.strMessage = str;
-        if (!str.contains("[CQ:")) {
-            message.add(MessageSegment.text(str));
+        if (!msg.contains("[CQ:")) {
+            message.add(MessageSegment.text(msg));
             return message;
         }
         int fromIndex = 0, start = 0, end = 0;
         //获取第一个索引
         while (true) {
-            start = str.indexOf("[CQ:", fromIndex);
-            //如果没有cq了, 直接把剩余的部分添加成text
+            start = msg.indexOf("[CQ:", fromIndex);
+            //如果没有cq了, 把剩余的部分添加成text
             if (start == -1) {
-                if (str.length() > fromIndex) {
-                    message.add(MessageSegment.text(str.substring(fromIndex)));
-                }
+                if (msg.length() > fromIndex) message.add(MessageSegment.text(msg.substring(fromIndex)));
                 break;
             }
             //如果cq的start前面还有字符串, 先把这一部分添加成text
-            if (start - fromIndex > 0) {
-                message.add(MessageSegment.text(str.substring(fromIndex, start)));
-            }
-            end = str.indexOf("]", start);
-            //添加cq
-            String cq = str.substring(start + 4, end);
+            if (start - fromIndex > 0) message.add(MessageSegment.text(msg.substring(fromIndex, start)));
+            end = msg.indexOf("]", start);
+            //添加cq: type,xxx=xxx,xxx=xxx
+            String cq = msg.substring(start + 4, end);
             String[] split = cq.split(",");
-            MessageSegment segment = new MessageSegment(CqTypeEnum.valueOf(split[0]).name());
+            MessageSegment segment = new MessageSegment(split[0]);
             for (int i = 1; i < split.length; i++) {
                 String[] keyVal = split[i].split("=");
                 segment.put(keyVal[0], keyVal[1]);
@@ -61,7 +51,7 @@ public class Message extends ArrayList<MessageSegment> {
         this.add(MessageSegment.text(text));
     }
 
-    public boolean isToMe(Long selfId) {
+    public boolean checkToMe(Long selfId) {
         for (MessageSegment segment : this) {
             if ("at".equals(segment.getType()) &&
                     Objects.equals(Long.parseLong(segment.get("qq")), selfId)
@@ -70,21 +60,31 @@ public class Message extends ArrayList<MessageSegment> {
         return false;
     }
 
+    /**
+     * 获取所有text信息, 去除所有cq码
+     * @return String
+     */
+    public String plainText() {
+        StringBuilder sb = new StringBuilder();
+        for (MessageSegment segment : this) sb.append(segment.getText());
+        return sb.toString();
+    }
+
+    /**
+     * 用于拼接要发送的字符串, 例如: 早上好[CQ:at,qq123]
+     * @return String
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (MessageSegment segment : this) {
-            String text = segment.getText();
-            if (StringUtil.hasLength(text)) sb.append(text);
-            else sb.append(segment);
-        }
+        for (MessageSegment segment : this) sb.append(segment);
         return sb.toString();
     }
 
     public List<MessageSegment> getSegmentByType(String type) {
         List<MessageSegment> segments = new ArrayList<>();
         for (MessageSegment segment : this) {
-            if (segment.getType().equals(type)) segments.add(segment);
+            if (Objects.equals(type, segment.getType())) segments.add(segment);
         }
         return segments;
     }

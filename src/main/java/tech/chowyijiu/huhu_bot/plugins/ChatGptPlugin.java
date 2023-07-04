@@ -1,7 +1,5 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
-import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +8,7 @@ import java.util.Map;
  * @date 29/6/2023
  */
 @SuppressWarnings("unused")
-@BotPlugin
+//@BotPlugin
 public class ChatGptPlugin {
 
     //userId session

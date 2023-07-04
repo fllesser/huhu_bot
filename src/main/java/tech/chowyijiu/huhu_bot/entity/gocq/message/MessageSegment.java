@@ -25,6 +25,7 @@ public class MessageSegment extends HashMap<String, String> {
 
     @Override
     public String toString() {
+        if ("text".equals(type)) return get("text");
         StringBuilder sb = new StringBuilder();
         sb.append("[CQ:").append(this.type);
         this.keySet().forEach(key -> sb.append(",").append(key).append("=").append(this.get(key)));

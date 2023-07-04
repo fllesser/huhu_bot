@@ -5,10 +5,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.annotation.NoticeHandler;
-import tech.chowyijiu.huhu_bot.constant.CqTypeEnum;
 import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.core.rule.RuleImpl;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupInfo;
@@ -65,7 +65,7 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    @Scheduled(cron = "1 0 0 * * * *")
+    @Scheduled(cron = "1 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
         List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
@@ -117,14 +117,21 @@ public class GroupCoquettishOperationPlugin {
                 bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
     }
 
-    //真tm答辩,这是啥啊
-    @MessageHandler(name = "给予管理员", commands = "setadmin", rule = RuleEnum.self_owner)
+    Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event) &&
+            "message_sent".equals(event.getPostType());
+
+    /**
+     * 是答辩
+     * command setadmin@... false / true
+     */
+    @MessageHandler(name = "授予管理员", commands = "setadmin")
     public void giveAdmin(Bot bot, GroupMessageEvent event) {
+        boolean enable = Boolean.parseBoolean(event.getCommandArgs());
         Message message = event.getMsg();
-        List<MessageSegment> segments = message.getSegmentByType(CqTypeEnum.at.name());
+        List<MessageSegment> segments = message.getSegmentByType("at");
         segments.forEach(segment -> {
             long qq = Long.parseLong(segment.get("qq"));
-            bot.setGroupAdmin(event.getGroupId(), qq, true);
+            bot.setGroupAdmin(event.getGroupId(), qq, enable);
         });
 
     }

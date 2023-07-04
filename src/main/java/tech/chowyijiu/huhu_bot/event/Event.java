@@ -28,17 +28,17 @@ public abstract class Event {
     private String postType;
     private Long time;
 
-    public static Event jsonToEvent(JSONObject jsonObject) {
+    public static Event build(JSONObject jsonObject) {
         String postType = jsonObject.getString("post_type");
         Event event = null;
         if (StringUtil.hasLength(postType)) {
             switch (PostTypeEnum.valueOf(postType)) {
                 case message_sent:
                 case message:
-                    event = MessageEvent.jsonToMessageEvent(jsonObject);
+                    event = MessageEvent.build(jsonObject);
                     break;
                 case notice:
-                    event = NoticeEvent.jsonToNoticeEvent(jsonObject);
+                    event = NoticeEvent.build(jsonObject);
                     break;
                 case request:
                     event = jsonObject.toJavaObject(RequestEvent.class);

@@ -22,48 +22,41 @@ public class NoticeEvent extends Event {
     private final String postType = PostTypeEnum.notice.name();
     private String noticeType;
 
-    public static NoticeEvent jsonToNoticeEvent(JSONObject jsonObject) {
+    public static NoticeEvent build(JSONObject jsonObject) {
         String noticeType = jsonObject.getString("notice_type");
-        NoticeEvent noticeEvent;
+        // todo 改成map?
         switch (NoticeTypeEnum.valueOf(noticeType)) {
             case notify:
-                noticeEvent = jsonObject.toJavaObject(NotifyNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(NotifyNoticeEvent.class);
             case group_increase:
-                noticeEvent = jsonObject.toJavaObject(GroupIncreaseNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupIncreaseNoticeEvent.class);
             case group_decrease:
-                noticeEvent = jsonObject.toJavaObject(GroupDecreaseNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupDecreaseNoticeEvent.class);
             case group_card:
-                noticeEvent = jsonObject.toJavaObject(GroupCardNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupCardNoticeEvent.class);
             case group_ban:
-                noticeEvent = jsonObject.toJavaObject(GroupBanNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupBanNoticeEvent.class);
             case group_admin:
-                noticeEvent = jsonObject.toJavaObject(GroupAdminNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupAdminNoticeEvent.class);
             case group_upload:
-                noticeEvent = jsonObject.toJavaObject(GroupUploadNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupUploadNoticeEvent.class);
             case group_recall:
-                noticeEvent = jsonObject.toJavaObject(GroupRecallNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(GroupRecallNoticeEvent.class);
             case friend_recall:
-                noticeEvent = jsonObject.toJavaObject(FriendRecallNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(FriendRecallNoticeEvent.class);
             case friend_add:
-                noticeEvent = jsonObject.toJavaObject(FriendAddNoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(FriendAddNoticeEvent.class);
             case essence:
             case offline_file:
             case client_status:
             default:
-                noticeEvent = jsonObject.toJavaObject(NoticeEvent.class);
-                break;
+                return jsonObject.toJavaObject(NoticeEvent.class);
         }
-        return noticeEvent;
+        // NoticeEvent noticeEvent;
+        // String className = NoticeEvent.class.getPackage().getName() + "NoticeEvent";
+        // Class<? extends NoticeEvent> clazz = Class.forName(className);
+        // noticeEvent = jsonObject.toJavaObject(clazz);
+        // return noticeEvent;
     }
 
 

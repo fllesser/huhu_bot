@@ -68,7 +68,7 @@ public class Server extends TextWebSocketHandler {
         final String json = message.getPayload();
         try {
             JSONObject jsonObject = JSONObject.parseObject(json);
-            Event event = Event.jsonToEvent(jsonObject);
+            Event event = Event.build(jsonObject);
             if (event == null) return;
             if (event instanceof MetaEvent) {
                 MetaEvent metaEvent = (MetaEvent) event;
