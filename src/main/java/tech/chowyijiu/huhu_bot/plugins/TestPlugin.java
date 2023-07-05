@@ -26,9 +26,7 @@ public class TestPlugin {
     @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)
     public void apiTest(Bot bot, MessageEvent event) {
         String[] args = event.getCommandArgs().split(" ");
-        if (args.length % 2 != 1) {
-            bot.finish(event, "参数错误");
-        }
+        if (args.length % 2 != 1) event.finish("[bot]参数错误");
         GocqActionEnum action = null;
         for (GocqActionEnum value : GocqActionEnum.values()) {
             if (value.getAction().equals(args[0])) {
@@ -36,9 +34,7 @@ public class TestPlugin {
                 break;
             }
         }
-        if (action == null) {
-            bot.finish(event, "没有这个API, 或未支持");
-        }
+        if (action == null) event.finish("没有这个API, 或未支持");
         Object[] params = new String[args.length - 1];
         System.arraycopy(args, 1, params, 0, args.length - 1);
         String resp = bot.callApiWithResp(action, params);

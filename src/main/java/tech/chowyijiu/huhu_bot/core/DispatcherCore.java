@@ -231,16 +231,16 @@ public class DispatcherCore {
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
             } catch (IllegalAccessException e) {
-                log.info("{} IllegalAccessException: {}{}",
-                        LogUtil.buildArgsWithColor(ANSI.YELLOW, "handler method must be public"));
+                log.info("{}IllegalAccessException: {}{}",
+                        LogUtil.buildArgsWithColor(ANSI.RED, "handler method must be public"));
             } catch (InvocationTargetException e) {
                 Throwable rawException = e.getTargetException();
                 if (rawException instanceof FinishedException) {
-                    log.info("{} Finished: {}{}{}",
-                            LogUtil.buildArgsWithColor(ANSI.YELLOW, event, " execute forced termination"));
+                    log.info("{}Finished: {}{}{}",
+                            LogUtil.buildArgsWithColor(ANSI.RED, event, " execute forced termination"));
                 } else if (rawException instanceof ActionFailed) {
-                    log.info("{} ActionFailed: {}{}",
-                            LogUtil.buildArgsWithColor(ANSI.YELLOW, rawException.getMessage()));
+                    log.info("{}ActionFailed: {}{}",
+                            LogUtil.buildArgsWithColor(ANSI.RED, rawException.getMessage()));
                 } else {
                     rawException.printStackTrace();
                 }

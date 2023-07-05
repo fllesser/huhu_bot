@@ -59,7 +59,7 @@ public class Server extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
-        log.info("{} GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
+        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
                 session.getRemoteAddress(), getConnections() + 1, ANSI.RESET);
     }
 
@@ -80,7 +80,7 @@ public class Server extends TextWebSocketHandler {
                         && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     addBot(event.getSelfId(), session);
-                    log.info("{} RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
+                    log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
                     return;
                 }
@@ -89,7 +89,7 @@ public class Server extends TextWebSocketHandler {
             //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
             log.info("Accepted {}", event);
             for (Bot bot : bots)
-                if (Objects.equals(bot.getSession(), session))
+                if (Objects.equals(bot.getSession(), session)) //这里不要用userId获取bot, 因为echoEvent没有self_id
                     ProcessEventTask.execute(bot, event);
         } catch (Exception e) {
             log.error("Parsing payload exception", e);

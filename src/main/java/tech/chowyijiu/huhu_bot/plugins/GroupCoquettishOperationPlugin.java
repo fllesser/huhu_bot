@@ -65,7 +65,7 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    @Scheduled(cron = "2 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
         List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
@@ -74,19 +74,19 @@ public class GroupCoquettishOperationPlugin {
                 .forEach(groupId -> {
                     bot.sendGroupSign(groupId);
                     try {
-                        Thread.sleep(2000L);
+                        Thread.sleep(500L);
                     } catch (InterruptedException ignored) {
                     }
                 }));
         log.info("群打卡完毕");
     }
 
+    //todo bot对象要不放event得了
     @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
-        if (title.length() > 6) {
-            bot.finish(event, "[bot]群头衔最多为6位");
-        }
+        if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
+        if (title.length() > 6) event.finish("[bot]群头衔最多为6位");
         for (String filter : new String[]{"群主", "管理员"}) {
             if (title.contains(filter)) {
                 title = "群猪";

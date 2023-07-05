@@ -48,7 +48,8 @@ public abstract class Event {
                     break;
             }
         } else {
-            if (jsonObject.getString("echo") != null) event = jsonObject.toJavaObject(EchoEvent.class);
+            if (StringUtil.hasLength(jsonObject.getString("echo")))
+                event = jsonObject.toJavaObject(EchoEvent.class);
         }
         if (event != null) event.setJsonObject(jsonObject);
         return event;

@@ -11,7 +11,7 @@ import tech.chowyijiu.huhu_bot.event.Event;
  */
 @Getter
 @Setter
-@ToString(exclude = {"data"})
+@ToString(exclude = {"data", "message", "retcode"})
 public class EchoEvent extends Event {
     private String data;
     private String echo; //回声

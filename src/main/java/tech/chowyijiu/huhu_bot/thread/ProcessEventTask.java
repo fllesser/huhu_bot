@@ -58,7 +58,7 @@ public class ProcessEventTask implements Runnable {
                 String echo = echoEvent.getEcho();
                 String data = echoEvent.getData();
                 if (StringUtils.hasLength(echo) && StringUtils.hasLength(data))
-                    GocqUtil.putEchoResult(echo, echoEvent.getData());
+                    GocqUtil.putEchoResult(echo, data);
             } else if (event instanceof RequestEvent) {
                 log.info("{}", event);
             }

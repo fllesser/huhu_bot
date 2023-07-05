@@ -10,6 +10,8 @@ import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.response.Sender;
 import tech.chowyijiu.huhu_bot.event.Event;
+import tech.chowyijiu.huhu_bot.ws.Bot;
+import tech.chowyijiu.huhu_bot.ws.Server;
 
 import java.util.Objects;
 
@@ -58,6 +60,12 @@ public class MessageEvent extends Event {
     public Message getMsg() {
         if (msg == null) msg = Message.build(this.message);
         return msg;
+    }
+
+    public void finish(String message) {
+        Bot bot = Server.getBot(this.getSelfId());
+        assert bot != null;
+        bot.finish(this, message);
     }
 
 }
