@@ -126,7 +126,7 @@ public class DispatcherCore {
                 //去除触发的command, 并去掉头尾空格
                 event.setMessage(message.replaceFirst(command, "").trim());
                 //去除所有cq码, event.msg里是包含cq码的segment的
-                event.setCommandArgs(event.getMsg().plainText());
+                event.setCommandArgs(event.getMsg().plainText().trim());
                 handler.execute(bot, event);
                 return handler.block;
             }

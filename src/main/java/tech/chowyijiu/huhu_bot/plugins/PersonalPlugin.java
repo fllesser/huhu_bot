@@ -33,7 +33,8 @@ public class PersonalPlugin {
         bot.sendGroupMessage(event.getSender().getGroupId(), message,false);
     }
 
-    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
+    //@MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
+    @Deprecated
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
         bot.sendMessage(event, MessageSegment.tts(event.getCommandArgs()) + "", false);
     }

@@ -22,7 +22,7 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
-import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
+import tech.chowyijiu.huhu_bot.utils.GocqUtil;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
 import java.io.IOException;
@@ -69,14 +69,13 @@ public class Bot {
         RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.getAction());
-        String echo = Thread.currentThread().getName() + "_" +
-                this.getUserId() + "_" +
-                action.getAction() + "_" +
-                UUID.randomUUID().toString().replace("-", "");
+        //curThread__userId__action__uuid
+        String echo = Thread.currentThread().getName() + "." + this.getUserId() + "." +
+                action.getAction() + "." + UUID.randomUUID();
         requestBox.setEcho(echo);
         //发送请求
         this.sessionSend(JSONObject.toJSONString(requestBox));
-        return GocqSyncRequestUtil.sendSyncRequest(echo,5000L);
+        return GocqUtil.waitResp(echo, 5000L);
     }
 
     /**
@@ -267,9 +266,10 @@ public class Bot {
 
     /**
      * 设置群管理员
+     *
      * @param groupId group_id
-     * @param userId user_id
-     * @param enable true 为设置, false 为取消
+     * @param userId  user_id
+     * @param enable  true 为设置, false 为取消
      */
     public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
         this.callApi(GocqActionEnum.SET_GROUP_ADMIN,
@@ -352,7 +352,6 @@ public class Bot {
         this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
                 "user_id", userId, "messages", nodes);
     }
-
 
 
     /**

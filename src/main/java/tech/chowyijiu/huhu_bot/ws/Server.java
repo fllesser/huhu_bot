@@ -85,6 +85,8 @@ public class Server extends TextWebSocketHandler {
                     return;
                 }
             }
+            //测试
+            //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
             log.info("Accepted {}", event);
             for (Bot bot : bots)
                 if (Objects.equals(bot.getSession(), session))

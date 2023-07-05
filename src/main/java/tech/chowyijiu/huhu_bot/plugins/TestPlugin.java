@@ -4,11 +4,9 @@ import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.annotation.RuleV2;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
-import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
@@ -24,12 +22,6 @@ import java.util.List;
 @Slf4j
 @BotPlugin(name = "测试插件")
 public class TestPlugin {
-
-    @RuleV2
-    public void handle(Bot bot, Event event) {
-        System.out.println("handle 执行完毕");
-    }
-
 
     @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)
     public void apiTest(Bot bot, MessageEvent event) {

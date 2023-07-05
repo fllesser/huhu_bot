@@ -10,7 +10,7 @@ import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
+import tech.chowyijiu.huhu_bot.utils.GocqUtil;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class BotV2 {
             requestBox.setEcho(echo);
             //发送请求
             this.sessionSend(JSONObject.toJSONString(requestBox));
-            return GocqSyncRequestUtil.sendSyncRequest(echo,5000L);
+            return GocqUtil.waitResp(echo,5000L);
         } else {
             this.sessionSend(JSONObject.toJSONString(requestBox));
             return "";

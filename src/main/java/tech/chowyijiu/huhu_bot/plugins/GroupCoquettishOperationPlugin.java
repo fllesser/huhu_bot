@@ -65,7 +65,7 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    @Scheduled(cron = "1 0 0 * * *")
+    @Scheduled(cron = "2 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
         List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);

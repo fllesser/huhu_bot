@@ -8,7 +8,7 @@ import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
-import tech.chowyijiu.huhu_bot.utils.GocqSyncRequestUtil;
+import tech.chowyijiu.huhu_bot.utils.GocqUtil;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
@@ -58,7 +58,7 @@ public class ProcessEventTask implements Runnable {
                 String echo = echoEvent.getEcho();
                 String data = echoEvent.getData();
                 if (StringUtils.hasLength(echo) && StringUtils.hasLength(data))
-                    GocqSyncRequestUtil.putEchoResult(echo, echoEvent.getData());
+                    GocqUtil.putEchoResult(echo, echoEvent.getData());
             } else if (event instanceof RequestEvent) {
                 log.info("{}", event);
             }

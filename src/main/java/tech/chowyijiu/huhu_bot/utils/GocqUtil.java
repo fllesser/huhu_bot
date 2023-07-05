@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -12,30 +13,38 @@ import java.util.concurrent.*;
  * @date 14/5/2023
  */
 @Slf4j
-public class GocqSyncRequestUtil {
-    private GocqSyncRequestUtil() {
+public class GocqUtil {
+    private GocqUtil() {
     }
 
-    public static int poolSize = Runtime.getRuntime().availableProcessors() + 1;
-    public static long sleep = 1000L;
-    public static final ExecutorService pool =
-            new ThreadPoolExecutor(poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
-                    new SynchronousQueue<>(), new CustomizableThreadFactory("pool-sendSyncMessage-"));
+    public static final int poolSize;
+    public static final long sleep = 1000L;
+    public static final ExecutorService pool;
 
-    private static final Map<String, String> resultMap = new ConcurrentHashMap<>();
+    //todo 需要保证线程安全? key好像全局唯一诶
+    private static final Map<String, String> resultMap = new HashMap<>();
+
+    static {
+        poolSize = Runtime.getRuntime().availableProcessors() + 1;
+        pool = new ThreadPoolExecutor(
+                poolSize, poolSize * 2, 24L, TimeUnit.HOURS,
+                new SynchronousQueue<>(),
+                new CustomizableThreadFactory("wait-gocq-res-")
+        );
+    }
 
     public static void putEchoResult(String key, String val) {
         resultMap.put(key, val);
     }
 
     /***
-     * 发送同步消息
+     * 等待响应
      * @param echo echo 回声
      * @param timeout 超时 ms
      * @return String
      */
-    public static String sendSyncRequest(String echo, long timeout) {
-        log.info("futureTask echo: {}", echo);
+    public static String waitResp(String echo, long timeout) {
+        log.info("FutureTask will be submitted, echo: {}", echo);
         //提交task等待gocq传回数据
         FutureTask<String> futureTask = new FutureTask<>(new Task(echo));
         pool.submit(futureTask);
@@ -49,16 +58,16 @@ public class GocqSyncRequestUtil {
             //log.info("echo: {}, result: {}", echo, res);
             return res;
         } catch (InterruptedException e) {
-            throw new ActionFailed("发送同步消息线程中断异常, echo:" + echo);
+            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
         } catch (ExecutionException e) {
-            throw new ActionFailed("发送同步消息执行异常, echo:" + echo);
+            throw new ActionFailed("等待响应数据异常, echo:" + echo);
         } catch (TimeoutException e) {
-            throw new ActionFailed("发送同步消息超时, 或者该api无响应数据, echo:" + echo);
+            throw new ActionFailed("等待响应数据超时, 或者该api无响应数据, echo:" + echo);
         } catch (Exception e) {
-            throw new ActionFailed("发送同步消息发生未知异常, echo:" + echo + ", Exception:" + e.getMessage());
+            throw new ActionFailed("等待响应数据发生未知异常, echo:" + echo + ", Exception:" + e.getMessage());
         } finally {
             futureTask.cancel(true);
-            //这里似乎不一定能删掉
+            //这里似乎不一定能删掉, 比如超时过后, gocq那边才发过来
             resultMap.remove(echo);
         }
     }
@@ -67,9 +76,7 @@ public class GocqSyncRequestUtil {
         private final String echo;
 
         Task(String echo) {
-            if (!StringUtil.hasLength(echo)) {
-                throw new IllegalArgumentException("echo is blank");
-            }
+            if (!StringUtil.hasLength(echo)) throw new IllegalArgumentException("echo is blank");
             this.echo = echo;
         }
 
@@ -78,9 +85,9 @@ public class GocqSyncRequestUtil {
         public String call() throws Exception {
             String res;
             do {
-                res = GocqSyncRequestUtil.resultMap.get(echo);
+                res = GocqUtil.resultMap.get(echo);
                 if (res != null) break;
-                else Thread.sleep(GocqSyncRequestUtil.sleep);
+                else Thread.sleep(GocqUtil.sleep);
             } while (!Thread.currentThread().isInterrupted());
             return res;
         }
@@ -102,7 +109,7 @@ public class GocqSyncRequestUtil {
     //    param.put("user_id", userId);
     //    param.put("file", filePath);
     //    param.put("name", fileName);
-    //    String responseStr = sendSyncRequest(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
+    //    String responseStr = waitResp(bot, GocqActionEnum.UPLOAD_PRIVATE_FILE, param, timeout);
     //    if (responseStr != null) {
     //        return JSONObject.parseObject(responseStr, SyncResponse.class);
     //
@@ -139,7 +146,7 @@ public class GocqSyncRequestUtil {
     //        param.put("headers", JSONObject.toJSONString(headStrs));
     //
     //    }
-    //    String jsonStr = sendSyncRequest(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
+    //    String jsonStr = waitResp(bot, GocqActionEnum.DOWNLOAD_FILE, param, timeout);
     //    if (jsonStr != null) {
     //        return JSONObject.parseObject(jsonStr, DownloadFileResp.class);
     //    }
