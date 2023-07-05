@@ -12,6 +12,7 @@ import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
+import tech.chowyijiu.huhu_bot.ws.Bot;
 
 /**
  * @author elastic chow
@@ -47,11 +48,15 @@ public abstract class Event {
                     event = jsonObject.toJavaObject(MetaEvent.class);
                     break;
             }
+            event.setJsonObject(jsonObject);
         } else {
-            if (StringUtil.hasLength(jsonObject.getString("echo")))
-                event = jsonObject.toJavaObject(EchoEvent.class);
+            //todo put的操作放这里来?
+            if (StringUtil.hasLength(jsonObject.getString("echo")))  {
+                EchoEvent echoEvent = jsonObject.toJavaObject(EchoEvent.class);
+                if ("ok".equals(echoEvent.getStatus()))
+                    Bot.putEchoResult(echoEvent.getEcho(), echoEvent.getData());
+            }
         }
-        if (event != null) event.setJsonObject(jsonObject);
         return event;
     }
 

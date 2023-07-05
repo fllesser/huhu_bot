@@ -45,7 +45,7 @@ public class ThreadPoolUtil {
 
         @Override
         public void execute(Runnable task) {
-            log.info("[ThreadPool] Accepted a {}", task.getClass().getSimpleName());
+            //log.info("[ThreadPool] Accepted a {}", task.getClass().getSimpleName());
             super.execute(task);
         }
 

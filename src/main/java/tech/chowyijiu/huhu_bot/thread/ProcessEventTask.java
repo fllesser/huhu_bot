@@ -1,14 +1,11 @@
 package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import tech.chowyijiu.huhu_bot.core.DispatcherCore;
 import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
-import tech.chowyijiu.huhu_bot.utils.GocqUtil;
 import tech.chowyijiu.huhu_bot.utils.IocUtil;
 import tech.chowyijiu.huhu_bot.utils.ThreadPoolUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
@@ -53,12 +50,6 @@ public class ProcessEventTask implements Runnable {
                 DISPATCHER_CORE.onMessage(bot, (MessageEvent) event);
             } else if (event instanceof NoticeEvent) {
                 DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) event));
-            } else if (event instanceof EchoEvent) {
-                EchoEvent echoEvent = (EchoEvent) event;
-                String echo = echoEvent.getEcho();
-                String data = echoEvent.getData();
-                if (StringUtils.hasLength(echo) && StringUtils.hasLength(data))
-                    GocqUtil.putEchoResult(echo, data);
             } else if (event instanceof RequestEvent) {
                 log.info("{}", event);
             }

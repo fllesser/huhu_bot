@@ -87,7 +87,7 @@ public class Server extends TextWebSocketHandler {
             }
             //测试
             //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
-            log.info("Accepted {}", event);
+            //log.info("Accepted GOCQ {}", event);
             for (Bot bot : bots)
                 if (Objects.equals(bot.getSession(), session)) //这里不要用userId获取bot, 因为echoEvent没有self_id
                     ProcessEventTask.execute(bot, event);

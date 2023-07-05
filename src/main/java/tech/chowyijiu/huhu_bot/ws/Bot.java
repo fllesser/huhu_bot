@@ -22,11 +22,13 @@ import tech.chowyijiu.huhu_bot.entity.gocq.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
-import tech.chowyijiu.huhu_bot.utils.GocqUtil;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author elastic chow
@@ -46,6 +48,35 @@ public class Bot {
 
     public void update() {
         groups = this.getGroupList();
+    }
+
+    private static final long timeout = 5000L;
+    //多个Bot对象共用算了
+    private static final Map<String, LinkedBlockingDeque<String>> respMap = new HashMap<>();
+
+    public static void putEchoResult(String echo, String data) {
+        if (respMap.containsKey(echo)) respMap.get(echo).offer(data);
+    }
+
+    /***
+     * 等待响应
+     * @param echo 回声
+     * @return String
+     */
+    private static String waitResp(String echo) {
+        assert StringUtil.hasLength(echo);
+        log.info("Blocking waits for gocq api resp, echo: {}", echo);
+        LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
+        respMap.put(echo, deque);
+        try {
+            String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
+            log.info("Accept a Response: echo:{} data:{}", echo, resp);
+            return resp;
+        } catch (InterruptedException e) {
+            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
+        } finally {
+            respMap.remove(echo);
+        }
     }
 
     /**
@@ -75,7 +106,7 @@ public class Bot {
         requestBox.setEcho(echo);
         //发送请求
         this.sessionSend(JSONObject.toJSONString(requestBox));
-        return GocqUtil.waitResp(echo);
+        return waitResp(echo);
     }
 
     /**
