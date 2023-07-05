@@ -236,8 +236,9 @@ public class DispatcherCore {
             } catch (InvocationTargetException e) {
                 Throwable rawException = e.getTargetException();
                 if (rawException instanceof FinishedException) {
-                    log.info("{}Finished: {}{}{}",
-                            LogUtil.buildArgsWithColor(ANSI.RED, event, " execute forced termination"));
+                    //IGNORED
+                    //log.info("{}Finished: {}{}{}",
+                    //        LogUtil.buildArgsWithColor(ANSI.YELLOW, event, " execute forced termination"));
                 } else if (rawException instanceof ActionFailed) {
                     log.info("{}ActionFailed: {}{}",
                             LogUtil.buildArgsWithColor(ANSI.RED, rawException.getMessage()));

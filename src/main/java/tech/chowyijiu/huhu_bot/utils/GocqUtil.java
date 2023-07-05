@@ -18,11 +18,10 @@ public class GocqUtil {
     }
 
     public static final int poolSize;
-    public static final long sleep = 1000L;
+    public static final long timeout = 5000L;
     public static final ExecutorService pool;
 
-    //todo 需要保证线程安全? key好像全局唯一诶
-    private static final Map<String, String> resultMap = new HashMap<>();
+    private static final Map<String, LinkedBlockingDeque<String>> resultMap = new HashMap<>();
 
     static {
         poolSize = Runtime.getRuntime().availableProcessors() + 1;
@@ -33,41 +32,30 @@ public class GocqUtil {
         );
     }
 
-    public static void putEchoResult(String key, String val) {
-        resultMap.put(key, val);
+    public static void putEchoResult(String echo, String data) {
+        if (resultMap.containsKey(echo)) resultMap.get(echo).offer(data);
     }
 
     /***
      * 等待响应
-     * @param echo echo 回声
-     * @param timeout 超时 ms
+     * @param echo 回声
      * @return String
      */
-    public static String waitResp(String echo, long timeout) {
+    public static String waitResp(String echo) {
+        if (!StringUtil.hasLength(echo)) log.info("echo is empty, ignored");
         log.info("FutureTask will be submitted, echo: {}", echo);
         //提交task等待gocq传回数据
         FutureTask<String> futureTask = new FutureTask<>(new Task(echo));
+        resultMap.put(echo, new LinkedBlockingDeque<>(1));
         pool.submit(futureTask);
         try {
-            String res;
-            if (timeout <= sleep) {
-                res = futureTask.get();
-            } else {
-                res = futureTask.get(timeout, TimeUnit.MILLISECONDS);
-            }
-            //log.info("echo: {}, result: {}", echo, res);
-            return res;
+            return futureTask.get();
         } catch (InterruptedException e) {
             throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
         } catch (ExecutionException e) {
             throw new ActionFailed("等待响应数据异常, echo:" + echo);
-        } catch (TimeoutException e) {
-            throw new ActionFailed("等待响应数据超时, 或者该api无响应数据, echo:" + echo);
-        } catch (Exception e) {
-            throw new ActionFailed("等待响应数据发生未知异常, echo:" + echo + ", Exception:" + e.getMessage());
         } finally {
             futureTask.cancel(true);
-            //这里似乎不一定能删掉, 比如超时过后, gocq那边才发过来
             resultMap.remove(echo);
         }
     }
@@ -76,20 +64,12 @@ public class GocqUtil {
         private final String echo;
 
         Task(String echo) {
-            if (!StringUtil.hasLength(echo)) throw new IllegalArgumentException("echo is blank");
             this.echo = echo;
         }
 
-        @SuppressWarnings("BusyWait")
         @Override
         public String call() throws Exception {
-            String res;
-            do {
-                res = GocqUtil.resultMap.get(echo);
-                if (res != null) break;
-                else Thread.sleep(GocqUtil.sleep);
-            } while (!Thread.currentThread().isInterrupted());
-            return res;
+            return GocqUtil.resultMap.get(echo).poll(GocqUtil.timeout, TimeUnit.MILLISECONDS);
         }
     }
 

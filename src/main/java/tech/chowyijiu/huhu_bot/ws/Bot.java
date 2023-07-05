@@ -75,7 +75,7 @@ public class Bot {
         requestBox.setEcho(echo);
         //发送请求
         this.sessionSend(JSONObject.toJSONString(requestBox));
-        return GocqUtil.waitResp(echo, 5000L);
+        return GocqUtil.waitResp(echo);
     }
 
     /**

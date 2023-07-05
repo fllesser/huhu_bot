@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +68,10 @@ public class Message extends ArrayList<MessageSegment> {
      */
     public String plainText() {
         StringBuilder sb = new StringBuilder();
-        for (MessageSegment segment : this) sb.append(segment.getText());
+        for (MessageSegment segment : this) {
+            //防止加个null进去
+            StringUtil.hasLength(segment.getText(), sb::append);
+        }
         return sb.toString();
     }
 
