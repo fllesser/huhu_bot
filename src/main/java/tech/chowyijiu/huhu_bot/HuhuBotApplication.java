@@ -15,4 +15,6 @@ public class HuhuBotApplication {
         SpringApplication.run(HuhuBotApplication.class, args);
     }
 
+
+
 }

@@ -79,6 +79,7 @@ public class Server extends TextWebSocketHandler {
                 } else if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.lifecycle.name())
                         && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
+
                     addBot(event.getSelfId(), session);
                     log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
@@ -86,7 +87,7 @@ public class Server extends TextWebSocketHandler {
                 }
             }
             //测试
-            //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
+            if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
             //log.info("Accepted GOCQ {}", event);
             for (Bot bot : bots)
                 if (Objects.equals(bot.getSession(), session)) //这里不要用userId获取bot, 因为echoEvent没有self_id
@@ -98,21 +99,23 @@ public class Server extends TextWebSocketHandler {
 
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+    public void handleTransportError(WebSocketSession session, Throwable exception) {
         log.info("{}connect exception sessionId[{}], exception[{}]{}",
                 LogUtil.buildArgsWithColor(ANSI.YELLOW, session.getId(), exception.getMessage()));
-        removeClient(session);
+        removeBot(session);
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
         log.info("{}connect close, sessionId:{},{}{}", ANSI.YELLOW,
                 session.getId(), closeStatus.toString(), ANSI.RESET);
-        removeClient(session);
+        removeBot(session);
     }
 
-    private void removeClient(WebSocketSession session) {
+    private void removeBot(WebSocketSession session) {
         bots.removeIf(bot -> bot.getSession() == session);
     }
+
+
 
 }

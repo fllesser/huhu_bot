@@ -1,7 +1,7 @@
 package tech.chowyijiu.huhu_bot.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhu_bot.core.DispatcherCore;
+import tech.chowyijiu.huhu_bot.core.CoreDispatcher;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -36,20 +36,20 @@ public class ProcessEventTask implements Runnable {
     }
 
     private static final ThreadPoolExecutor EVENT_EXECUTOR;
-    private static final DispatcherCore DISPATCHER_CORE;
+    private static final CoreDispatcher CORE_DISPATCHER;
 
     static {
         EVENT_EXECUTOR = ThreadPoolUtil.getEventExecutor();
-        DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
+        CORE_DISPATCHER = IocUtil.getBean(CoreDispatcher.class);
     }
 
     @Override
     public void run() {
         try {
             if (event instanceof MessageEvent) {
-                DISPATCHER_CORE.onMessage(bot, (MessageEvent) event);
+                CORE_DISPATCHER.onMessage(bot, (MessageEvent) event);
             } else if (event instanceof NoticeEvent) {
-                DISPATCHER_CORE.onNotice(bot, ((NoticeEvent) event));
+                CORE_DISPATCHER.onNotice(bot, ((NoticeEvent) event));
             } else if (event instanceof RequestEvent) {
                 log.info("{}", event);
             }

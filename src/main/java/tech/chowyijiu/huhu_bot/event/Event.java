@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
-import tech.chowyijiu.huhu_bot.event.echo.EchoEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -50,11 +49,10 @@ public abstract class Event {
             }
             event.setJsonObject(jsonObject);
         } else {
-            //todo put的操作放这里来?
             if (StringUtil.hasLength(jsonObject.getString("echo")))  {
-                EchoEvent echoEvent = jsonObject.toJavaObject(EchoEvent.class);
-                if ("ok".equals(echoEvent.getStatus()))
-                    Bot.putEchoResult(echoEvent.getEcho(), echoEvent.getData());
+                ApiResp resp = jsonObject.toJavaObject(ApiResp.class);
+                if ("ok".equals(resp.getStatus()))
+                    Bot.putEchoResult(resp.getEcho(), resp.getData());
             }
         }
         return event;

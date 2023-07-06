@@ -13,6 +13,7 @@ import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author elastic chow
@@ -37,19 +38,21 @@ public class TestPlugin {
         if (action == null) event.finish("没有这个API, 或未支持");
         Object[] params = new String[args.length - 1];
         System.arraycopy(args, 1, params, 0, args.length - 1);
+        long start = System.currentTimeMillis();
         String resp = bot.callApiWithResp(action, params);
+        long end = System.currentTimeMillis();
+        String costTime = "time-consuming: " + (end - start) + "ms";
         if (resp.startsWith("{")) {
-            bot.sendMessage(event, resp, true);
+            bot.sendMessage(event, resp + "\n" + costTime, true);
         } else if (resp.startsWith("[")) {
             List<String> list = JSONArray.parseArray(resp, String.class);
-            if (list.size() > 0) {
-                List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), list);
-                //bot.sendMessage(event, resp, true);
-                if (event instanceof GroupMessageEvent) {
-                    bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
-                } else if (event instanceof PrivateMessageEvent) {
-                    bot.sendPrivateForwardMsg(event.getUserId(), nodes);
-                }
+            if (list.size() > 99) list = list.stream().limit(98).collect(Collectors.toList());
+            list.add(costTime);
+            List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), list);
+            if (event instanceof GroupMessageEvent) {
+                bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
+            } else if (event instanceof PrivateMessageEvent) {
+                bot.sendPrivateForwardMsg(event.getUserId(), nodes);
             }
         }
     }

@@ -1,9 +1,8 @@
-package tech.chowyijiu.huhu_bot.event.echo;
+package tech.chowyijiu.huhu_bot.event;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tech.chowyijiu.huhu_bot.event.Event;
 
 /**
  * @author elastic chow
@@ -12,7 +11,7 @@ import tech.chowyijiu.huhu_bot.event.Event;
 @Getter
 @Setter
 @ToString(exclude = {"data", "message", "retcode"})
-public class EchoEvent extends Event {
+public class ApiResp {
     private String data;
     private String echo; //回声
     private String message;

@@ -50,7 +50,7 @@ public class Bot {
         groups = this.getGroupList();
     }
 
-    private static final long timeout = 5000L;
+    private static final long timeout = 10000L;
     //多个Bot对象共用算了
     private static final Map<String, LinkedBlockingDeque<String>> respMap = new HashMap<>();
 
@@ -64,13 +64,13 @@ public class Bot {
      * @return String
      */
     private static String waitResp(String echo) {
-        assert StringUtil.hasLength(echo);
         log.info("Blocking waits for gocq api resp, echo: {}", echo);
         LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
         respMap.put(echo, deque);
         try {
             String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
-            log.info("Accept a Response: echo:{} data:{}", echo, resp);
+            if (!StringUtil.hasLength(resp)) throw new ActionFailed("api请求超时, 或者该api无响应数据");
+            log.info("Accept a Response: echo:{}", echo);
             return resp;
         } catch (InterruptedException e) {
             throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);

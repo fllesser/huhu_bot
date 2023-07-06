@@ -16,6 +16,7 @@ import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
+import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DispatcherCore {
+public class CoreDispatcher {
 
     private final ApplicationContext ioc;
 
@@ -76,7 +77,7 @@ public class DispatcherCore {
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            //throw new RuntimeException("[DispatcherCore] No plugins were found");
+            //throw new RuntimeException("[CoreDispatcher] No plugins were found");
             log.info("{}No plugins were found{}", ANSI.YELLOW, ANSI.RESET);
             return;
         }
@@ -95,7 +96,7 @@ public class DispatcherCore {
         log.info("{} Start Match MessageHandler", event);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
-            if (!handler.eventType.isAssignableFrom(event.getClass())) continue;
+            if (!handler.eventTypeMatch(event.getClass())) continue;
             //因为注解中的commands和keywords 默认为{}, 无需判空
             if (handler.commandsHasLength()) {
                 if (matchCommand(bot, event, handler)) break;
@@ -150,12 +151,24 @@ public class DispatcherCore {
     public void onNotice(final Bot bot, final NoticeEvent event) {
         log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            if (handler.eventType.isAssignableFrom(event.getClass())) {
+            if (handler.eventTypeMatch(event.getClass())) {
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
         }
         log.info("{} Match NoticeHandler End", event);
+    }
+
+    @Deprecated
+    public void onRequest(final Bot bot, final RequestEvent event) {
+        log.info("{} Start Match RequestHandler", event);
+        for (Handler handler : new ArrayList<Handler>()) {
+            if (handler.eventTypeMatch(event.getClass())) {
+                handler.execute(bot, event);
+                break;
+            }
+        }
+        log.info("{} Match RequestHandler End", event);
     }
 
     @Accessors(chain = true)
@@ -269,6 +282,10 @@ public class DispatcherCore {
 
         public boolean commandsHasLength() {
             return commands.length > 0;
+        }
+
+        public boolean eventTypeMatch(Class<? extends Event> eventClass) {
+            return eventType.isAssignableFrom(eventClass);
         }
     }
 
