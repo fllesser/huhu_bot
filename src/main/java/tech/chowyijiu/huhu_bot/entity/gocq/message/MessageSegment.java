@@ -1,7 +1,6 @@
 package tech.chowyijiu.huhu_bot.entity.gocq.message;
 
 import lombok.RequiredArgsConstructor;
-import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 import java.util.HashMap;
 
@@ -39,8 +38,9 @@ public class MessageSegment extends HashMap<String, String> {
         if (length > 0) {
             if (length % 2 != 0) return null;
             for (int i = 0; i < params.length; i += 2) {
-                //统一判断
-                if (StringUtil.hasLength(params[i + 1])) segment.put(params[i], params[i + 1]);
+                //if (StringUtil.hasLength(params[i + 1]))
+                //这里就不判断了, 因为如果为"", get出来反而为null
+                segment.put(params[i], params[i + 1]);
             }
         } else segment.put("error", "No valid parameters");
         return segment;
@@ -54,6 +54,10 @@ public class MessageSegment extends HashMap<String, String> {
         return build("at", "qq", String.valueOf(userId));
     }
 
+    public static MessageSegment atAll() {
+        return build("at", "qq", "all");
+    }
+
 
     public static MessageSegment tts(String text) {
         return build("tts", "text", text);
@@ -62,8 +66,7 @@ public class MessageSegment extends HashMap<String, String> {
     public static MessageSegment image(String file, Integer cache, Integer threadNum) {
         if (!file.startsWith("http") && !file.startsWith("file://") && !file.startsWith("base64://"))
             return build("image", "error", "Incorrect format of 'file' parameter");
-        return build("image", "file", file,
-                "cache", String.valueOf(cache),
+        return build("image", "file", file, "cache", String.valueOf(cache),
                 "c", String.valueOf(threadNum));
     }
 

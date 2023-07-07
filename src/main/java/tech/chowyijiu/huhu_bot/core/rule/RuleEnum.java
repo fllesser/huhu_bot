@@ -16,8 +16,8 @@ public enum RuleEnum {
     superuser("使用者为超级用户", RuleImpl::superuser),
     owner("使用者为群主", RuleImpl::owner),
     admin("使用者为 管理 or 群主 or 超级用户", RuleImpl::admin),
-    self_owner("机器人号为群主", RuleImpl::selfOwner),
-    self_admin("机器人号为管理 or 群主", RuleImpl::selfAdmin);
+    self_owner("本体为群主", RuleImpl::selfOwner),
+    self_admin("本体为管理 or 群主", RuleImpl::selfAdmin);
 
     private final String description;
     private final Rule rule;

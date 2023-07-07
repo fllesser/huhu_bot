@@ -29,7 +29,8 @@ public class StringUtil {
     }
 
 
-    public String underlineToHump(String str){
+    //下划线转大驼峰
+    public static String underlineToHump(String str){
         Pattern UNDERLINE_PATTERN = Pattern.compile("_([a-z])");
         //正则匹配下划线及后一个字符，删除下划线并将匹配的字符转成大写
         Matcher matcher = UNDERLINE_PATTERN.matcher(str);
@@ -48,4 +49,8 @@ public class StringUtil {
         return underlineToHump(sb.toString());
     }
 
+    //是否是数字
+    public static boolean isDigit(String str) {
+        return hasLength(str) && str.chars().allMatch(Character::isDigit);
+    }
 }

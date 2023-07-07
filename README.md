@@ -28,24 +28,25 @@ go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 @SuppressWarnings("unused")
 public class GroupCoquettishOperationPlugin {
 
-    @Scheduled(cron = "0 * * * * *  ")
+
+    @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        String card = buildDateCard();
+        final String card = buildDateCard();
+        log.info("时间群昵称开始设置 card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
-                    bot.callApi(GocqActionEnum.SET_GROUP_CARD,
-                            "group_id", groupId, "user_id", bot.getUserId(), "card", card);
+                    bot.setGroupCard(groupId, bot.getUserId(), card);
                     try {
                         Thread.sleep(2000L);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                    } catch (InterruptedException ignored) {
                     }
                 }));
+        log.info("时间群昵称设置完毕 card: {}", card);
     }
 
     private String buildDateCard() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime shitTime = LocalDateTime.parse("2023-05-27 17:00", formatter);
+        LocalDateTime shitTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
         Duration duration = Duration.between(shitTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);
@@ -56,31 +57,37 @@ public class GroupCoquettishOperationPlugin {
     }
 
 
-    //机器人->群主
-    Rule sgstRule = (bot, event) -> {
-        GroupMember groupMember = bot.getGroupMember(
-                ((GroupMessageEvent) event).getGroupId(), bot.getUserId(), true);
-        return "owner".equals(groupMember.getRole());
-    };
+    @Scheduled(cron = "0 0 0 * * *")
+    public void dailyClockIn() {
+        log.info("开始群打卡");
+        List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L);
+        Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+                .stream().map(GroupInfo::getGroupId).filter(clockGroups::contains)
+                .forEach(groupId -> {
+                    bot.sendGroupSign(groupId);
+                    try {
+                        Thread.sleep(500L);
+                    } catch (InterruptedException ignored) {
+                    }
+                }));
+        log.info("群打卡完毕");
+    }
 
-    @MessageHandler(name = "头衔自助", commands = {"sgst"})
+
+    @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
-        String title = event.getMessage();
-        if (title.length() > 6) {
-            bot.sendGroupMessage(event.getGroupId(), "[bot]群头衔最多为6位", true);
-            return;
-        }
+        String title = event.getCommandArgs();
+        if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
+        if (title.length() > 6) event.finish("[bot]群头衔最多为6位");
         for (String filter : new String[]{"群主", "管理员"}) {
             if (title.contains(filter)) {
                 title = "群猪";
                 break;
             }
         }
-        bot.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
-                "group_id", event.getGroupId(), "user_id", event.getUserId(),
-                "special_title", title);
+        bot.setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
     }
-    
+
     Rule replyPokeRule = (bot, event) -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
         return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
@@ -94,22 +101,32 @@ public class GroupCoquettishOperationPlugin {
                 event.getGroupId(), MessageSegment.poke(event.getUserId()) + "", false);
     }
 
-    Rule replyJyGroupRule = (bot, event) -> "group".equals(((PrivateMessageEvent) event).getSubType());
-
-    @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
-    public void replyJyGroup(Bot bot, PrivateMessageEvent event) {
-        String message = "[bot]" + MessageSegment.at(event.getUserId()) +
-                "请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了";
-        bot.sendGroupMessage(event.getSender().getGroupId(), message,false);
+    @NoticeHandler(name = "清代肝")
+    public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {
+        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
+        for (String name : new String[]{groupMember.getNickname(), groupMember.getCard()})
+            if (StringUtil.hasLength(name) && name.contains("代肝"))
+                bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
     }
-    
-    Rule replyTtsMessageRule = (bot, event) -> BotConfig.isSuperUser(((GroupMessageEvent) event).getUserId());
 
-    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"})
-    public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
-        bot.sendMessage(event, MessageSegment.tts(event.getMessage()) + "", false);
+    Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event) &&
+            "message_sent".equals(event.getPostType());
+
+    /**
+     * 是答辩
+     * command setadmin@... false / true
+     */
+    @MessageHandler(name = "授予管理员", commands = "setadmin")
+    public void giveAdmin(Bot bot, GroupMessageEvent event) {
+        boolean enable = Boolean.parseBoolean(event.getCommandArgs());
+        Message message = event.getMsg();
+        List<MessageSegment> segments = message.getSegmentByType("at");
+        segments.forEach(segment -> {
+            long qq = Long.parseLong(segment.get("qq"));
+            bot.setGroupAdmin(event.getGroupId(), qq, enable);
+        });
+
     }
-    
 }
 ```
 

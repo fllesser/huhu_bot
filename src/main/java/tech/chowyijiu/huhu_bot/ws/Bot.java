@@ -69,13 +69,28 @@ public class Bot {
         respMap.put(echo, deque);
         try {
             String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
-            if (!StringUtil.hasLength(resp)) throw new ActionFailed("api请求超时, 或者该api无响应数据");
+            if (!StringUtil.hasLength(resp)) throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
             log.info("Accepted a response for echo:{}", echo);
             return resp;
         } catch (InterruptedException e) {
             throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
         } finally {
             respMap.remove(echo);
+        }
+    }
+
+    /**
+     * call api 最终调用的方法
+     * Send a WebSocket message
+     *
+     * @param text text
+     */
+    public void sessionSend(String text) {
+        try {
+            this.session.sendMessage(new TextMessage(text));
+        } catch (IOException e) {
+            log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
+                    LogUtil.buildArgsWithColor(ANSI.YELLOW, this.session.getId(), text, e.getMessage()));
         }
     }
 
@@ -156,7 +171,7 @@ public class Bot {
 
     /**
      * HTTP request API method
-     *
+     * gocq 需配置 http
      * @param action    action
      * @param paramsMap parameters
      * @return json String
@@ -172,7 +187,8 @@ public class Bot {
             case 403:
                 throw new ActionFailed("action" + action.getAction() + " access token 不符合");
             case 406:
-                throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持(非 application/json 或 application/x-www-form-urlencoded");
+                throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持" +
+                        "(非 application/json 或 application/x-www-form-urlencoded");
             case 404:
                 throw new ActionFailed("action:" + action.getAction() + " API 不存在");
             case 200:
@@ -403,32 +419,36 @@ public class Bot {
         }
     }
 
-
-    public void kickGroupMember(Long groupId, Long userId, boolean rejectAddRequest) {
-        this.callApi(GocqActionEnum.SET_GROUP_KICK,
-                "group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest);
-    }
-
-
     public void finish(Event event, String message) {
         this.sendMessage(event, message, false);
         throw new FinishedException();
     }
 
-    /**
-     * call api 最终调用的方法
-     * Send a WebSocket message
-     *
-     * @param text text
-     */
-    public void sessionSend(String text) {
-        try {
-            this.session.sendMessage(new TextMessage(text));
-        } catch (IOException e) {
-            log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
-                    LogUtil.buildArgsWithColor(ANSI.YELLOW, this.session.getId(), text, e.getMessage()));
-        }
+
+
+    public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
+        this.callApi(GocqActionEnum.SET_GROUP_KICK,
+                "group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest);
     }
 
 
+    /**
+     * 群单人禁言
+     * @param groupId group_id
+     * @param userId user_id
+     * @param duration duration 单位秒 default 30 * 60 | 0 表示取消禁言
+     */
+    public void setGroupBan(Long groupId, Long userId, int duration) {
+        this.callApi(GocqActionEnum.SET_GROUP_BAN,
+                "group_id", groupId, "user_id", userId, "duration", duration);
+    }
+
+    /**
+     * 群全体禁言
+     * @param groupId group_id
+     * @param enable 默认true 禁言
+     */
+    public void setGroupWholeBan(Long groupId, boolean enable) {
+        this.callApi(GocqActionEnum.SET_GROUP_WHOLE_BAN, groupId, enable);
+    }
 }

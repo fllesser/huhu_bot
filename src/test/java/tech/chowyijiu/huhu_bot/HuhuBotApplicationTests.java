@@ -5,24 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
-import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
-import tech.chowyijiu.huhu_bot.plugins.TestPlugin;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
 import tech.chowyijiu.huhu_bot.utils.ImageUtil;
-import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
+@SuppressWarnings("all")
 public class HuhuBotApplicationTests {
 
     @Test
@@ -41,17 +36,20 @@ public class HuhuBotApplicationTests {
         String regex = "\\[CQ:([a-z]+)((,([a-z]+)=([\\w:/.]+))+)]";
     }
 
-    //@Test
+    // @Test
     public void testMessage() {
         String cq1 = "测试[CQ:image,file=http://baidu.com/1.jpg]";
         String cq2 = "[CQ:image,file=http://baidu.com/1.jpg]";
         String cq3 = "[CQ:image,file=http://baidu.com/1.jpg]测试";
-        String cq4 = "测试[CQ:image,file=https://baidu.com/1.jpg][CQ:face,id=123]";
-        Message message = new Message();
-        message.add(MessageSegment.at(1942422015L));
-        message.add("测试");
-        message.add(MessageSegment.image("https://baidu.com/1.jpg", 0));
-        System.out.println(message);
+        String cq4 = "测试[CQ:image,file=https://baidu.com/1.jpg]sfdsaf[CQ:face,id=123]sdfsdf";
+        Message message1 = Message.build(cq4);
+        System.out.println(message1);
+        System.out.println(message1.toArrayString());
+        Message message2 = new Message();
+        message2.add(MessageSegment.at(1942422015L));
+        message2.add("测试");
+        message2.add(MessageSegment.image("https://baidu.com/1.jpg", 0));
+        System.out.println(message2);
     }
 
     //@Test
@@ -72,25 +70,6 @@ public class HuhuBotApplicationTests {
             return null;
         }).toArray(BufferedImage[]::new);
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
-    }
-
-
-    //@Resource
-    private TestPlugin testPlugin;
-
-    //@Test
-    public void test() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Bot bot = new Bot(1923123123L, null);
-        MessageEvent event = new MessageEvent();
-        event.setMessage("测试");
-        Method method = testPlugin.getClass().getMethod("handle", Bot.class, Event.class);
-        method.invoke(testPlugin, bot, event);
-    }
-
-
-    @Test
-    public void testParam() {
-        //{"action":"get_login_info","params":{"user_id":123123123,"group_id":12312312}}
     }
 
 

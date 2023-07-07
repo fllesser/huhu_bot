@@ -19,6 +19,7 @@ public class Message extends ArrayList<MessageSegment> {
      */
     public static Message build(String msg) {
         Message message = new Message();
+        if (!StringUtil.hasLength(msg)) return message;
         if (!msg.contains("[CQ:")) {
             message.add(MessageSegment.text(msg));
             return message;
@@ -70,7 +71,8 @@ public class Message extends ArrayList<MessageSegment> {
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this) {
             //防止加个null进去
-            StringUtil.hasLength(segment.getText(), sb::append);
+            //StringUtil.hasLength(segment.getText(), sb::append);
+            sb.append(segment.getText());
         }
         return sb.toString();
     }
@@ -94,7 +96,7 @@ public class Message extends ArrayList<MessageSegment> {
         return segments;
     }
 
-    public String toJsonArray() {
+    public String toArrayString() {
         return Arrays.toString(this.toArray());
     }
 }

@@ -34,7 +34,7 @@ import java.util.Optional;
 @Slf4j
 @BotPlugin("群组骚操作")
 @SuppressWarnings("unused")
-public class GroupCoquettishOperationPlugin {
+public class MyGroupPlugin {
 
 
     @Scheduled(cron = "0 0/2 * * * * ")
@@ -64,7 +64,6 @@ public class GroupCoquettishOperationPlugin {
         return "失业第" + days + "天" + hours + "时" + minutes + "分";
     }
 
-
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
@@ -81,11 +80,10 @@ public class GroupCoquettishOperationPlugin {
         log.info("群打卡完毕");
     }
 
-
     @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
-        if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
+        //if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
         if (title.length() > 6) event.finish("[bot]群头衔最多为6位");
         for (String filter : new String[]{"群主", "管理员"}) {
             if (title.contains(filter)) {
@@ -114,8 +112,9 @@ public class GroupCoquettishOperationPlugin {
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
         for (String name : new String[]{groupMember.getNickname(), groupMember.getCard()})
             if (StringUtil.hasLength(name) && name.contains("代肝"))
-                bot.kickGroupMember(event.getGroupId(), event.getUserId(), true);
+                bot.setGroupKick(event.getGroupId(), event.getUserId(), true);
     }
+
 
     Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event) &&
             "message_sent".equals(event.getPostType());
@@ -126,13 +125,53 @@ public class GroupCoquettishOperationPlugin {
      */
     @MessageHandler(name = "授予管理员", commands = "setadmin")
     public void giveAdmin(Bot bot, GroupMessageEvent event) {
-        boolean enable = Boolean.parseBoolean(event.getCommandArgs());
         Message message = event.getMsg();
         List<MessageSegment> segments = message.getSegmentByType("at");
         segments.forEach(segment -> {
             long qq = Long.parseLong(segment.get("qq"));
+            GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
+            boolean enable = !"admin".equals(groupMember.getRole());
             bot.setGroupAdmin(event.getGroupId(), qq, enable);
         });
 
     }
+
+    //@MessageHandler(name = "禁言", commands = {"ban", "禁"}, rule = RuleEnum.admin)
+    //public void ban(Bot bot, GroupMessageEvent event) {
+    //    List<MessageSegment> segments = event.getMsg().getSegmentByType("at");
+    //    final int duration;
+    //    if (StringUtil.isDigit(event.getCommandArgs())) {
+    //        duration = Integer.parseInt(event.getCommandArgs());
+    //    } else duration = 600; //默认禁 10 min
+    //    segments.forEach(segment -> {
+    //        long qq = Long.parseLong(segment.get("qq"));
+    //        bot.setGroupBan(event.getGroupId(), qq, duration);
+    //    });
+    //    //if (segments.size() == 1 && "all".equals(segments.get(0).get("qq"))) {
+    //    //    bot.setGroupWholeBan(event.getGroupId(), true);
+    //    //} else {
+    //    //    final int duration;
+    //    //    if (StringUtil.isDigit(event.getCommandArgs())) {
+    //    //         duration = Integer.parseInt(event.getCommandArgs());
+    //    //    } else duration = 600; //默认禁 10 min
+    //    //    segments.forEach(segment -> {
+    //    //        //这里qq必为数字, 无需判断
+    //    //        long qq = Long.parseLong(segment.get("qq"));
+    //    //        bot.setGroupBan(event.getGroupId(), qq, duration);
+    //    //    });
+    //    //}
+    //}
+    //
+    //@MessageHandler(name = "踢人", commands = {"kick", "踢"}, rule = RuleEnum.admin)
+    //public void kick(Bot bot, GroupMessageEvent event) {
+    //    List<MessageSegment> segments = event.getMsg().getSegmentByType("at");
+    //    if (segments.size() == 1 && "all".equals(segments.get(0).get("qq"))) {
+    //        event.finish("你是要把所有人都踢了吗?");
+    //    }
+    //    segments.forEach(segment -> {
+    //        //这里qq必为数字, 无需判断
+    //        long qq = Long.parseLong(segment.get("qq"));
+    //        bot.setGroupKick(event.getGroupId(), qq, true);
+    //    });
+    //}
 }
