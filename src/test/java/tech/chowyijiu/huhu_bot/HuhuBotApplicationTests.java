@@ -88,6 +88,13 @@ public class HuhuBotApplicationTests {
     }
 
 
+    @Test
+    public void testParam() {
+        //{"action":"get_login_info","params":{"user_id":123123123,"group_id":12312312}}
+    }
+
+
+
 
 
 }

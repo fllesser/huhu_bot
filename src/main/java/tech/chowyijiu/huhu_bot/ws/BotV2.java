@@ -78,7 +78,7 @@ public class BotV2 {
     }
 
     private String callApi(GocqActionEnum action, Map<String, Object> paramsMap, boolean needReturn) {
-        RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
+        RequestBox requestBox = new RequestBox();
         requestBox.setAction(action.getAction());
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         if (needReturn) {

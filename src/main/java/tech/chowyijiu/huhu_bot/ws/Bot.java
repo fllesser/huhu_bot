@@ -64,13 +64,13 @@ public class Bot {
      * @return String
      */
     private static String waitResp(String echo) {
-        log.info("Blocking waits for gocq api resp, echo: {}", echo);
+        log.info("Blocking waits for gocq api resp, echo:{}", echo);
         LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
         respMap.put(echo, deque);
         try {
             String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
             if (!StringUtil.hasLength(resp)) throw new ActionFailed("api请求超时, 或者该api无响应数据");
-            log.info("Accept a Response: echo:{}", echo);
+            log.info("Accepted a response for echo:{}", echo);
             return resp;
         } catch (InterruptedException e) {
             throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
@@ -83,7 +83,7 @@ public class Bot {
      * 私有 callApi
      */
     private void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
-        RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
+        RequestBox requestBox = new RequestBox();
         requestBox.setAction(action.getAction());
         requestBox.setParams(paramsMap);
         this.sessionSend(JSONObject.toJSONString(requestBox));
@@ -97,7 +97,7 @@ public class Bot {
      * @return json 字符串数据
      */
     private String callApiWithResp(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
-        RequestBox<Map<String, Object>> requestBox = new RequestBox<>();
+        RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.getAction());
         //curThread__userId__action__uuid
@@ -121,8 +121,7 @@ public class Bot {
         if (length > 0) {
             paramsMap = new HashMap<>();
             if (length % 2 != 0) {
-                log.info("[Bot] callApi invalid params, canceled");
-                return null;
+                throw new IllegalArgumentException("callApi invalid params");
             }
             for (int i = 0; i < params.length; i += 2) {
                 paramsMap.put(params[i].toString(), params[i + 1]);
@@ -163,7 +162,7 @@ public class Bot {
      * @return json String
      */
     @Deprecated
-    private String callGetApi(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
+    private String callHttpApi(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
         String url = "http://127.0.0.1:8899/" + action.getAction();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
