@@ -17,6 +17,8 @@ import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
+import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
+import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
@@ -245,19 +247,16 @@ public class CoreDispatcher {
                 log.info("{}IllegalAccessException: {}{}",
                         LogUtil.buildArgsWithColor(ANSI.RED, "handler method must be public"));
             } catch (InvocationTargetException e) {
-                Throwable rawE = e.getTargetException();
-                switch (rawE.getClass().getSimpleName()) {
-                    case "FinishedException":
-                        //ignored
-                        break;
-                    case "ActionFailed":
-                        log.info("{}ActionFailed: {}{}",
-                                LogUtil.buildArgsWithColor(ANSI.RED, rawE.getMessage()));
-                    case "IllegalArgumentException":
-                    default:
-                        rawE.printStackTrace();
-                        break;
+                Throwable targetException = e.getTargetException();
+                if (targetException instanceof FinishedException) {
+                    log.info("{} FinishedException ignored", event);
+                } else if (targetException instanceof ActionFailed) {
+                    log.info("{}ActionFailed: {}{}",
+                            LogUtil.buildArgsWithColor(ANSI.RED, targetException.getMessage()));
+                } else {
+                    targetException.printStackTrace();
                 }
+
             }
         }
 

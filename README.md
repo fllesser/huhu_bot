@@ -11,8 +11,9 @@ go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
 
 ## TODO
 1. 连续对话
-2. 自定义合并转发
-3. 把整个项目,做成springboot-starter, 使之和plugin分离
+2. 适配频道
+3. 自定义合并转发[已支持]
+4. springboot-starter 分离plugin
 
 ## 插件编写方式
 1. 新建一个类加上`@BotPlugin("指定名称,用于加载时打印日志")` 和 `@SuppressWarnings("unused")`

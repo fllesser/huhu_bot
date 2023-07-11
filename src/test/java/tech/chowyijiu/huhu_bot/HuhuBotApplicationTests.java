@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.Message;
 import tech.chowyijiu.huhu_bot.entity.gocq.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
 import tech.chowyijiu.huhu_bot.utils.ImageUtil;
@@ -73,6 +74,10 @@ public class HuhuBotApplicationTests {
     }
 
 
+    @Test
+    public void test12312() {
+        System.out.println(ActionFailed.class.getSimpleName());
+    }
 
 
 

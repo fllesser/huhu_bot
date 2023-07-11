@@ -40,7 +40,8 @@ public class RuleImpl {
         if (event instanceof GroupMessageEvent) {
             GroupMessageEvent groupMessageEvent = (GroupMessageEvent) event;
             //这里就取缓存了, 毕竟群主不可能也变来变去吧
-            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), false);
+            //但好像使用缓存, 一直没有响应数据, gocq那边有问题
+            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), true);
             return "owner".equals(groupMember.getRole());
         } else return false;
     }

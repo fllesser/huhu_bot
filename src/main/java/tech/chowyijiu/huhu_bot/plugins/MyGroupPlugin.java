@@ -129,9 +129,9 @@ public class MyGroupPlugin {
         List<MessageSegment> segments = message.getSegmentByType("at");
         segments.forEach(segment -> {
             long qq = Long.parseLong(segment.get("qq"));
-            GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
-            boolean enable = !"admin".equals(groupMember.getRole());
-            bot.setGroupAdmin(event.getGroupId(), qq, enable);
+            GroupMember groupMember = bot.getGroupMember(event.getGroupId(), qq, true);
+            boolean isAdmin = "admin".equals(groupMember.getRole());
+            bot.setGroupAdmin(event.getGroupId(), qq, !isAdmin);
         });
 
     }

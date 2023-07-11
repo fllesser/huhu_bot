@@ -64,13 +64,14 @@ public class Bot {
      * @return String
      */
     private static String waitResp(String echo) {
-        log.info("Blocking waits for gocq api resp, echo:{}", echo);
+        log.info("{}Blocking waits for gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
         LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
         respMap.put(echo, deque);
         try {
             String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
-            if (!StringUtil.hasLength(resp)) throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
-            log.info("Accepted a response for echo:{}", echo);
+            if (!StringUtil.hasLength(resp))
+                throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
+            log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
             return resp;
         } catch (InterruptedException e) {
             throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
@@ -172,6 +173,7 @@ public class Bot {
     /**
      * HTTP request API method
      * gocq 需配置 http
+     *
      * @param action    action
      * @param paramsMap parameters
      * @return json String
@@ -425,7 +427,6 @@ public class Bot {
     }
 
 
-
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
         this.callApi(GocqActionEnum.SET_GROUP_KICK,
                 "group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest);
@@ -434,8 +435,9 @@ public class Bot {
 
     /**
      * 群单人禁言
-     * @param groupId group_id
-     * @param userId user_id
+     *
+     * @param groupId  group_id
+     * @param userId   user_id
      * @param duration duration 单位秒 default 30 * 60 | 0 表示取消禁言
      */
     public void setGroupBan(Long groupId, Long userId, int duration) {
@@ -445,8 +447,9 @@ public class Bot {
 
     /**
      * 群全体禁言
+     *
      * @param groupId group_id
-     * @param enable 默认true 禁言
+     * @param enable  默认true 禁言
      */
     public void setGroupWholeBan(Long groupId, boolean enable) {
         this.callApi(GocqActionEnum.SET_GROUP_WHOLE_BAN, groupId, enable);
