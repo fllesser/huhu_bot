@@ -10,7 +10,7 @@ spring:
 
 logging:
   file:
-    name: huhu.log  # 日志文件绝对路径及名称
+    name: log/huhubot.log  # 日志文件相对路径及名称
   level:
     root: info
 

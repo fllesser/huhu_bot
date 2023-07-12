@@ -68,15 +68,14 @@ public class MyGroupPlugin {
     public void dailyClockIn() {
         log.info("开始群打卡");
         List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
-        Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
-                .stream().map(GroupInfo::getGroupId).filter(clockGroups::contains)
-                .forEach(groupId -> {
+        Server.getBots().forEach(bot -> clockGroups.forEach(groupId -> {
                     bot.sendGroupSign(groupId);
                     try {
                         Thread.sleep(500L);
                     } catch (InterruptedException ignored) {
                     }
-                }));
+                })
+        );
         log.info("群打卡完毕");
     }
 
@@ -85,7 +84,7 @@ public class MyGroupPlugin {
         String title = event.getCommandArgs();
         //if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
         if (title.length() > 6) event.finish("[bot]群头衔最多为6位");
-        for (String filter : new String[]{"群主", "管理员"}) {
+        for (String filter : new String[]{"群主", "管理"}) {
             if (title.contains(filter)) {
                 title = "群猪";
                 break;
