@@ -17,7 +17,6 @@ import java.util.List;
 @ConfigurationProperties(prefix = "bot")
 public class BotConfig {
 
-
     public static List<Long> superUsers = new ArrayList<>(1);
     public static List<Character> commandPrefixes = new ArrayList<>(1);
 

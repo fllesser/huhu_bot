@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.exception.gocq;
+package tech.chowyijiu.huhu_bot.exception;
 
 /**
  * @author elastic chow

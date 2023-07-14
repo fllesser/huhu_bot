@@ -1,7 +1,7 @@
 package tech.chowyijiu.huhu_bot.core.rule;
 
 import tech.chowyijiu.huhu_bot.config.BotConfig;
-import tech.chowyijiu.huhu_bot.entity.gocq.response.GroupMember;
+import tech.chowyijiu.huhu_bot.entity.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;

@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.gocq.message;
+package tech.chowyijiu.huhu_bot.entity.message;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;

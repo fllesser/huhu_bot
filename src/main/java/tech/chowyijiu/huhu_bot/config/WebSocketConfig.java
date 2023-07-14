@@ -9,7 +9,6 @@ import org.springframework.web.util.WebAppRootListener;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 
 /**
  * @author elastic chow
@@ -26,7 +25,7 @@ public class WebSocketConfig implements WebSocketConfigurer, ServletContextIniti
 
 
     @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
+    public void onStartup(ServletContext servletContext) {
         servletContext.addListener(WebAppRootListener.class);
         servletContext.setInitParameter("org.apache.tomcat.websocket.textBufferSize","81920");
         //servletContext.setInitParameter("org.apache.tomcat.websocket.binaryBufferSize","16384");

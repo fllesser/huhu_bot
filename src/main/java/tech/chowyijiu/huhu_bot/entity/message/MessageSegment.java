@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.gocq.message;
+package tech.chowyijiu.huhu_bot.entity.message;
 
 import lombok.RequiredArgsConstructor;
 

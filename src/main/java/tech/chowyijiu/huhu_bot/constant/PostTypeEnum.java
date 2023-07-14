@@ -12,7 +12,7 @@ public enum PostTypeEnum {
     message,
     // message与message_sent的数据是一致的,
     // 区别仅在于后者是bot发出的消息.
-    // 默认配置下不会上报message_sent, 仅在配置message下report-self-message项为true时上报
+    // gocq默认配置下不会上报message_sent, 仅在配置message下report-self-message项为true时上报
     message_sent,
     // 事件
     meta_event,

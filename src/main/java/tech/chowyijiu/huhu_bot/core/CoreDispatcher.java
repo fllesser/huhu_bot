@@ -17,8 +17,8 @@ import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
-import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
-import tech.chowyijiu.huhu_bot.exception.gocq.FinishedException;
+import tech.chowyijiu.huhu_bot.exception.ActionFailed;
+import tech.chowyijiu.huhu_bot.exception.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 

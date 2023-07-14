@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.gocq.request;
+package tech.chowyijiu.huhu_bot.entity.request;
 
 import lombok.Data;
 

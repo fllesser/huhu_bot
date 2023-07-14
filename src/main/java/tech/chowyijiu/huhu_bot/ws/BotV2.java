@@ -9,8 +9,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.request.RequestBox;
-import tech.chowyijiu.huhu_bot.exception.gocq.ActionFailed;
+import tech.chowyijiu.huhu_bot.entity.request.RequestBox;
+import tech.chowyijiu.huhu_bot.exception.ActionFailed;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 

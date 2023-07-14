@@ -6,7 +6,7 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
-import tech.chowyijiu.huhu_bot.entity.gocq.message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.entity.message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
