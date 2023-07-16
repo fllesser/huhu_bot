@@ -1,6 +1,8 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
@@ -23,6 +25,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +39,11 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class MyGroupPlugin {
 
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        final String card = buildDateCard();
+        final String card = "失业" + this.countdown("2023-06-16 10:00");
         log.info("时间群昵称开始设置 card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
@@ -49,19 +53,59 @@ public class MyGroupPlugin {
                     } catch (InterruptedException ignored) {
                     }
                 }));
+        customInfoList.forEach(customInfo -> {
+            String customCard = "";
+            if ("now".equals(customInfo.type)) {
+                customCard = customInfo.suffix + LocalDateTime.now().format(formatter);
+            } else if ("countdown".equals(customInfo.type)) {
+                customCard = customInfo.suffix + countdown(customInfo.date);
+            }
+            Server.getBots().get(0).setGroupCard(customInfo.groupId, customInfo.userId, customCard);
+        });
         log.info("时间群昵称设置完毕 card: {}", card);
     }
 
-    private String buildDateCard() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime shitTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
+    private String countdown(String dateText) {
+        LocalDateTime shitTime = LocalDateTime.parse(dateText, formatter);
         Duration duration = Duration.between(shitTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);
         long hours = duration.toHours();
         duration = duration.minusHours(hours);
         long minutes = duration.toMinutes();
-        return "失业第" + days + "天" + hours + "时" + minutes + "分";
+        return "第" + days + "天" + hours + "时" + minutes + "分";
+    }
+
+    private final List<CustomInfo> customInfoList = new ArrayList<>();
+
+    @Builder
+    static class CustomInfo {
+        private Long userId;
+        private Long groupId;
+        private String type;    //now / countdown
+        private String date;    //"2023-06-16 10:00"
+        private String suffix;  //前缀
+    }
+
+    /**
+     * 两分钟一改
+     * cgtn now 前缀
+     * cgtn cutdown/前缀/2023-06-16 10:00
+     */
+    @MessageHandler(name = "自定义时间群昵称", commands = {"cgtn", "自定义群时间昵称"}, rule = RuleEnum.self_admin)
+    public void customDateCard(Bot bot, GroupMessageEvent event) {
+        String commandArgs = event.getCommandArgs();
+        val infoBuilder = CustomInfo.builder()
+                .userId(event.getUserId()).groupId(event.getGroupId());
+        if (commandArgs.startsWith("now")) {
+            customInfoList.add(infoBuilder.type("now").suffix(commandArgs.replace("now", "")).build());
+        } else if (commandArgs.startsWith("cutdown")) {
+            String[] argsArr = commandArgs.split("/");
+            if (argsArr.length == 3) {
+                String card = argsArr[2] + countdown(argsArr[1]);
+                customInfoList.add(infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]).build());
+            }
+        }
     }
 
     @Scheduled(cron = "0 0 0 * * *")
