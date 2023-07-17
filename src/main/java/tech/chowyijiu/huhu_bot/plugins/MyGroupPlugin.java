@@ -25,10 +25,7 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author elastic chow
@@ -43,7 +40,7 @@ public class MyGroupPlugin {
 
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        final String card = "失业" + this.countdown("2023-06-16 10:00");
+        final String card = "失业第" + this.countdown("2023-06-16 10:00");
         log.info("时间群昵称开始设置 card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
@@ -53,30 +50,36 @@ public class MyGroupPlugin {
                     } catch (InterruptedException ignored) {
                     }
                 }));
-        customInfoList.forEach(customInfo -> {
+        customInfoMap.keySet().forEach(userId -> {
             String customCard = "";
+            CustomInfo customInfo = customInfoMap.get(userId);
             if ("now".equals(customInfo.type)) {
                 customCard = customInfo.suffix + LocalDateTime.now().format(formatter);
             } else if ("countdown".equals(customInfo.type)) {
-                customCard = customInfo.suffix + countdown(customInfo.date);
+                customCard = customInfo.suffix + this.countdown(customInfo.date);
             }
             Server.getBots().get(0).setGroupCard(customInfo.groupId, customInfo.userId, customCard);
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         });
         log.info("时间群昵称设置完毕 card: {}", card);
     }
 
     private String countdown(String dateText) {
-        LocalDateTime shitTime = LocalDateTime.parse(dateText, formatter);
-        Duration duration = Duration.between(shitTime, LocalDateTime.now());
+        LocalDateTime fromTime = LocalDateTime.parse(dateText, formatter);
+        Duration duration = Duration.between(fromTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);
         long hours = duration.toHours();
         duration = duration.minusHours(hours);
         long minutes = duration.toMinutes();
-        return "第" + days + "天" + hours + "时" + minutes + "分";
+        return days + "天" + hours + "时" + minutes + "分";
     }
 
-    private final List<CustomInfo> customInfoList = new ArrayList<>();
+    private final Map<Long, CustomInfo> customInfoMap = new HashMap<>();
 
     @Builder
     static class CustomInfo {
@@ -92,20 +95,24 @@ public class MyGroupPlugin {
      * cgtn now 前缀
      * cgtn cutdown/前缀/2023-06-16 10:00
      */
-    @MessageHandler(name = "自定义时间群昵称", commands = {"cgtn", "自定义群时间昵称"}, rule = RuleEnum.self_admin)
+    @MessageHandler(name = "自定义时间群昵称", commands = {"cgtn"}, rule = RuleEnum.self_admin)
     public void customDateCard(Bot bot, GroupMessageEvent event) {
+        if (customInfoMap.size() >= 30) event.finish("定制人数已上限");
         String commandArgs = event.getCommandArgs();
         val infoBuilder = CustomInfo.builder()
                 .userId(event.getUserId()).groupId(event.getGroupId());
         if (commandArgs.startsWith("now")) {
-            customInfoList.add(infoBuilder.type("now").suffix(commandArgs.replace("now", "")).build());
+            infoBuilder.type("now").suffix(commandArgs.replaceFirst("now", ""));
         } else if (commandArgs.startsWith("cutdown")) {
             String[] argsArr = commandArgs.split("/");
             if (argsArr.length == 3) {
-                String card = argsArr[2] + countdown(argsArr[1]);
-                customInfoList.add(infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]).build());
+                infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]);
+            } else {
+                event.finish("格式有误:\n1.cgtn now 前缀\n2.cgtn cutdown/前缀/2023-06-16 10:00");
             }
         }
+        customInfoMap.put(event.getUserId(), infoBuilder.build());
+        bot.sendGroupMessage(event.getGroupId(), "自定义群时间昵称成功, 两分钟后见效", false);
     }
 
     @Scheduled(cron = "0 0 0 * * *")
