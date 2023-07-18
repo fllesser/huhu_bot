@@ -1,7 +1,8 @@
 /**
   * Copyright 2023 json.cn 
   */
-package tech.chowyijiu.huhu_bot.plugins.aliyunpan;
+package tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe;
+
 import java.util.List;
 
 /**

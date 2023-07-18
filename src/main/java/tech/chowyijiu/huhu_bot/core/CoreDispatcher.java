@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhu_bot.core;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,7 +23,6 @@ import tech.chowyijiu.huhu_bot.exception.FinishedException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

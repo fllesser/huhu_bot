@@ -1,9 +1,8 @@
 package tech.chowyijiu.huhu_bot.utils;
 
+import jakarta.annotation.Resource;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 /**
  * @author elastic chow

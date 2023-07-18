@@ -53,7 +53,7 @@ public class ForwardMessage {
     }
 
     /**
-     * 快速构建 uin恒定, name message 对应, 作为键值对存储, 用于生成排行榜类
+     * 快速构建 uin 恒定, name message 对应, 作为键值对存储, 用于生成排行榜类
      * @param uin Long
      * @param nameAndMsgs LinkedHashMap<String, String> 需要插入顺序
      * @return List<ForwardMessage>
