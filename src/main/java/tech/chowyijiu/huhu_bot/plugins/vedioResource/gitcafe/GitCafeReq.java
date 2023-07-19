@@ -2,11 +2,10 @@ package tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
-import tech.chowyijiu.huhu_bot.plugins.vedioResource.WillSendData;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author elastic chow
@@ -14,17 +13,22 @@ import java.util.stream.Collectors;
  */
 public class GitCafeReq {
 
-    public static List<WillSendData> get(String keyword) {
-        Map<String, Object> map = Map.of("action", "search", "from", "web",
-                "token","", "keyword", keyword);
-        String resp = HttpUtil.post("https://gitcafe.net/tool/alipaper/", map);
+    private static final String URL = "https://gitcafe.net/tool/alipaper/";
+    private static final Map<String, Object> paramsMap = new HashMap<>(
+            Map.of("action", "search", "from", "web", "token", ""));
+
+    public static String get(String keyword) {
+        paramsMap.put("keyword", keyword);
+        String resp = HttpUtil.post(URL, paramsMap);
         GitcafeResp gitcafeResp = JSONObject.parseObject(resp, GitcafeResp.class);
-        return gitcafeResp.getData().stream()
-                .map(data -> WillSendData.builder()
-                        .title(data.getAlititle())
-                        .type("aliyun")
-                        .url("https://www.aliyundrive.com/s/" + data.getAlikey())
-                        .build())
-                .collect(Collectors.toList());
+        StringBuilder sb = new StringBuilder();
+        if (gitcafeResp.isSuccess()) {
+            List<Data> list = gitcafeResp.getData();
+            sb.append("共查询到").append(list.size()).append("个资源");
+            gitcafeResp.getData().forEach(data -> sb.append("\n[")
+                    .append(data.getAlititle()).append("] ")
+                    .append("https://www.aliyundrive.com/s/").append(data.getAlikey()));
+        } else sb.append(gitcafeResp.getError());
+        return sb.toString();
     }
 }

@@ -1,14 +1,10 @@
 package tech.chowyijiu.huhu_bot;
 
 import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson2.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.message.Message;
 import tech.chowyijiu.huhu_bot.entity.message.MessageSegment;
-import tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe.Data;
-import tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe.GitcafeResp;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
 import tech.chowyijiu.huhu_bot.utils.ImageUtil;
@@ -18,9 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @SpringBootTest
 @SuppressWarnings("all")
@@ -77,28 +71,5 @@ public class HuhuBotApplicationTests {
         }).toArray(BufferedImage[]::new);
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     }
-
-    public void test() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("action", "search");
-        map.put("from", "web");
-        map.put("token", "14730e6c54e9bead73a1299c08896026e1c3e");
-        map.put("keyword", "消失的十一层");
-        String resp = HttpUtil.post("https://gitcafe.net/tool/alipaper/", map);
-        GitcafeResp gitcafeResp = JSONObject.parseObject(resp, GitcafeResp.class);
-        //if (!gitcafeResp.getSuccess()) event.finish("查询失败" + gitcafeResp.getError());
-        StringBuilder sb = new StringBuilder();
-        List<Data> dataList = gitcafeResp.getData();
-        sb.append("共查询到").append(dataList.size()).append("个资源");
-        for (Data data : dataList) {
-            sb.append("\n")
-                    .append(data.getAlititle())
-                    .append(" https://www.aliyundrive.com/s/").append(data.getAlikey());
-        }
-        System.out.println(sb);
-    }
-
-
-
 
 }

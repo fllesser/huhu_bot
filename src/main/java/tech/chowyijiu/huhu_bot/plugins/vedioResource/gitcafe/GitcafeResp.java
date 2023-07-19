@@ -3,6 +3,9 @@
   */
 package tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
 /**
@@ -11,30 +14,12 @@ import java.util.List;
  * @author json.cn (i@json.cn)
  * @website http://www.json.cn/java2pojo/
  */
+@Getter
+@Setter
 public class GitcafeResp {
 
     private boolean success;
     private List<Data> data;
     private String error;
-    public void setSuccess(boolean success) {
-         this.success = success;
-     }
-     public boolean getSuccess() {
-         return success;
-     }
-
-    public void setData(List<Data> data) {
-         this.data = data;
-     }
-     public List<Data> getData() {
-         return data;
-     }
-
-    public void setError(String error) {
-         this.error = error;
-     }
-     public String getError() {
-         return error;
-     }
 
 }
