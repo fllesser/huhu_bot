@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhu_bot.config;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
@@ -19,17 +20,36 @@ public class BotConfig {
 
     public static List<Long> superUsers = new ArrayList<>(1);
     public static List<Character> commandPrefixes = new ArrayList<>(1);
+    public static String aliRefreshToken;
+    public static Long testGroup;
 
     public void setSuperUsers(List<Long> superUsers) {
         BotConfig.superUsers = superUsers;
-        log.info("{}[BotConfig] super-users: {}{}", ANSI.YELLOW,
-                Arrays.toString(superUsers.toArray()), ANSI.RESET);
     }
 
     public void setCommandPrefixes(List<Character> commandPrefixes) {
         BotConfig.commandPrefixes = commandPrefixes;
-        log.info("{}[BotConfig] command-prefixes: {}{}", ANSI.YELLOW,
-                Arrays.toString(commandPrefixes.toArray()), ANSI.RESET);
+    }
+
+    public void setAliRefreshToken(String aliRefreshToken) {
+        BotConfig.aliRefreshToken = aliRefreshToken;
+    }
+
+    public void setTestGroup(Long testGroup) {
+        BotConfig.testGroup = testGroup;
+    }
+
+    @PostConstruct
+    public void postLog() {
+        log.info("{}[BotConfig] {}{}", ANSI.YELLOW, this, ANSI.RESET);
+    }
+
+    @Override
+    public String toString() {
+        return "super-users: " + Arrays.toString(superUsers.toArray()) +
+                ", command-prefix: " + Arrays.toString(commandPrefixes.toArray()) +
+                ", test-group: " + testGroup +
+                ", ali-refresh-token: " + aliRefreshToken;
     }
 
     public static boolean isSuperUser(Long userId) {

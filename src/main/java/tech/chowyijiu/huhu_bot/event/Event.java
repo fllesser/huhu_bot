@@ -32,21 +32,12 @@ public abstract class Event {
         String postType = jsonObject.getString("post_type");
         Event event = null;
         if (StringUtil.hasLength(postType)) {
-            switch (PostTypeEnum.valueOf(postType)) {
-                case message_sent:
-                case message:
-                    event = MessageEvent.build(jsonObject);
-                    break;
-                case notice:
-                    event = NoticeEvent.build(jsonObject);
-                    break;
-                case request:
-                    event = jsonObject.toJavaObject(RequestEvent.class);
-                    break;
-                case meta_event:
-                    event = jsonObject.toJavaObject(MetaEvent.class);
-                    break;
-            }
+            event = switch (PostTypeEnum.valueOf(postType)) {
+                case message_sent, message -> MessageEvent.build(jsonObject);
+                case notice -> NoticeEvent.build(jsonObject);
+                case request -> jsonObject.toJavaObject(RequestEvent.class);
+                case meta_event -> jsonObject.toJavaObject(MetaEvent.class);
+            };
             event.setJsonObject(jsonObject);
         } else {
             if (StringUtil.hasLength(jsonObject.getString("echo")))  {

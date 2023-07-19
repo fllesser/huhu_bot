@@ -21,7 +21,8 @@ import java.util.List;
 public class HuhuBotApplicationTests {
 
     @Test
-    void contextLoads() {
+    void context() {
+
     }
 
     //@Test
@@ -70,6 +71,13 @@ public class HuhuBotApplicationTests {
             return null;
         }).toArray(BufferedImage[]::new);
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
+    }
+
+
+    public void testHdHive() {
+        //System.out.println(HdhiveReq.get1("asdfs "));
+        //System.out.println(AliYunDriver.dailyCheck("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZWE2NjQ2MDc4ZmM0MzNmOTc1MWIyMzRmNjhhOWU2NSIsImN1c3RvbUpzb24iOiJ7XCJjbGllbnRJZFwiOlwiMjVkelgzdmJZcWt0Vnh5WFwiLFwiZG9tYWluSWRcIjpcImJqMjlcIixcInNjb3BlXCI6W1wiRFJJVkUuQUxMXCIsXCJTSEFSRS5BTExcIixcIkZJTEUuQUxMXCIsXCJVU0VSLkFMTFwiLFwiVklFVy5BTExcIixcIlNUT1JBR0UuQUxMXCIsXCJTVE9SQUdFRklMRS5MSVNUXCIsXCJCQVRDSFwiLFwiT0FVVEguQUxMXCIsXCJJTUFHRS5BTExcIixcIklOVklURS5BTExcIixcIkFDQ09VTlQuQUxMXCIsXCJTWU5DTUFQUElORy5MSVNUXCIsXCJTWU5DTUFQUElORy5ERUxFVEVcIl0sXCJyb2xlXCI6XCJ1c2VyXCIsXCJyZWZcIjpcImh0dHBzOi8vd3d3LmFsaXl1bmRyaXZlLmNvbS9cIixcImRldmljZV9pZFwiOlwiYjhlMTc1OTNmNTU0NDYxYjhkMDI4MTcxODlkMDZiMTlcIn0iLCJleHAiOjE2ODk3Njg0MjUsImlhdCI6MTY4OTc2MTE2NX0.Xoj6OenC04Cb3Wy6YwnhgBvxLJGClp2Re7_YTqv2JC8iC_ZBaDUFGuXdqlmCK7t01jLSGufeNKlXpIxBUAE-_wISlKpysMdBSkQGfCjeKMhaenUrb8Q7SPBkaFtnFqbsUzij6rVaVP4KgBjjrwh2VvC00nSFcWTd5Csmy-3LBHw"));
+
     }
 
 }

@@ -27,7 +27,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -83,12 +82,9 @@ public class CoreDispatcher {
         }
         //根据priority对handler进行排序, 并全部加入到handlerContainer中
         MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
-                .sorted(Comparator.comparingInt(handler -> handler.priority))
-                .collect(Collectors.toList())
-        );
+                .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
         NOTICE_HANDLER_CONTAINER.addAll(noticeHandlers.stream()
-                .sorted(Comparator.comparingInt(handler -> handler.priority))
-                .collect(Collectors.toList()));
+                .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
         log.info("{}[HUHUBOT] Running...{}", ANSI.YELLOW, ANSI.RESET);
     }
 

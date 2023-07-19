@@ -8,14 +8,6 @@ spring:
     ansi:
       enabled: always
 
-logging:
-  file:
-    name: log/huhubot.log  # 日志文件相对路径及名称
-  level:
-    root: info
-
-bot:
-  super-users: [1942422015, 2412125282]
 
 
 

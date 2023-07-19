@@ -45,12 +45,12 @@ public class ProcessEventTask implements Runnable {
 
     @Override
     public void run() {
-        if (event instanceof MessageEvent) {
-            CORE_DISPATCHER.onMessage(bot, (MessageEvent) event);
-        } else if (event instanceof NoticeEvent) {
-            CORE_DISPATCHER.onNotice(bot, ((NoticeEvent) event));
-        } else if (event instanceof RequestEvent) {
-            log.info("{}", event);
+        if (event instanceof MessageEvent messageEvent) {
+            CORE_DISPATCHER.onMessage(bot, messageEvent);
+        } else if (event instanceof NoticeEvent noticeEvent) {
+            CORE_DISPATCHER.onNotice(bot, noticeEvent);
+        } else if (event instanceof RequestEvent requestEvent) {
+            log.info("{}", requestEvent);
         }
     }
 

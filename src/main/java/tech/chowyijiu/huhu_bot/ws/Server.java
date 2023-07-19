@@ -64,14 +64,13 @@ public class Server extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
+    public void handleTextMessage(final WebSocketSession session, final TextMessage message) {
         final String json = message.getPayload();
         try {
             JSONObject jsonObject = JSONObject.parseObject(json);
             Event event = Event.build(jsonObject);
             if (event == null) return;
-            if (event instanceof MetaEvent) {
-                MetaEvent metaEvent = (MetaEvent) event;
+            if (event instanceof MetaEvent metaEvent) {
                 if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.heartbeat.name())) {
                     //心跳忽略
                     //log.info("[{}] bot[{}] heartbeat ", this.getClass().getSimpleName(), metaEvent.getSelfId());
