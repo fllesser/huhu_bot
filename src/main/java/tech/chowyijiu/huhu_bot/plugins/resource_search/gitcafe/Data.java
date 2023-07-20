@@ -1,7 +1,7 @@
 /**
   * Copyright 2023 json.cn 
   */
-package tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe;
+package tech.chowyijiu.huhu_bot.plugins.resource_search.gitcafe;
 import lombok.Getter;
 import lombok.Setter;
 

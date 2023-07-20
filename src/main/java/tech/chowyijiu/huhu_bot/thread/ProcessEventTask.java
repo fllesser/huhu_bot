@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @date 14/5/2023
  */
 @Slf4j
+@SuppressWarnings("all")
 public class ProcessEventTask implements Runnable {
 
     private final Bot bot;

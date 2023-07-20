@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @date 14/5/2023
  */
 @Slf4j
+@SuppressWarnings("all")
 public class ShareRunsPolicy implements RejectedExecutionHandler {
     private final String poolName;
     public ShareRunsPolicy(String poolName){

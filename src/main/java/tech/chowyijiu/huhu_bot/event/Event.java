@@ -40,11 +40,10 @@ public abstract class Event {
             };
             event.setJsonObject(jsonObject);
         } else {
-            if (StringUtil.hasLength(jsonObject.getString("echo")))  {
+            StringUtil.hasLength(jsonObject.getString("echo"), echo -> {
                 ApiResp resp = jsonObject.toJavaObject(ApiResp.class);
-                if ("ok".equals(resp.getStatus()))
-                    Bot.putEchoResult(resp.getEcho(), resp.getData());
-            }
+                if ("ok".equals(resp.getStatus())) Bot.putEchoResult(echo, resp.getData());
+            });
         }
         return event;
     }

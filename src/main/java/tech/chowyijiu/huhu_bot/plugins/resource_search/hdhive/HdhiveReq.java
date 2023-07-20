@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.plugins.vedioResource.hdhive;
+package tech.chowyijiu.huhu_bot.plugins.resource_search.hdhive;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
@@ -29,17 +29,17 @@ public class HdhiveReq {
         JSONArray data = jsonObject.getJSONArray("data");
         StringBuilder sb = new StringBuilder();
         if (data.size() == 0) return "无此关键词资源";
-        else sb.append("共查询到以下资源:");
+        else sb.append("共搜索到以下资源:");
         for (Object d : data) {
             JSONObject d_ = (JSONObject) d;
             Integer tmdbId = d_.getInteger("id");
             String mediaType = d_.getString("media_type");
-            switch (mediaType) {
-                case "movie" -> sb.append(get2("movies", tmdbId));
-                case "tv" -> sb.append(get2("tv", tmdbId));
-                default -> {
-                }
-            }
+            String type = switch (mediaType) {
+                case "movie" -> "movies";
+                case "tv" -> "tv";
+                default -> mediaType;
+            };
+            sb.append(get2(type, tmdbId));
         }
         return sb.toString();
     }
@@ -55,13 +55,13 @@ public class HdhiveReq {
         for (Object d : dataArr) {
             JSONObject d_ = (JSONObject) d;
             Integer id = d_.getInteger("id");
-            switch (type) {
-                case "tv" -> res = get3("tv_id", id);
-                case "movies" -> res = get3("movie_id", id);
-                default -> {
-                }
-            }
-            if (!StringUtil.hasLength(res)) res = "\n" + d_.getString("name") + " 暂无分享";
+            String idType = switch (type) {
+                case "tv" -> "tv_id";
+                case "movies" -> "movie_id";
+                default -> type + "_id";
+            };
+            res = get3(idType, id);
+            if (!StringUtil.hasLength(res)) res = "\n" + d_.getString("title") + ": 暂无云盘分享链接";
         }
         return res;
     }

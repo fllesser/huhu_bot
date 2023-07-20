@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.plugins.vedioResource.gitcafe;
+package tech.chowyijiu.huhu_bot.plugins.resource_search.gitcafe;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
@@ -24,11 +24,11 @@ public class GitCafeReq {
         StringBuilder sb = new StringBuilder();
         if (gitcafeResp.isSuccess()) {
             List<Data> list = gitcafeResp.getData();
-            sb.append("共查询到").append(list.size()).append("个资源");
+            sb.append("共搜索到").append(list.size()).append("个资源");
             gitcafeResp.getData().forEach(data -> sb.append("\n[")
                     .append(data.getAlititle()).append("] ")
                     .append("https://www.aliyundrive.com/s/").append(data.getAlikey()));
-        } else sb.append(gitcafeResp.getError());
+        } else sb.append("gitcafe").append("查询失败, ").append(gitcafeResp.getError());
         return sb.toString();
     }
 }

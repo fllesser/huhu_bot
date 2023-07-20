@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -18,38 +18,42 @@ import java.util.List;
 @ConfigurationProperties(prefix = "bot")
 public class BotConfig {
 
-    public static List<Long> superUsers = new ArrayList<>(1);
+    public static List<Long> superUsers;
     public static List<Character> commandPrefixes = new ArrayList<>(1);
-    public static String aliRefreshToken;
     public static Long testGroup;
 
-    public void setSuperUsers(List<Long> superUsers) {
+    public static String aliRefreshToken;
+    public static List<String> chatGptKey;
+
+    public void setSuperUsers(ArrayList<Long> superUsers) {
         BotConfig.superUsers = superUsers;
     }
 
-    public void setCommandPrefixes(List<Character> commandPrefixes) {
+    public void setCommandPrefixes(ArrayList<Character> commandPrefixes) {
         BotConfig.commandPrefixes = commandPrefixes;
-    }
-
-    public void setAliRefreshToken(String aliRefreshToken) {
-        BotConfig.aliRefreshToken = aliRefreshToken;
     }
 
     public void setTestGroup(Long testGroup) {
         BotConfig.testGroup = testGroup;
     }
 
-    @PostConstruct
-    public void postLog() {
-        log.info("{}[BotConfig] {}{}", ANSI.YELLOW, this, ANSI.RESET);
+    public void setAliRefreshToken(String aliRefreshToken) {
+        BotConfig.aliRefreshToken = aliRefreshToken;
     }
 
-    @Override
-    public String toString() {
-        return "super-users: " + Arrays.toString(superUsers.toArray()) +
-                ", command-prefix: " + Arrays.toString(commandPrefixes.toArray()) +
-                ", test-group: " + testGroup +
-                ", ali-refresh-token: " + aliRefreshToken;
+    public void setChatGptKey(ArrayList<String> chatGptKey) {
+        BotConfig.chatGptKey = chatGptKey;
+    }
+
+    @PostConstruct
+    public void postLog() throws IllegalAccessException {
+        StringBuilder sb = new StringBuilder();
+        for (Field f : this.getClass().getDeclaredFields()) {
+            if ("Logger".equals(f.getType().getSimpleName())) continue;
+            sb.append(" ").append(f.getName()).append(": ").append(f.get(this));
+        }
+
+        log.info("{}[BotConfig]{}{}", ANSI.YELLOW, sb, ANSI.RESET);
     }
 
     public static boolean isSuperUser(Long userId) {

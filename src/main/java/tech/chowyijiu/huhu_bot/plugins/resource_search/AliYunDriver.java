@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.plugins.vedioResource;
+package tech.chowyijiu.huhu_bot.plugins.resource_search;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
