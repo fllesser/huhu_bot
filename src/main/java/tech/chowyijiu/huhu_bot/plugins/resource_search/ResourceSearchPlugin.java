@@ -25,7 +25,8 @@ public class ResourceSearchPlugin {
     @Scheduled(cron = "0 0 12 * * *")
     public void scheduledCheck() {
         Objects.requireNonNull(Server.getBot(1942422015L))
-                .sendGroupMessage(BotConfig.testGroup, AliYunDriver.dailyCheck(), false);
+                .sendGroupMessage(BotConfig.testGroup,
+                        "阿里云盘签到结果: " + AliYunDriver.dailySignIn(), false);
     }
 
     @MessageHandler(name = "阿里云盘资源搜索 gitcafe ", commands = {".s"})
@@ -37,7 +38,6 @@ public class ResourceSearchPlugin {
     @MessageHandler(name = "阿里云盘资源搜索 hdhive", commands = {".ds"})
     public void search2(Bot bot, MessageEvent event) {
         String data = StringUtil.hasLengthReturn(event.getCommandArgs(), HdhiveReq::get1);
-        if (!StringUtil.hasLength(data)) event.finish("查询失败" + data);
         bot.sendMessage(event, data, false);
     }
 }
