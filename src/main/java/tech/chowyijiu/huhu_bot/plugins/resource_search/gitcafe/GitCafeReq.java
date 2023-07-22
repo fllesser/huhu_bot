@@ -2,6 +2,8 @@ package tech.chowyijiu.huhu_bot.plugins.resource_search.gitcafe;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
+import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceData;
+import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,18 +19,16 @@ public class GitCafeReq {
     private static final Map<String, Object> paramsMap = new HashMap<>(
             Map.of("action", "search", "from", "web", "token", ""));
 
-    public static String get(String keyword) {
+    public static List<ResourceData> get(String keyword) {
         paramsMap.put("keyword", keyword);
         String resp = HttpUtil.post(URL, paramsMap);
         GitcafeResp gitcafeResp = JSONObject.parseObject(resp, GitcafeResp.class);
-        StringBuilder sb = new StringBuilder();
         if (gitcafeResp.isSuccess()) {
-            List<Data> list = gitcafeResp.getData();
-            sb.append("共搜索到").append(list.size()).append("个资源");
-            gitcafeResp.getData().forEach(data -> sb.append("\n[")
-                    .append(data.getAlititle()).append("] ")
-                    .append("https://www.aliyundrive.com/s/").append(data.getAlikey()));
-        } else sb.append("gitcafe").append("查询失败, ").append(gitcafeResp.getError());
-        return sb.toString();
+            List<Data> dataList = gitcafeResp.getData();
+            List<ResourceData> resourceDataList = dataList.stream()
+                    .map(data -> new ResourceData(data.getAlititle(), data.getAlikey())).toList();
+            ResourceUtil.put(keyword, resourceDataList);
+        }
+        return null;
     }
 }

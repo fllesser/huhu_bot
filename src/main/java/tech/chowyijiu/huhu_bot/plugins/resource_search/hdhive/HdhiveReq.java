@@ -4,8 +4,11 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import tech.chowyijiu.huhu_bot.utils.StringUtil;
+import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceData;
+import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,14 +25,13 @@ public class HdhiveReq {
     /**
      * 搜索 by page
      */
-    public static String get1(String keyword) {
+    public static List<ResourceData> get1(String keyword) {
         Map<String, Object> map = Map.of("query", keyword, "page", 1);
         String respJson = HttpUtil.get(url1, map);
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         JSONArray data = jsonObject.getJSONArray("data");
-        StringBuilder sb = new StringBuilder();
-        if (data.size() == 0) return "无此关键词资源";
-        else sb.append("共搜索到以下资源:");
+        if (data.size() == 0) return null;
+        List<ResourceData> dataList = new ArrayList<>();
         for (Object d : data) {
             JSONObject d_ = (JSONObject) d;
             Integer tmdbId = d_.getInteger("id");
@@ -39,21 +41,29 @@ public class HdhiveReq {
                 case "tv" -> "tv";
                 default -> mediaType;
             };
-            sb.append(get2(type, tmdbId));
+            dataList.add(get2(type, tmdbId));
         }
-        return sb.toString();
+        ResourceUtil.put(keyword, dataList);
+        return dataList;
     }
 
     /**
      * 进入详细页面
      */
-    private static String get2(String type, Integer tmdbId) {
+    private static ResourceData get2(String type, Integer tmdbId) {
         String respJson = HttpUtil.get(url2 + type, Map.of("tmdb_id", tmdbId));
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         JSONArray dataArr = jsonObject.getJSONArray("data");
-        String res = "";
+        ResourceData res = null;
         for (Object d : dataArr) {
             JSONObject d_ = (JSONObject) d;
+            JSONArray resources = d_.getJSONArray("resources");
+            if (resources != null && resources.size() > 0) {
+                JSONObject resource = (JSONObject) resources.get(0);
+                String[] preAndId = resource.getString("url").split("/s/");
+                res = new ResourceData(resource.getString("title"), preAndId[1]);
+                break;
+            }
             Integer id = d_.getInteger("id");
             String idType = switch (type) {
                 case "tv" -> "tv_id";
@@ -61,7 +71,7 @@ public class HdhiveReq {
                 default -> type + "_id";
             };
             res = get3(idType, id);
-            if (!StringUtil.hasLength(res)) res = "\n" + d_.getString("title") + ": 暂无云盘分享链接";
+            break;
         }
         return res;
     }
@@ -69,7 +79,7 @@ public class HdhiveReq {
     /**
      * 获得分享链接
      */
-    private static String get3(String idType, Integer id) {
+    private static ResourceData get3(String idType, Integer id) {
         Map<String, Object> map = Map.of(idType, id,
                 "sort_by", "is_admin", "sort_order", "descend", "per_page", 100);
         String respJson = HttpRequest.get(url3)
@@ -78,14 +88,17 @@ public class HdhiveReq {
                 .body();
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         Boolean success = jsonObject.getBoolean("success");
-        if (success == null || !success) return "auth可能过期, 请联系我";
-        JSONArray data = jsonObject.getJSONArray("data");
-        if (data == null || data.size() == 0) return "";
-        StringBuilder sb = new StringBuilder();
-        for (Object d : data) {
-            JSONObject d_ = (JSONObject) d;
-            sb.append("\n").append(d_.get("title")).append(d_.get("remark")).append(" ").append(d_.get("url"));
+        //auth可能过期
+        if (success == null || !success) return null;
+        JSONArray datas = jsonObject.getJSONArray("data");
+        //没有分享链接
+        if (datas == null || datas.size() == 0) return null;
+        ResourceData resourceData = null;
+        for (Object data : datas) {
+            JSONObject data_ = (JSONObject) data;
+            resourceData = new ResourceData(data_.getString("title"), data_.getString("url"));
+            break;
         }
-        return sb.toString();
+        return resourceData;
     }
 }
