@@ -4,11 +4,11 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import lombok.Getter;
-import lombok.Setter;
 import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -17,44 +17,72 @@ import java.util.Map;
  */
 public class AliYunDriver {
 
+    private static String ACCESS_TOKEN;
+    private static LocalDateTime EXPIRE_TIME;
+    //2023-07-22T15:35:40Z
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     private static String getAccessToken() {
+        if (EXPIRE_TIME != null && EXPIRE_TIME.isAfter(LocalDateTime.now())) return ACCESS_TOKEN;
         HttpResponse response = HttpRequest.post("https://auth.aliyundrive.com/v2/account/token")
                 .header("Content-Type", "application/json")
                 .body("{\"grant_type\":\"refresh_token\",\"refresh_token\":\"" + BotConfig.aliRefreshToken + "\"}")
                 .execute();
         JSONObject jsonObject = JSONObject.parseObject(response.body());
-        return jsonObject.getString("access_token");
+        ACCESS_TOKEN = jsonObject.getString("access_token");
+        //需要+8个小时
+        String et = jsonObject.getString("expire_time");
+        LocalDateTime utc = LocalDateTime.parse(et, formatter);
+        EXPIRE_TIME = utc.plusHours(8L);
+        return ACCESS_TOKEN;
     }
 
-    public static String dailySignIn() {
-        HttpResponse httpResponse = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in")
+    /**
+     * 获取签到列表, 并签到
+     */
+    public static String signInList() {
+        String accessToken = getAccessToken();
+        if (!StringUtil.hasLength(accessToken)) return "阿里云盘今日签到失败";
+        HttpResponse response = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in_list")
+                .header("Authorization", accessToken)
                 .header("Content-Type", "application/json")
-                .header("Authorization", getAccessToken())
-                .body("{\"checkDate\": \"2020-12-16\"}")
+                .body("{\"isReward\": \"true\"}")
+                .form("_rx-s", "mobile")
                 .execute();
-        JSONObject jsonObject = JSONObject.parseObject(httpResponse.body());
-        Boolean success = jsonObject.getBoolean("success");
-        if (success == null || !success) {
-            return "签到失败, token可能过期";
-        }
-        SignResult result = jsonObject.getJSONObject("result").toJavaObject(SignResult.class);
-        return result.getTitle() + result.getRewardNotice();
+        JSONObject result = JSONObject.parseObject(response.body()).getJSONObject("result");
+        if (result == null) return "阿里云盘今日签到失败";
+        int signInCount = result.getIntValue("signInCount");
+        return signInReward(signInCount);
     }
 
-    @Getter
-    @Setter
-    private static class SignResult {
-        private Boolean isSignIn;
-        private String title;
-        private String rewardNotice;
+    /**
+     * 签到并领取奖励
+     */
+    private static String signInReward(int signInCount) {
+        HttpResponse response = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in_reward")
+                .header("Content-Type", "application/json")
+                .header("Authorization", ACCESS_TOKEN)
+                .body("{\"signInDay\":" + signInCount + "}")
+                .form("_rx-s", "mobile")
+                .execute();
+        JSONObject resp = JSONObject.parseObject(response.body());
+        boolean success = resp.getBooleanValue("success");
+        if (!success) return "阿里云盘今日签到失败";
+        JSONObject result = resp.getJSONObject("result");
+        return "阿里云盘今日签到成功, 奖励为:\n"
+                + result.getString("name") + ", " + result.getString("description")
+                + ", " + result.getString("notice");
     }
 
     public static boolean fileCopy(String shareId) {
-        if (shareId == null) return false;
+        String accessToken = getAccessToken();
+        if (!StringUtil.hasLength(accessToken)) return false;
+        String shareToken = getShareToken(shareId);
+        if (!StringUtil.hasLength(shareToken)) return false;
         Map<String, String> headers = Map.of(
                 "Content-Type", "application/json",
-                "Authorization", getAccessToken(),
-                "X-Share-Token", getShareToken(shareId)
+                "Authorization", accessToken,
+                "X-Share-Token", shareToken
         );
         Map<String, Object> body = Map.of(
                 "file_id", getShareFileId(shareId),

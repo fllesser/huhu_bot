@@ -3,7 +3,6 @@ package tech.chowyijiu.huhu_bot.plugins.resource_search.gitcafe;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
 import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceData;
-import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +24,8 @@ public class GitCafeReq {
         GitcafeResp gitcafeResp = JSONObject.parseObject(resp, GitcafeResp.class);
         if (gitcafeResp.isSuccess()) {
             List<Data> dataList = gitcafeResp.getData();
-            List<ResourceData> resourceDataList = dataList.stream()
+            return dataList.stream()
                     .map(data -> new ResourceData(data.getAlititle(), data.getAlikey())).toList();
-            ResourceUtil.put(keyword, resourceDataList);
         }
         return null;
     }

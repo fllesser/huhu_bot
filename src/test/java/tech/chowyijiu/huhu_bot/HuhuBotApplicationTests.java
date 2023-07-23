@@ -5,7 +5,6 @@ import com.unfbx.chatgpt.OpenAiStreamClient;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.function.KeyRandomStrategy;
 import com.unfbx.chatgpt.sse.ConsoleEventSourceListener;
-import org.junit.jupiter.api.Test;
 import tech.chowyijiu.huhu_bot.entity.message.Message;
 import tech.chowyijiu.huhu_bot.entity.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
@@ -24,10 +23,6 @@ import java.util.concurrent.CountDownLatch;
 @SuppressWarnings("all")
 public class HuhuBotApplicationTests {
 
-    @Test
-    void context() {
-
-    }
 
     //@Test
     public void test1() {

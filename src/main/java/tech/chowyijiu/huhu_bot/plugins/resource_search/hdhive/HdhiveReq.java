@@ -5,7 +5,6 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceData;
-import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +40,9 @@ public class HdhiveReq {
                 case "tv" -> "tv";
                 default -> mediaType;
             };
-            dataList.add(get2(type, tmdbId));
+            ResourceData resourceData = get2(type, tmdbId);
+            if (resourceData != null) dataList.add(resourceData);
         }
-        ResourceUtil.put(keyword, dataList);
         return dataList;
     }
 
@@ -83,8 +82,7 @@ public class HdhiveReq {
         Map<String, Object> map = Map.of(idType, id,
                 "sort_by", "is_admin", "sort_order", "descend", "per_page", 100);
         String respJson = HttpRequest.get(url3)
-                .bearerAuth(auth).form(map)
-                .execute()
+                .bearerAuth(auth).form(map).execute()
                 .body();
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         Boolean success = jsonObject.getBoolean("success");
@@ -96,7 +94,8 @@ public class HdhiveReq {
         ResourceData resourceData = null;
         for (Object data : datas) {
             JSONObject data_ = (JSONObject) data;
-            resourceData = new ResourceData(data_.getString("title"), data_.getString("url"));
+            String[] preAndId = data_.getString("url").split("/s/");
+            resourceData = new ResourceData(data_.getString("title"), preAndId[1]);
             break;
         }
         return resourceData;

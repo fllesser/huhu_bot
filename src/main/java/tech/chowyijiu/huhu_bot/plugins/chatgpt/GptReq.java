@@ -57,7 +57,7 @@ public class GptReq {
             return sb.toString();
         } catch (Exception e) {
             clientMap.remove(userId);
-            return " api key invoked";
+            return "error: api key invoked";
         }
 
     }

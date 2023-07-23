@@ -22,6 +22,7 @@ public class OpenwrtReq {
         return ok != null && ok;
     }
 
+    //todo expire time
     public static String login(String username, String password) {
         Map<String, Object> map = Map.of("luci_username", username, "luci_password", password);
         HttpResponse response = HttpRequest.post(baseUrl)
