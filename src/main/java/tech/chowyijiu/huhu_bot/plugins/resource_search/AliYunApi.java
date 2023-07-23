@@ -15,7 +15,7 @@ import java.util.Map;
  * @author elastic chow
  * @date 19/7/2023
  */
-public class AliYunDriver {
+public class AliYunApi {
 
     private static String ACCESS_TOKEN;
     private static LocalDateTime EXPIRE_TIME;
@@ -24,9 +24,13 @@ public class AliYunDriver {
 
     private static String getAccessToken() {
         if (EXPIRE_TIME != null && EXPIRE_TIME.isAfter(LocalDateTime.now())) return ACCESS_TOKEN;
+        Map<String, String> bodyMap = Map.of(
+                "grant_type", "refresh_token",
+                "refresh_token", BotConfig.aliRefreshToken
+        );
         HttpResponse response = HttpRequest.post("https://auth.aliyundrive.com/v2/account/token")
                 .header("Content-Type", "application/json")
-                .body("{\"grant_type\":\"refresh_token\",\"refresh_token\":\"" + BotConfig.aliRefreshToken + "\"}")
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         ACCESS_TOKEN = jsonObject.getString("access_token");
@@ -42,15 +46,15 @@ public class AliYunDriver {
      */
     public static String signInList() {
         String accessToken = getAccessToken();
-        if (!StringUtil.hasLength(accessToken)) return "阿里云盘今日签到失败";
+        if (!StringUtil.hasLength(accessToken)) return "阿里云盘今日签到失败, error: access token is null";
+        Map<String, Object> bodyMap = Map.of("isReward", true, "_rx-s", "mobile");
         HttpResponse response = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in_list")
-                .header("Authorization", accessToken)
                 .header("Content-Type", "application/json")
-                .body("{\"isReward\": \"true\"}")
-                .form("_rx-s", "mobile")
+                .header("Authorization", accessToken)
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         JSONObject result = JSONObject.parseObject(response.body()).getJSONObject("result");
-        if (result == null) return "阿里云盘今日签到失败";
+        if (result == null) return "阿里云盘今日签到失败, error: result is null";
         int signInCount = result.getIntValue("signInCount");
         return signInReward(signInCount);
     }
@@ -59,11 +63,11 @@ public class AliYunDriver {
      * 签到并领取奖励
      */
     private static String signInReward(int signInCount) {
+        Map<String, Object> bodyMap = Map.of("signInDay", signInCount, "_rx-s", "mobile");
         HttpResponse response = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in_reward")
                 .header("Content-Type", "application/json")
                 .header("Authorization", ACCESS_TOKEN)
-                .body("{\"signInDay\":" + signInCount + "}")
-                .form("_rx-s", "mobile")
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         JSONObject resp = JSONObject.parseObject(response.body());
         boolean success = resp.getBooleanValue("success");
@@ -84,7 +88,7 @@ public class AliYunDriver {
                 "Authorization", accessToken,
                 "X-Share-Token", shareToken
         );
-        Map<String, Object> body = Map.of(
+        Map<String, Object> bodyMap = Map.of(
                 "file_id", getShareFileId(shareId),
                 "share_id", shareId,
                 "auto_rename", true,
@@ -93,16 +97,17 @@ public class AliYunDriver {
         );
         HttpResponse response = HttpRequest.post("https://api.aliyundrive.com/v2/file/copy")
                 .addHeaders(headers)
-                .body(JSONObject.toJSONString(body))
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         JSONObject jsonObject = JSONObject.parseObject(response.body());
         return StringUtil.hasLength(jsonObject.getString("drive_id"));
     }
 
     public static String getShareToken(String shareId) {
+        Map<String, String> bodyMap = Map.of("share_id", shareId);
         HttpResponse response = HttpRequest.post("https://api.aliyundrive.com/v2/share_link/get_share_token")
                 .header("Content-Type", "application/json")
-                .body("{\"share_id\": \"" + shareId + "\"}")
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         return JSONObject.parseObject(response.body()).getString("share_token");
     }
@@ -111,9 +116,10 @@ public class AliYunDriver {
      * 如果有多个文件夹,会有多个,先不考虑
      */
     public static String getShareFileId(String shareId) {
+        Map<String, String> bodyMap = Map.of("share_id", shareId);
         HttpResponse response = HttpRequest.post("https://api.aliyundrive.com/adrive/v3/share_link/get_share_by_anonymous")
                 .header("Content-Type", "application/json")
-                .body("{\"share_id\":\"" + shareId + "\"}")
+                .body(JSONObject.toJSONString(bodyMap))
                 .execute();
         JSONArray fileInfos = JSONObject.parseObject(response.body()).getJSONArray("file_infos");
         String fileId = "";

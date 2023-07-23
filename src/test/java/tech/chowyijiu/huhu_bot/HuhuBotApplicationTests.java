@@ -5,10 +5,13 @@ import com.unfbx.chatgpt.OpenAiStreamClient;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.function.KeyRandomStrategy;
 import com.unfbx.chatgpt.sse.ConsoleEventSourceListener;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhu_bot.entity.message.Message;
 import tech.chowyijiu.huhu_bot.entity.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhu_bot.plugins.fortnite.ShopEntry;
+import tech.chowyijiu.huhu_bot.plugins.resource_search.AliYunApi;
 import tech.chowyijiu.huhu_bot.utils.ImageUtil;
 
 import javax.imageio.ImageIO;
@@ -19,10 +22,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-//@SpringBootTest
+@SpringBootTest
 @SuppressWarnings("all")
 public class HuhuBotApplicationTests {
 
+
+    @Test
+    public void test2() {
+        System.out.println(AliYunApi.signInList());
+    }
 
     //@Test
     public void test1() {
@@ -76,7 +84,7 @@ public class HuhuBotApplicationTests {
     //@Test
     public void testHdHive() {
         //System.out.println(HdhiveReq.get1("asdfs "));
-        //System.out.println(AliYunDriver.dailySignIn("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZWE2NjQ2MDc4ZmM0MzNmOTc1MWIyMzRmNjhhOWU2NSIsImN1c3RvbUpzb24iOiJ7XCJjbGllbnRJZFwiOlwiMjVkelgzdmJZcWt0Vnh5WFwiLFwiZG9tYWluSWRcIjpcImJqMjlcIixcInNjb3BlXCI6W1wiRFJJVkUuQUxMXCIsXCJTSEFSRS5BTExcIixcIkZJTEUuQUxMXCIsXCJVU0VSLkFMTFwiLFwiVklFVy5BTExcIixcIlNUT1JBR0UuQUxMXCIsXCJTVE9SQUdFRklMRS5MSVNUXCIsXCJCQVRDSFwiLFwiT0FVVEguQUxMXCIsXCJJTUFHRS5BTExcIixcIklOVklURS5BTExcIixcIkFDQ09VTlQuQUxMXCIsXCJTWU5DTUFQUElORy5MSVNUXCIsXCJTWU5DTUFQUElORy5ERUxFVEVcIl0sXCJyb2xlXCI6XCJ1c2VyXCIsXCJyZWZcIjpcImh0dHBzOi8vd3d3LmFsaXl1bmRyaXZlLmNvbS9cIixcImRldmljZV9pZFwiOlwiYjhlMTc1OTNmNTU0NDYxYjhkMDI4MTcxODlkMDZiMTlcIn0iLCJleHAiOjE2ODk3Njg0MjUsImlhdCI6MTY4OTc2MTE2NX0.Xoj6OenC04Cb3Wy6YwnhgBvxLJGClp2Re7_YTqv2JC8iC_ZBaDUFGuXdqlmCK7t01jLSGufeNKlXpIxBUAE-_wISlKpysMdBSkQGfCjeKMhaenUrb8Q7SPBkaFtnFqbsUzij6rVaVP4KgBjjrwh2VvC00nSFcWTd5Csmy-3LBHw"));
+        //System.out.println(AliYunApi.dailySignIn("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5ZWE2NjQ2MDc4ZmM0MzNmOTc1MWIyMzRmNjhhOWU2NSIsImN1c3RvbUpzb24iOiJ7XCJjbGllbnRJZFwiOlwiMjVkelgzdmJZcWt0Vnh5WFwiLFwiZG9tYWluSWRcIjpcImJqMjlcIixcInNjb3BlXCI6W1wiRFJJVkUuQUxMXCIsXCJTSEFSRS5BTExcIixcIkZJTEUuQUxMXCIsXCJVU0VSLkFMTFwiLFwiVklFVy5BTExcIixcIlNUT1JBR0UuQUxMXCIsXCJTVE9SQUdFRklMRS5MSVNUXCIsXCJCQVRDSFwiLFwiT0FVVEguQUxMXCIsXCJJTUFHRS5BTExcIixcIklOVklURS5BTExcIixcIkFDQ09VTlQuQUxMXCIsXCJTWU5DTUFQUElORy5MSVNUXCIsXCJTWU5DTUFQUElORy5ERUxFVEVcIl0sXCJyb2xlXCI6XCJ1c2VyXCIsXCJyZWZcIjpcImh0dHBzOi8vd3d3LmFsaXl1bmRyaXZlLmNvbS9cIixcImRldmljZV9pZFwiOlwiYjhlMTc1OTNmNTU0NDYxYjhkMDI4MTcxODlkMDZiMTlcIn0iLCJleHAiOjE2ODk3Njg0MjUsImlhdCI6MTY4OTc2MTE2NX0.Xoj6OenC04Cb3Wy6YwnhgBvxLJGClp2Re7_YTqv2JC8iC_ZBaDUFGuXdqlmCK7t01jLSGufeNKlXpIxBUAE-_wISlKpysMdBSkQGfCjeKMhaenUrb8Q7SPBkaFtnFqbsUzij6rVaVP4KgBjjrwh2VvC00nSFcWTd5Csmy-3LBHw"));
         OpenAiStreamClient client = OpenAiStreamClient.builder()
                 .apiKey(List.of("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",
                         "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",

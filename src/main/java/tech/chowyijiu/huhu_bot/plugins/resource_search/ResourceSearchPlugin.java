@@ -29,7 +29,7 @@ public class ResourceSearchPlugin {
     @Scheduled(cron = "0 0 12 * * *")
     public void scheduledCheck() {
         Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
-                .sendGroupMessage(BotConfig.testGroup, AliYunDriver.signInList(), false);
+                .sendGroupMessage(BotConfig.testGroup, AliYunApi.signInList(), false);
         //清除搜索
         ResourceUtil.clear();
     }
@@ -60,7 +60,7 @@ public class ResourceSearchPlugin {
         int index = Integer.parseInt(no);
         ResourceData data = ResourceUtil.get(index);
         if (data != null) {
-            boolean success = AliYunDriver.fileCopy(data.getShareId());
+            boolean success = AliYunApi.fileCopy(data.getShareId());
             String willSend = "转存[" + index + "]" + data.getName();
             if (success) {
                 willSend += "成功\n删除Openwrt阿里云盘缓存" + (OpenwrtReq.invalidateCache() ? "成功" : "失败");
