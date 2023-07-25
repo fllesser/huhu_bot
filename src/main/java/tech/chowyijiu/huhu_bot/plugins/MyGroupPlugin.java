@@ -19,6 +19,7 @@ import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
+import tech.chowyijiu.huhu_bot.utils.xiaoai.XiaoAIUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -153,8 +154,21 @@ public class MyGroupPlugin {
 
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(Bot bot, NotifyNoticeEvent event) {
-        if (event.getGroupId() != null) bot.sendGroupMessage(
-                event.getGroupId(), MessageSegment.poke(event.getUserId()) + "", false);
+        if (event.getGroupId() != null) {
+            bot.sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()) + "", false);
+        }
+    }
+
+    @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
+    public void atMeXiaoAiNotice(Bot bot, GroupMessageEvent event) {
+        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
+        bot.getGroups().stream()
+                .filter(g -> g.getGroupId().equals(event.getGroupId()))
+                .findFirst()
+                .ifPresent(g -> XiaoAIUtil.tts("群"+ g.getGroupName() + "内"
+                        + groupMember.getNickname() + "at你说, " + event.getMsg().plainText())
+                );
+
     }
 
     @NoticeHandler(name = "清代肝")
@@ -166,8 +180,8 @@ public class MyGroupPlugin {
     }
 
 
-    Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event) &&
-            "message_sent".equals(event.getPostType());
+    Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event)
+            && "message_sent".equals(event.getPostType());
 
     /**
      * 是答辩
@@ -185,6 +199,7 @@ public class MyGroupPlugin {
         });
 
     }
+
 
     //@MessageHandler(name = "禁言", commands = {"ban", "禁"}, rule = RuleEnum.admin)
     //public void ban(Bot bot, GroupMessageEvent event) {

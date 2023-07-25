@@ -56,9 +56,11 @@ public class Message extends ArrayList<MessageSegment> {
 
     public boolean checkToMe(Long selfId) {
         for (MessageSegment segment : this) {
-            if ("at".equals(segment.getType()) &&
-                    Objects.equals(Long.parseLong(segment.get("qq")), selfId)
-            ) return true;
+            if ("at".equals(segment.getType()) ) {
+                String qq = segment.get("qq");
+                if ("all".equals(qq)) return true;
+                else return Long.parseLong(qq) == selfId;
+            }
         }
         return false;
     }

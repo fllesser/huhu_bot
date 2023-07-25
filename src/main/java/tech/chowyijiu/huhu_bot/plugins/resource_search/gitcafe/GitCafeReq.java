@@ -4,7 +4,6 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONObject;
 import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceData;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +14,10 @@ import java.util.Map;
 public class GitCafeReq {
 
     private static final String URL = "https://gitcafe.net/tool/alipaper/";
-    private static final Map<String, Object> paramsMap = new HashMap<>(
-            Map.of("action", "search", "from", "web", "token", ""));
 
     public static List<ResourceData> get(String keyword) {
-        paramsMap.put("keyword", keyword);
+        Map<String, Object> paramsMap = Map.of("action", "search",
+                "from", "web", "token", "", "keyword", keyword);
         String resp = HttpUtil.post(URL, paramsMap);
         GitcafeResp gitcafeResp = JSONObject.parseObject(resp, GitcafeResp.class);
         if (gitcafeResp.isSuccess()) {

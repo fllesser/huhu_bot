@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.entity.message;
 
 import lombok.RequiredArgsConstructor;
+import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 import java.util.HashMap;
 
@@ -20,6 +21,12 @@ public class MessageSegment extends HashMap<String, String> {
 
     public String getText() {
         return "text".equals(type) ? get("text") : "";
+    }
+
+    public long getLong(String key) {
+        String val = this.get(key);
+        if (StringUtil.isDigit(val)) return Long.parseLong(val);
+        else return -1;
     }
 
     @Override

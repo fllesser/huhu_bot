@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhu_bot.plugins.resource_search;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
@@ -11,6 +12,7 @@ import tech.chowyijiu.huhu_bot.plugins.resource_search.cache_.ResourceUtil;
 import tech.chowyijiu.huhu_bot.plugins.resource_search.gitcafe.GitCafeReq;
 import tech.chowyijiu.huhu_bot.plugins.resource_search.hdhive.HdhiveReq;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
+import tech.chowyijiu.huhu_bot.utils.xiaoai.XiaoAIUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 import tech.chowyijiu.huhu_bot.ws.Server;
 
@@ -22,25 +24,28 @@ import java.util.Objects;
  * @author elastic chow
  * @date 17/7/2023
  */
+@Slf4j
 @BotPlugin
 public class ResourceSearchPlugin {
 
 
-    @Scheduled(cron = "0 0 12 * * *")
+    @Scheduled(cron = "0 0 10 * * *")
     public void scheduledCheck() {
+        String result = AliYunApi.signInList();
         Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
-                .sendGroupMessage(BotConfig.testGroup, AliYunApi.signInList(), false);
+                .sendGroupMessage(BotConfig.testGroup, result, false);
+        XiaoAIUtil.tts(result);
         //清除搜索
         ResourceUtil.clear();
     }
 
-    @MessageHandler(name = "阿里云盘资源搜索 gitcafe ", commands = {".s"})
+    @MessageHandler(name = "阿里云盘资源搜索 GITCAFE", commands = {".s"})
     public void search1(Bot bot, MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), GitCafeReq::get);
         bot.sendMessage(event, ResourceUtil.buildString(dataList), false);
     }
 
-    @MessageHandler(name = "阿里云盘资源搜索 hdhive", commands = {".ds"})
+    @MessageHandler(name = "阿里云盘资源搜索 HDHIVE", commands = {".ds"})
     public void search2(Bot bot, MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), HdhiveReq::get1);
         bot.sendMessage(event, ResourceUtil.buildString(dataList), false);

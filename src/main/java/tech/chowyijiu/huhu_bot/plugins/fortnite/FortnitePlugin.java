@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author elastic chow
@@ -73,7 +72,7 @@ public class FortnitePlugin {
         if (nodes == null) {
             scheduleShop();
         }
-        if (Arrays.stream(groups).collect(Collectors.toList()).contains(event.getGroupId())) {
+        if (Arrays.stream(groups).toList().contains(event.getGroupId())) {
             bot.sendGroupForwardMsg(event.getGroupId(), nodes);
         }
     }
