@@ -9,6 +9,7 @@ import java.util.HashMap;
  * @author elastic chow
  * @date 3/7/2023
  */
+@Deprecated
 @RequiredArgsConstructor
 public class MessageSegment extends HashMap<String, String> {
 

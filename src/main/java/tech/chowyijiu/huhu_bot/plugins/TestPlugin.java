@@ -6,13 +6,14 @@ import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
-import tech.chowyijiu.huhu_bot.entity.message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.entity.arr_message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,31 +25,35 @@ import java.util.stream.Collectors;
 @BotPlugin(name = "测试插件")
 public class TestPlugin {
 
+
     @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)
     public void apiTest(Bot bot, MessageEvent event) {
+        //[key:value,key:value]
         String[] args = event.getCommandArgs().split(" ");
-        if (args.length % 2 != 1) event.finish("[bot]参数错误");
         GocqActionEnum action = null;
-        for (GocqActionEnum value : GocqActionEnum.values()) {
-            if (value.getAction().equals(args[0])) {
-                action = value;
-                break;
-            }
+        try {
+            action = GocqActionEnum.valueOf(args[0].toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            bot.sendMessage(event, "没有这个API, 或huhubot暂未支持");
         }
-        if (action == null) event.finish("没有这个API, 或未支持");
-        Object[] params = new String[args.length - 1];
-        System.arraycopy(args, 1, params, 0, args.length - 1);
+        String[] keyValue = new String[args.length - 1];
+        System.arraycopy(args, 1, keyValue, 0, args.length - 1);
+        Map<String, Object> map = Arrays.stream(keyValue)
+                .map(kv -> kv.split(":"))
+                .collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
         long start = System.currentTimeMillis();
-        String resp = bot.callApiWithResp(action, params);
+        assert action != null;
+        String resp = bot.callApiWithResp(action, map);
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
         if (resp.startsWith("{")) {
-            bot.sendMessage(event, resp + "\n" + costTime, true);
+            bot.sendMessage(event, resp + "\n" + costTime);
         } else if (resp.startsWith("[")) {
-            List<String> list = JSONArray.parseArray(resp, String.class);
-            if (list.size() > 99) list = list.stream().limit(98).collect(Collectors.toList());
-            list.add(costTime);
-            List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), list);
+            List<Message> messages = new ArrayList<>();
+            messages.add(Message.text(costTime));
+            messages.addAll(JSONArray.parseArray(resp, String.class).stream()
+                    .limit(98).map(Message::text).toList());
+            List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), messages);
             if (event instanceof GroupMessageEvent) {
                 bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
             } else if (event instanceof PrivateMessageEvent) {

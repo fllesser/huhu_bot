@@ -31,7 +31,7 @@ public class PrivateMessageEvent extends MessageEvent {
     public String toString() {
         return "PrivateMessageEvent{" +
                 "userId=" + super.getUserId() +
-                ", message=" + super.getMessage() +
+                ", raw_message=" + super.getRawMessage() +
                 ", subType=" + subType +
                 "}";
     }

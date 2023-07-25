@@ -1,9 +1,8 @@
 package tech.chowyijiu.huhu_bot.core;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -14,6 +13,7 @@ import tech.chowyijiu.huhu_bot.config.BotConfig;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
@@ -107,23 +107,24 @@ public class CoreDispatcher {
     }
 
     private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
-        String message = event.getMessage();
+        Message message = event.getMessage();
+        String plainText = message.plainText();
         //如果配置了命令前缀
         if (BotConfig.commandPrefixes.size() > 0) {
-            if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(message::startsWith)) {
+            if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
                 //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
                 return false;
             } else {
-                message = message.substring(1);
+                plainText = plainText.substring(1);
             }
         }
         for (String command : handler.commands) {
             //匹配前缀命令
-            if (message.startsWith(command)) {
+            if (plainText.startsWith(command)) {
                 //去除触发的command, 并去掉头尾空格
                 //String argWithCQ = message.replaceFirst(command, "").trim();
                 //去除所有cq码, event.msg里是包含cq码的segment的
-                event.setCommandArgs(event.getMsg().plainText().replaceFirst(command, "").trim());
+                event.setCommandArgs(plainText.replaceFirst(command, "").trim());
                 handler.execute(bot, event);
                 return handler.block;
             }
@@ -136,7 +137,7 @@ public class CoreDispatcher {
      */
     private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         for (String keyword : handler.keywords) {
-            if (event.getMessage().contains(keyword)) {
+            if (event.getMessage().plainText().contains(keyword)) {
                 handler.execute(bot, event);
                 return handler.block; //
             }
@@ -167,8 +168,7 @@ public class CoreDispatcher {
         log.info("{} Match RequestHandler End", event);
     }
 
-    @Accessors(chain = true)
-    @Setter
+    @Builder
     static class Handler {
         private final Object plugin; //ioc容器中的插件Bean
         private final Method method;
@@ -188,9 +188,7 @@ public class CoreDispatcher {
 
         private Rule rule;
 
-        private Handler(Object plugin, Method method) {
-            this.plugin = plugin;
-            this.method = method;
+        private void initEventType() {
             //在method的形参中定位事件类型
             for (Class<?> clazz : method.getParameterTypes()) {
                 if (Event.class.isAssignableFrom(clazz)) {
@@ -200,19 +198,35 @@ public class CoreDispatcher {
             }
         }
 
+        private void initRule(RuleEnum rule) {
+            if (!rule.equals(RuleEnum.default_)) {
+                this.rule = rule.getRule();
+            } else {
+                String RuleName = method.getName() + "Rule";
+                try {
+                    Field field = plugin.getClass().getDeclaredField(RuleName);
+                    field.setAccessible(true);
+                    Object obj = field.get(plugin);
+                    if (obj instanceof Rule) this.rule = (Rule) obj;
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
+            }
+        }
+
         public static Handler buildMessageHandler(Object plugin, Method method) {
-            Handler handler = new Handler(plugin, method);
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
-            handler.setName(mh.name()).setBlock(mh.block()).setPriority(mh.priority())
-                    .setCommands(mh.commands()).setKeywords(mh.keywords());
+            Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
+                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).build();
+            handler.initEventType();
             handler.initRule(mh.rule());
             return handler;
         }
 
         public static Handler buildNoticeHandler(Object plugin, Method method) {
-            Handler handler = new Handler(plugin, method);
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
-            handler.setName(nh.name()).setPriority(nh.priority());
+            Handler handler = Handler.builder().plugin(plugin).method(method).name(nh.name())
+                    .priority(nh.priority()).build();
+            handler.initEventType();
             handler.initRule(nh.rule());
             return handler;
         }
@@ -256,20 +270,6 @@ public class CoreDispatcher {
             }
         }
 
-        private void initRule(RuleEnum rule) {
-            if (!rule.equals(RuleEnum.default_)) {
-                this.rule = rule.getRule();
-            } else {
-                String RuleName = method.getName() + "Rule";
-                try {
-                    Field field = plugin.getClass().getDeclaredField(RuleName);
-                    field.setAccessible(true);
-                    Object obj = field.get(plugin);
-                    if (obj instanceof Rule) this.rule = (Rule) obj;
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
-                }
-            }
-        }
 
         public boolean keyWordsHasLength() {
             return keywords.length > 0;

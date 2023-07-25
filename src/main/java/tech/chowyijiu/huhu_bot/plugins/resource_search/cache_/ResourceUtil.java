@@ -40,6 +40,8 @@ public class ResourceUtil {
         return sb.toString();
     }
 
+    //todo 移除关键词资源
+
     public static String buildString(List<ResourceData> dataList) {
         if (dataList == null || dataList.size() == 0) return "未搜索到此关键词资源, 试试别的";
         int start = resourceDataList.size();

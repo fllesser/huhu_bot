@@ -1,8 +1,6 @@
 package tech.chowyijiu.huhu_bot.plugins;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
@@ -11,8 +9,8 @@ import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.core.rule.Rule;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleImpl;
-import tech.chowyijiu.huhu_bot.entity.message.Message;
-import tech.chowyijiu.huhu_bot.entity.message.MessageSegment;
+import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
+import tech.chowyijiu.huhu_bot.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.response.GroupInfo;
 import tech.chowyijiu.huhu_bot.entity.response.GroupMember;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
@@ -26,7 +24,9 @@ import tech.chowyijiu.huhu_bot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -51,21 +51,21 @@ public class MyGroupPlugin {
                     } catch (InterruptedException ignored) {
                     }
                 }));
-        customInfoMap.keySet().forEach(userId -> {
-            String customCard = "";
-            CustomInfo customInfo = customInfoMap.get(userId);
-            if ("now".equals(customInfo.type)) {
-                customCard = customInfo.suffix + LocalDateTime.now().format(formatter);
-            } else if ("countdown".equals(customInfo.type)) {
-                customCard = customInfo.suffix + this.countdown(customInfo.date);
-            }
-            Server.getBots().get(0).setGroupCard(customInfo.groupId, customInfo.userId, customCard);
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        //customInfoMap.keySet().forEach(userId -> {
+        //    String customCard = "";
+        //    CustomInfo customInfo = customInfoMap.get(userId);
+        //    if ("now".equals(customInfo.type)) {
+        //        customCard = customInfo.suffix + LocalDateTime.now().format(formatter);
+        //    } else if ("countdown".equals(customInfo.type)) {
+        //        customCard = customInfo.suffix + this.countdown(customInfo.date);
+        //    }
+        //    Server.getBots().get(0).setGroupCard(customInfo.groupId, customInfo.userId, customCard);
+        //    try {
+        //        Thread.sleep(1000L);
+        //    } catch (InterruptedException e) {
+        //        e.printStackTrace();
+        //    }
+        //});
         log.info("时间群昵称设置完毕 card: {}", card);
     }
 
@@ -80,41 +80,41 @@ public class MyGroupPlugin {
         return days + "天" + hours + "时" + minutes + "分";
     }
 
-    private final Map<Long, CustomInfo> customInfoMap = new HashMap<>();
+    //private final Map<Long, CustomInfo> customInfoMap = new HashMap<>();
 
-    @Builder
-    static class CustomInfo {
-        private Long userId;
-        private Long groupId;
-        private String type;    //now / countdown
-        private String date;    //"2023-06-16 10:00"
-        private String suffix;  //前缀
-    }
+    //@Builder
+    //static class CustomInfo {
+    //    private Long userId;
+    //    private Long groupId;
+    //    private String type;    //now / countdown
+    //    private String date;    //"2023-06-16 10:00"
+    //    private String suffix;  //前缀
+    //}
 
     /**
      * 两分钟一改
      * cgtn now 前缀
      * cgtn cutdown/前缀/2023-06-16 10:00
      */
-    @MessageHandler(name = "自定义时间群昵称", commands = {"cgtn"}, rule = RuleEnum.self_admin)
-    public void customDateCard(Bot bot, GroupMessageEvent event) {
-        if (customInfoMap.size() >= 30) event.finish("定制人数已上限");
-        String commandArgs = event.getCommandArgs();
-        val infoBuilder = CustomInfo.builder()
-                .userId(event.getUserId()).groupId(event.getGroupId());
-        if (commandArgs.startsWith("now")) {
-            infoBuilder.type("now").suffix(commandArgs.replaceFirst("now", ""));
-        } else if (commandArgs.startsWith("cutdown")) {
-            String[] argsArr = commandArgs.split("/");
-            if (argsArr.length == 3) {
-                infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]);
-            } else {
-                event.finish("格式有误:\n1.cgtn now 前缀\n2.cgtn cutdown/前缀/2023-06-16 10:00");
-            }
-        }
-        customInfoMap.put(event.getUserId(), infoBuilder.build());
-        bot.sendGroupMessage(event.getGroupId(), "自定义群时间昵称成功, 两分钟后见效", false);
-    }
+    //@MessageHandler(name = "自定义时间群昵称", commands = {"cgtn"}, rule = RuleEnum.self_admin)
+    //public void customDateCard(Bot bot, GroupMessageEvent event) {
+    //    if (customInfoMap.size() >= 30) event.finish("定制人数已上限");
+    //    String commandArgs = event.getCommandArgs();
+    //    val infoBuilder = CustomInfo.builder()
+    //            .userId(event.getUserId()).groupId(event.getGroupId());
+    //    if (commandArgs.startsWith("now")) {
+    //        infoBuilder.type("now").suffix(commandArgs.replaceFirst("now", ""));
+    //    } else if (commandArgs.startsWith("cutdown")) {
+    //        String[] argsArr = commandArgs.split("/");
+    //        if (argsArr.length == 3) {
+    //            infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]);
+    //        } else {
+    //            event.finish("格式有误:\n1.cgtn now 前缀\n2.cgtn cutdown/前缀/2023-06-16 10:00");
+    //        }
+    //    }
+    //    customInfoMap.put(event.getUserId(), infoBuilder.build());
+    //    bot.sendGroupMessage(event.getGroupId(), "自定义群时间昵称成功, 两分钟后见效", false);
+    //}
 
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
@@ -135,7 +135,10 @@ public class MyGroupPlugin {
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
         //if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
-        if (title.length() > 6) event.finish("[bot]群头衔最多为6位");
+        if (title.length() > 6) {
+            bot.sendMessage(event, "[bot]群头衔最多为6位");
+            return;
+        }
         for (String filter : new String[]{"群主", "管理"}) {
             if (title.contains(filter)) {
                 title = "群猪";
@@ -155,10 +158,11 @@ public class MyGroupPlugin {
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(Bot bot, NotifyNoticeEvent event) {
         if (event.getGroupId() != null) {
-            bot.sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()) + "", false);
+            bot.sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
         }
     }
 
+    //todo rule可以定义哪些群需要通知我, 然后移除tome, 写到方法里判断
     @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
     public void atMeXiaoAiNotice(Bot bot, GroupMessageEvent event) {
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
@@ -166,7 +170,7 @@ public class MyGroupPlugin {
                 .filter(g -> g.getGroupId().equals(event.getGroupId()))
                 .findFirst()
                 .ifPresent(g -> XiaoAIUtil.tts("群"+ g.getGroupName() + "内"
-                        + groupMember.getNickname() + "at你说, " + event.getMsg().plainText())
+                        + groupMember.getNickname() + "at你说, " + event.getMessage().plainText())
                 );
 
     }
@@ -189,10 +193,10 @@ public class MyGroupPlugin {
      */
     @MessageHandler(name = "授予管理员", commands = "setadmin")
     public void giveAdmin(Bot bot, GroupMessageEvent event) {
-        Message message = event.getMsg();
+        Message message = event.getMessage();
         List<MessageSegment> segments = message.getSegmentByType("at");
         segments.forEach(segment -> {
-            long qq = Long.parseLong(segment.get("qq"));
+            long qq = segment.getLong("qq");
             GroupMember groupMember = bot.getGroupMember(event.getGroupId(), qq, true);
             boolean isAdmin = "admin".equals(groupMember.getRole());
             bot.setGroupAdmin(event.getGroupId(), qq, !isAdmin);

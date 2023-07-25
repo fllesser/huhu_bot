@@ -30,7 +30,7 @@ public class GroupMessageEvent extends MessageEvent {
     private boolean toMe;
 
     public boolean isToMe() {
-        if (this.getMsg().checkToMe(this.getSelfId())) this.toMe = true;
+        if (this.getMessage().checkToMe(this.getSelfId())) this.toMe = true;
         return toMe;
     }
 
@@ -39,7 +39,7 @@ public class GroupMessageEvent extends MessageEvent {
         return "GroupMessageEvent{" +
                 "groupId=" + groupId +
                 ", userId=" + super.getUserId() +
-                ", message=" + super.getMessage() +
+                ", raw_message=" + super.getRawMessage() +
                 "}";
     }
 }

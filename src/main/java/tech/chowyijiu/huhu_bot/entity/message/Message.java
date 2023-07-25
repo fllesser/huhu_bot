@@ -11,6 +11,7 @@ import java.util.Objects;
  * @author elastic chow
  * @date 3/7/2023
  */
+@Deprecated
 public class Message extends ArrayList<MessageSegment> {
 
     /**

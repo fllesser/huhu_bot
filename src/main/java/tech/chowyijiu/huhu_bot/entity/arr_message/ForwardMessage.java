@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.message;
+package tech.chowyijiu.huhu_bot.entity.arr_message;
 
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
@@ -16,28 +16,24 @@ import java.util.stream.Collectors;
  */
 @Data
 @NoArgsConstructor
-@Deprecated
 public class ForwardMessage {
     private final String type = "node";
 
     @JSONField(name = "data")
-    private Data_ data;
+    private Node data;
 
-    public ForwardMessage(Data_ data) {
-        this.data = data;
-    }
 
-    public ForwardMessage(String name, Long uin, String content) {
-        this.data = new Data_(name, uin, content);
+    public ForwardMessage(String name, Long uin, Message content) {
+        this.data = new Node(name, uin, content);
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Data_ {
+    public static class Node {
         private String name;    //发送者显示名字	用于自定义消息 (自定义消息并合并转发, 实际查看顺序为自定义消息段顺序)
         private Long uin;       //uin	int64	发送者QQ号	用于自定义消息
-        private String content; //用MessageSegment组合构建
+        private Message content; //用MessageSegment组合构建
     }
 
     /**
@@ -47,7 +43,7 @@ public class ForwardMessage {
      * @param messages messages
      * @return List<ForwardMessage>
      */
-    public static List<ForwardMessage> quickBuild(String name, Long uin, List<String> messages) {
+    public static List<ForwardMessage> quickBuild(String name, Long uin, List<Message> messages) {
         return messages.stream()
                 .map(message -> new ForwardMessage(name, uin, message))
                 .collect(Collectors.toList());
@@ -59,7 +55,7 @@ public class ForwardMessage {
      * @param nameAndMsgs LinkedHashMap<String, String> 需要插入顺序
      * @return List<ForwardMessage>
      */
-    public static List<ForwardMessage> quickBuild(Long uin, LinkedHashMap<String, String> nameAndMsgs) {
+    public static List<ForwardMessage> quickBuild(Long uin, LinkedHashMap<String, Message> nameAndMsgs) {
         return nameAndMsgs.keySet().stream()
                 .map(name -> new ForwardMessage(name, uin, nameAndMsgs.get(name)))
                 .collect(Collectors.toList());

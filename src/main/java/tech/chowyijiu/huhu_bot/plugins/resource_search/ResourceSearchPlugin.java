@@ -33,7 +33,7 @@ public class ResourceSearchPlugin {
     public void scheduledCheck() {
         String result = AliYunApi.signInList();
         Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
-                .sendGroupMessage(BotConfig.testGroup, result, false);
+                .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
         //清除搜索
         ResourceUtil.clear();
@@ -42,13 +42,13 @@ public class ResourceSearchPlugin {
     @MessageHandler(name = "阿里云盘资源搜索 GITCAFE", commands = {".s"})
     public void search1(Bot bot, MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), GitCafeReq::get);
-        bot.sendMessage(event, ResourceUtil.buildString(dataList), false);
+        bot.sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
     @MessageHandler(name = "阿里云盘资源搜索 HDHIVE", commands = {".ds"})
     public void search2(Bot bot, MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), HdhiveReq::get1);
-        bot.sendMessage(event, ResourceUtil.buildString(dataList), false);
+        bot.sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
     /**
@@ -59,7 +59,7 @@ public class ResourceSearchPlugin {
     public void save(Bot bot, MessageEvent event) {
         String no = event.getCommandArgs();
         if (!StringUtil.isDigit(no)) {
-            bot.sendMessage(event, "参数应为数字", false);
+            bot.sendMessage(event, "参数应为数字");
             return;
         }
         int index = Integer.parseInt(no);
@@ -72,7 +72,7 @@ public class ResourceSearchPlugin {
             } else {
                 willSend += "失败, 分享者取消分享, 或被风控";
             }
-            bot.sendMessage(event, willSend, false);
+            bot.sendMessage(event, willSend);
         }
 
     }
@@ -82,6 +82,6 @@ public class ResourceSearchPlugin {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLengthReturn(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
-        bot.sendMessage(event, willSend, false);
+        bot.sendMessage(event, willSend);
     }
 }

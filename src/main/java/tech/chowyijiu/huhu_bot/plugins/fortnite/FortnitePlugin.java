@@ -4,12 +4,10 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
+import tech.chowyijiu.huhu_bot.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.message.ForwardMessage;
-import tech.chowyijiu.huhu_bot.entity.message.MessageSegment;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.ws.Bot;
-import tech.chowyijiu.huhu_bot.ws.Server;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,33 +53,34 @@ public class FortnitePlugin {
                 imageUrl = item.getImages().getIcon();
                 name = item.getName();
             }
-            Optional.ofNullable(MessageSegment.image(imageUrl, 1, 1)).ifPresent(segment ->
+            Optional.ofNullable(MessageSegment.image(imageUrl)).ifPresent(segment ->
                     map.put(name + " " + shopEntry.getFinalPrice() + "VB", segment.toString()));
         }
         //System.out.println(map.size());
-        nodes = ForwardMessage.quickBuild(501273515L, map);
-        for (Bot bot : Server.getBots()) {
-            bot.sendGroupForwardMsg(754044548L, nodes);
-            Thread.sleep(1000 * 10L);
-            bot.sendGroupForwardMsg(208248400L, nodes);
-        }
+        //nodes = ForwardMessage.quickBuild(501273515L, map);
+        //for (Bot bot : Server.getBots()) {
+        //    bot.sendGroupForwardMsg(754044548L, nodes);
+        //    Thread.sleep(1000 * 10L);
+        //    bot.sendGroupForwardMsg(208248400L, nodes);
+        //}
     }
 
-    @MessageHandler(name = "商城1", commands = "shop", priority = 1, block = true, rule = RuleEnum.superuser)
+    //@MessageHandler(name = "商城1", commands = "shop", priority = 1, block = true, rule = RuleEnum.superuser)
     public void myshop(Bot bot, GroupMessageEvent event) throws InterruptedException {
         if (nodes == null) {
             scheduleShop();
         }
         if (Arrays.stream(groups).toList().contains(event.getGroupId())) {
-            bot.sendGroupForwardMsg(event.getGroupId(), nodes);
+            //bot.sendGroupForwardMsg(event.getGroupId(), nodes);
         }
     }
 
-    //@MessageHandler(name = "商城2", commands = {"商城","shop"}, priority = 0, block = true)
+    @MessageHandler(name = "商城2", commands = {"商城","shop"}, priority = 0, block = true)
     public void shop(Bot bot, GroupMessageEvent event) {
         //bot.sendMessage(event, "今日商城" + shop, false);
         updateShopImage();
-        bot.sendMessage(event, MessageSegment.image("file://" + shopPath) + "", false);
+        bot.sendMessage(event,
+                tech.chowyijiu.huhu_bot.entity.arr_message.MessageSegment.image("file://" + shopPath));
     }
 
 

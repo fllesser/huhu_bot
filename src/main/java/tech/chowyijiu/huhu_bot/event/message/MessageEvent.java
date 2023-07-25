@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
-import tech.chowyijiu.huhu_bot.entity.message.Message;
+import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.entity.response.Sender;
 import tech.chowyijiu.huhu_bot.event.Event;
-import tech.chowyijiu.huhu_bot.ws.Bot;
-import tech.chowyijiu.huhu_bot.ws.Server;
 
 import java.util.Objects;
 
@@ -33,14 +31,14 @@ public class MessageEvent extends Event {
     private Integer messageId;
     //注意这里gocq要设置成字符串格式消息, 就是raw_message
     //后续看要不要换成数组消息
-    private String message;
+    private Message message;
     private String rawMessage;
 
     private Integer font; //0
     private Sender sender;
 
-    @JsonIgnore
-    private Message msg;
+    //@JsonIgnore
+    //private Message msg;
 
     //去除匹配的命令, 保留剩余的字符串,并去掉头尾空格, 注意不会去除at
     @JsonIgnore
@@ -57,15 +55,5 @@ public class MessageEvent extends Event {
         return event;
     }
 
-    public Message getMsg() {
-        if (msg == null) msg = Message.build(this.message);
-        return msg;
-    }
-
-    public void finish(String message) {
-        Bot bot = Server.getBot(this.getSelfId());
-        assert bot != null;
-        bot.finish(this, message);
-    }
 
 }

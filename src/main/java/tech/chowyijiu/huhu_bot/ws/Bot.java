@@ -13,7 +13,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
-import tech.chowyijiu.huhu_bot.entity.message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.entity.arr_message.ForwardMessage;
+import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
+import tech.chowyijiu.huhu_bot.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhu_bot.entity.request.RequestBox;
 import tech.chowyijiu.huhu_bot.entity.response.FriendInfo;
 import tech.chowyijiu.huhu_bot.entity.response.GroupInfo;
@@ -51,7 +53,8 @@ public class Bot {
     }
 
     private static final long timeout = 10000L;
-    //多个Bot对象共用算了
+
+    //多个Bot对象共用
     private static final Map<String, LinkedBlockingDeque<String>> respMap = new HashMap<>();
 
     public static void putEchoResult(String echo, String data) {
@@ -98,7 +101,7 @@ public class Bot {
     /**
      * 私有 callApi
      */
-    private void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
+    public void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         requestBox.setAction(action.getAction());
         requestBox.setParams(paramsMap);
@@ -112,7 +115,7 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
-    private String callApiWithResp(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
+    public String callApiWithResp(GocqActionEnum action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.getAction());
@@ -125,49 +128,7 @@ public class Bot {
         return waitResp(echo);
     }
 
-    /**
-     * 校验参数, 并转为Map
-     *
-     * @param params params
-     * @return Map
-     */
-    private Map<String, Object> checkParamsToMap(Object... params) {
-        Map<String, Object> paramsMap = null;
-        int length = params.length;
-        if (length > 0) {
-            paramsMap = new HashMap<>();
-            if (length % 2 != 0) {
-                throw new IllegalArgumentException("callApi invalid params");
-            }
-            for (int i = 0; i < params.length; i += 2) {
-                paramsMap.put(params[i].toString(), params[i + 1]);
-            }
-        }
-        return paramsMap;
-    }
 
-    /**
-     * 提供给外部调用的callApi
-     * callApi(GocqActionEnum action, key, value, key, value ...)
-     *
-     * @param action GocqActionEnum
-     * @param params 参数 key, value
-     */
-    public void callApi(GocqActionEnum action, Object... params) {
-        this.callApi(action, checkParamsToMap(params));
-    }
-
-
-    /**
-     * 调用 get api获取数据, 同步, 10s超时
-     *
-     * @param action GocqActionEnum
-     * @param params 参数 key, value, key, value
-     * @return json 字符串数据
-     */
-    public String callApiWithResp(GocqActionEnum action, Object... params) {
-        return this.callApiWithResp(action, checkParamsToMap(params));
-    }
 
 
     /**
@@ -183,26 +144,19 @@ public class Bot {
         String url = "http://127.0.0.1:8899/" + action.getAction();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
-        switch (response.getStatus()) {
-            case 401:
-                throw new ActionFailed("action" + action.getAction() + " access token 未提供");
-            case 403:
-                throw new ActionFailed("action" + action.getAction() + " access token 不符合");
-            case 406:
-                throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持" +
-                        "(非 application/json 或 application/x-www-form-urlencoded");
-            case 404:
-                throw new ActionFailed("action:" + action.getAction() + " API 不存在");
-            case 200:
-                return response.body(); //除上述情况外所有情况 (具体 API 调用是否成功, 需要看 API 的 响应数据
-            default:
-                throw new ActionFailed("action:" + action.getAction() + " 获取数据失败");
-        }
+        return switch (response.getStatus()) {
+            case 401 -> throw new ActionFailed("action" + action.getAction() + " access token 未提供");
+            case 403 -> throw new ActionFailed("action" + action.getAction() + " access token 不符合");
+            case 406 -> throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持" +
+                    "(非 application/json 或 application/x-www-form-urlencoded");
+            case 404 -> throw new ActionFailed("action:" + action.getAction() + " API 不存在");
+            case 200 -> response.body(); //除上述情况外所有情况 (具体 API 调用是否成功, 需要看 API 的 响应数据
+            default -> throw new ActionFailed("action:" + action.getAction() + " 获取数据失败");
+        };
     }
 
     public void deleteFriend(Long userId) {
-        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND,
-                "user_id", userId);
+        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND, Map.of("user_id", userId));
     }
 
     /**
@@ -211,7 +165,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INFO);
+        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INFO, null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -221,7 +175,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST);
+        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST, null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -235,7 +189,7 @@ public class Bot {
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
         String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_LIST,
-                "group_id", groupId, "no_cache", noCache);
+                Map.of("group_id", groupId, "no_cache", noCache));
         return JSONArray.parseArray(data, GroupMember.class);
     }
 
@@ -246,8 +200,7 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_LIST,
-                "no_cache", noCache);
+        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_LIST, Map.of("no_cache", noCache));
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
@@ -274,7 +227,7 @@ public class Bot {
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
         String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_INFO,
-                "group_id", groupId, "user_id", userId, "no_cache", noCache);
+                Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupMember.class);
     }
 
@@ -287,7 +240,7 @@ public class Bot {
      */
     public void setGroupSpecialTitle(Long groupId, Long userId, String specialTitle) {
         this.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
-                "group_id", groupId, "user_id", userId, "special_title", specialTitle);
+                Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
     }
 
     /**
@@ -299,7 +252,7 @@ public class Bot {
      */
     public void setGroupCard(Long groupId, Long userId, String card) {
         this.callApi(GocqActionEnum.SET_GROUP_CARD,
-                "group_id", groupId, "user_id", userId, "card", card);
+                Map.of("group_id", groupId, "user_id", userId, "card", card));
     }
 
     /**
@@ -308,8 +261,7 @@ public class Bot {
      * @param groupId group_id
      */
     public void sendGroupSign(Long groupId) {
-        this.callApi(GocqActionEnum.SEND_GROUP_SIGN,
-                "group_id", groupId);
+        this.callApi(GocqActionEnum.SEND_GROUP_SIGN, Map.of("group_id", groupId));
     }
 
     /**
@@ -321,31 +273,44 @@ public class Bot {
      */
     public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
         this.callApi(GocqActionEnum.SET_GROUP_ADMIN,
-                "group_id", groupId, "user_id", userId, "enable", enable);
+                Map.of("group_id", groupId, "user_id", userId, "enable", enable));
     }
+
+
 
     /**
      * 发送群消息
      *
      * @param groupId    群号
      * @param message    消息
-     * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
-    public void sendGroupMessage(Long groupId, String message, boolean autoEscape) {
-        this.callApi(GocqActionEnum.SEND_GROUP_MSG,
-                "group_id", groupId, "message", message, "auto_escape", autoEscape);
+    public void sendGroupMessage(Long groupId, Object message) {
+        Map<String, Object> map;
+        if (message instanceof String s) {
+            map = Map.of("group_id", groupId, "message", s, "auto_escape", true);
+        } else if (message instanceof MessageSegment || message instanceof Message) {
+            map = Map.of("group_id", groupId, "message", message, "auto_escape", false);
+        } else throw new IllegalArgumentException("The type of message must be one of the Message,MessageSegment,String");
+        this.callApi(GocqActionEnum.SEND_GROUP_MSG, map);
     }
+
 
     /**
      * 发送私聊消息
      *
      * @param userId     对方qq
      * @param message    消息
-     * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
-    public void sendPrivateMessage(Long userId, String message, boolean autoEscape) {
-        this.callApi(GocqActionEnum.SEND_PRIVATE_MSG,
-                "user_id", userId, "message", message, "auto_escape", autoEscape);
+    public void sendPrivateMessage(Long userId, Object message) {
+        Map<String, Object> map;
+        if (message instanceof String s) {
+            map = Map.of("user_id", userId, "message", s, "auto_escape", true);
+        } else if (message instanceof MessageSegment || message instanceof Message) {
+            map = Map.of("user_id", userId, "message", message, "auto_escape", false);
+        } else throw new IllegalArgumentException("The type of message must be one of the Message,MessageSegment,String");
+        this.callApi(GocqActionEnum.SEND_PRIVATE_MSG, map);
     }
 
 
@@ -355,8 +320,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void deleteMsg(Integer messageId) {
-        this.callApi(GocqActionEnum.DELETE_MSG,
-                "message_id", messageId);
+        this.callApi(GocqActionEnum.DELETE_MSG, Map.of("message_id", messageId));
     }
 
     /**
@@ -366,7 +330,7 @@ public class Bot {
      */
     public void markMsgAsRead(Integer messageId) {
         this.callApi(GocqActionEnum.MARK_MSG_AS_READ,
-                "message_id", messageId);
+                Map.of("message_id", messageId));
     }
 
     /**
@@ -376,7 +340,7 @@ public class Bot {
      */
     public void getForwardMsg(Integer messageId) {
         String data = this.callApiWithResp(GocqActionEnum.GET_FORWARD_MSG,
-                "message_id", messageId);
+                Map.of("message_id", messageId));
     }
 
     /**
@@ -387,7 +351,7 @@ public class Bot {
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
         this.callApi(GocqActionEnum.SEND_GROUP_FORWARD_MSG,
-                "group_id", groupId, "messages", nodes);
+                Map.of("group_id", groupId, "messages", nodes));
     }
 
     /**
@@ -398,7 +362,7 @@ public class Bot {
      */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
         this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
-                "user_id", userId, "messages", nodes);
+                Map.of("user_id", userId, "messages", nodes));
     }
 
 
@@ -406,30 +370,32 @@ public class Bot {
      * 根据事件, 来发送对应的消息
      *
      * @param event      event object
-     * @param message    消息
-     * @param autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * @param message    消息 Message | MessageSegment | String
+     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
-    public void sendMessage(Event event, String message, boolean autoEscape) {
+    public void sendMessage(Event event, Object message) {
         JSONObject jsonObject = event.getJsonObject();
         Long groupId = jsonObject.getLong("group_id");
         if (groupId != null) {
-            this.sendGroupMessage(groupId, message, autoEscape);
+            this.sendGroupMessage(groupId, message);
         } else {
             Long userId = jsonObject.getLong("user_id");
             //if (this.userId.equals(userId)) return;
-            if (userId != null) this.sendPrivateMessage(userId, message, autoEscape);
+            assert userId != null;
+            this.sendPrivateMessage(userId, message);
         }
     }
 
+    @Deprecated
     public void finish(Event event, String message) {
-        this.sendMessage(event, message, false);
+        this.sendMessage(event, message);
         throw new FinishedException();
     }
 
 
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
         this.callApi(GocqActionEnum.SET_GROUP_KICK,
-                "group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest);
+                Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
     }
 
 
@@ -442,7 +408,7 @@ public class Bot {
      */
     public void setGroupBan(Long groupId, Long userId, int duration) {
         this.callApi(GocqActionEnum.SET_GROUP_BAN,
-                "group_id", groupId, "user_id", userId, "duration", duration);
+                Map.of("group_id", groupId, "user_id", userId, "duration", duration));
     }
 
     /**
@@ -452,6 +418,6 @@ public class Bot {
      * @param enable  默认true 禁言
      */
     public void setGroupWholeBan(Long groupId, boolean enable) {
-        this.callApi(GocqActionEnum.SET_GROUP_WHOLE_BAN, groupId, enable);
+        this.callApi(GocqActionEnum.SET_GROUP_WHOLE_BAN, Map.of("group_id", groupId, "enable", enable));
     }
 }
