@@ -29,10 +29,9 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
     public void replyJyGroup(Bot bot, PrivateMessageEvent event) {
-        Message message = new Message();
-        message.add("[bot]");
-        message.add(MessageSegment.at(event.getUserId()));
-        message.add("请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了");
+        Message message = new Message()
+                .append("[bot]").append(MessageSegment.at(event.getUserId()))
+                .append("请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了");
         bot.sendGroupMessage(event.getSender().getGroupId(), message);
     }
 
@@ -44,11 +43,11 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
     public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
-        LinkedHashMap<String, Message> map = new LinkedHashMap<>();
-        map.put("1-2", Message.text("1.转发消息完全不可信\n2.转发消息完全不可信"));
-        map.put("3-4", Message.text("3.转发消息完全不可信\n4.转发消息完全不可信"));
-        map.put("5-6", Message.text("5.转发消息完全不可信\n6.转发消息完全不可信"));
-        map.put("7-8", Message.text("7.转发消息完全不可信\n8.转发消息完全不可信"));
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+        map.put("1", "转发消息是完全不可信的");
+        map.put("2", "昵称内容头像均可自定义");
+        map.put("3", "连演员啥的都不需要请捏");
+        map.put("4", "当然此条也是不可信的哈");
         List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
         bot.sendGroupForwardMsg(event.getGroupId(), nodes);
     }

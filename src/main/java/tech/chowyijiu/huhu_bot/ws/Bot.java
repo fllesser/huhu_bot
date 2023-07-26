@@ -24,6 +24,7 @@ import tech.chowyijiu.huhu_bot.entity.response.SelfInfo;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.exception.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.FinishedException;
+import tech.chowyijiu.huhu_bot.exception.IllegalMessageTypeException;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
@@ -98,9 +99,6 @@ public class Bot {
         }
     }
 
-    /**
-     * 私有 callApi
-     */
     public void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         requestBox.setAction(action.getAction());
@@ -291,7 +289,7 @@ public class Bot {
             map = Map.of("group_id", groupId, "message", s, "auto_escape", true);
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("group_id", groupId, "message", message, "auto_escape", false);
-        } else throw new IllegalArgumentException("The type of message must be one of the Message,MessageSegment,String");
+        } else throw new IllegalMessageTypeException();
         this.callApi(GocqActionEnum.SEND_GROUP_MSG, map);
     }
 
@@ -309,7 +307,7 @@ public class Bot {
             map = Map.of("user_id", userId, "message", s, "auto_escape", true);
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("user_id", userId, "message", message, "auto_escape", false);
-        } else throw new IllegalArgumentException("The type of message must be one of the Message,MessageSegment,String");
+        } else throw new IllegalMessageTypeException();
         this.callApi(GocqActionEnum.SEND_PRIVATE_MSG, map);
     }
 
@@ -374,7 +372,7 @@ public class Bot {
      * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendMessage(Event event, Object message) {
-        JSONObject jsonObject = event.getJsonObject();
+        JSONObject jsonObject = event.getEventJsonObject();
         Long groupId = jsonObject.getLong("group_id");
         if (groupId != null) {
             this.sendGroupMessage(groupId, message);

@@ -7,7 +7,6 @@ import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
 import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.arr_message.ForwardMessage;
-import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.MessageEvent;
 import tech.chowyijiu.huhu_bot.event.message.PrivateMessageEvent;
@@ -49,10 +48,10 @@ public class TestPlugin {
         if (resp.startsWith("{")) {
             bot.sendMessage(event, resp + "\n" + costTime);
         } else if (resp.startsWith("[")) {
-            List<Message> messages = new ArrayList<>();
-            messages.add(Message.text(costTime));
+            List<Object> messages = new ArrayList<>();
+            messages.add(costTime);
             messages.addAll(JSONArray.parseArray(resp, String.class).stream()
-                    .limit(98).map(Message::text).toList());
+                    .limit(98).toList());
             List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), messages);
             if (event instanceof GroupMessageEvent) {
                 bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
@@ -78,6 +77,7 @@ public class TestPlugin {
     //public void testRule2(Bot bot, GroupMessageEvent event) {
     //    bot.sendMessage(event, "测试rule, 属性", true);
     //}
+
 
 
     //失败

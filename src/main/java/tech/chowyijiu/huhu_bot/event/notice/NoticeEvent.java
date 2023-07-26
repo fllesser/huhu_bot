@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.event.notice;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ import tech.chowyijiu.huhu_bot.event.Event;
 public class NoticeEvent extends Event {
 
     private final String postType = PostTypeEnum.notice.name();
+    @JsonProperty("notice_type")
     private String noticeType;
 
     public static NoticeEvent build(JSONObject jsonObject) {

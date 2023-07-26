@@ -2,6 +2,7 @@ package tech.chowyijiu.huhu_bot.event.message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,17 +25,24 @@ import java.util.Objects;
 @NoArgsConstructor
 public class MessageEvent extends Event {
 
+    @JsonProperty("post_type")
     private String postType; //message message_sent
+    @JsonProperty("sub_type")
     private String subType; //group, public
+    @JsonProperty("user_id")
     private Long userId;
+    @JsonProperty("message_type")
     private String messageType;
+    @JsonProperty("message_id")
     private Integer messageId;
-    //注意这里gocq要设置成字符串格式消息, 就是raw_message
-    //后续看要不要换成数组消息
+    //注意这里gocq要设置数组array消息格式
+    @JsonProperty("message")
     private Message message;
+    @JsonProperty("raw_message")
     private String rawMessage;
-
+    @JsonProperty("font")
     private Integer font; //0
+    @JsonProperty("sender")
     private Sender sender;
 
     //@JsonIgnore

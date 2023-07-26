@@ -3,6 +3,7 @@ package tech.chowyijiu.huhu_bot.event;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import tech.chowyijiu.huhu_bot.constant.PostTypeEnum;
@@ -22,9 +23,11 @@ import tech.chowyijiu.huhu_bot.ws.Bot;
 public abstract class Event {
 
     @JsonIgnore
-    private JSONObject jsonObject;
+    private JSONObject eventJsonObject;
 
+    @JsonProperty("self_id")
     private Long selfId;
+    @JsonProperty("post_type")
     private String postType;
     private Long time;
 
@@ -38,7 +41,7 @@ public abstract class Event {
                 case request -> jsonObject.toJavaObject(RequestEvent.class);
                 case meta_event -> jsonObject.toJavaObject(MetaEvent.class);
             };
-            event.setJsonObject(jsonObject);
+            event.setEventJsonObject(jsonObject);
         } else {
             StringUtil.hasLength(jsonObject.getString("echo"), echo -> {
                 ApiResp resp = jsonObject.toJavaObject(ApiResp.class);

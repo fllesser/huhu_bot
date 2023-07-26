@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhu_bot.entity.arr_message;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 public class Message extends ArrayList<MessageSegment> {
 
+    @JsonIgnore
     private String plainText;
 
     public boolean checkToMe(Long selfId) {
@@ -24,15 +26,18 @@ public class Message extends ArrayList<MessageSegment> {
         return false;
     }
 
-    public Message add(String text) {
+    public Message append(String text) {
         this.add(MessageSegment.text(text));
         return this;
     }
 
+    public Message append(MessageSegment segment) {
+        this.add(segment);
+        return this;
+    }
+
     public static Message text(String text) {
-        Message message = new Message();
-        message.add(MessageSegment.text(text));
-        return message;
+        return new Message().append(text);
     }
 
     /**
