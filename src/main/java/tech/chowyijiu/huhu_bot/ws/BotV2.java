@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
-import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.constant.GocqAction;
 import tech.chowyijiu.huhu_bot.entity.request.RequestBox;
 import tech.chowyijiu.huhu_bot.exception.ActionFailed;
 import tech.chowyijiu.huhu_bot.utils.LogUtil;
@@ -77,14 +77,14 @@ public class BotV2 {
         }
     }
 
-    private String callApi(GocqActionEnum action, Map<String, Object> paramsMap, boolean needReturn) {
+    private String callApi(GocqAction action, Map<String, Object> paramsMap, boolean needReturn) {
         RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.getAction());
+        requestBox.setAction(action.toString());
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         if (needReturn) {
             String echo = Thread.currentThread().getName() + "_" +
                     this.getUserId() + "_" +
-                    action.getAction() + "_" +
+                    action + "_" +
                     UUID.randomUUID().toString().replace("-", "");
             requestBox.setEcho(echo);
             //发送请求

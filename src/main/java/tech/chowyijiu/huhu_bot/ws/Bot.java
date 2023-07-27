@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
-import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.constant.GocqAction;
 import tech.chowyijiu.huhu_bot.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.entity.arr_message.MessageSegment;
@@ -62,27 +62,6 @@ public class Bot {
         if (respMap.containsKey(echo)) respMap.get(echo).offer(data);
     }
 
-    /***
-     * 等待响应
-     * @param echo 回声
-     * @return String
-     */
-    private static String waitResp(String echo) {
-        log.info("{}Blocking waits for gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
-        LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
-        respMap.put(echo, deque);
-        try {
-            String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
-            if (!StringUtil.hasLength(resp))
-                throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
-            log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
-            return resp;
-        } catch (InterruptedException e) {
-            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
-        } finally {
-            respMap.remove(echo);
-        }
-    }
 
     /**
      * call api 最终调用的方法
@@ -95,13 +74,13 @@ public class Bot {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
             log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
-                    LogUtil.buildArgsWithColor(ANSI.YELLOW, this.session.getId(), text, e.getMessage()));
+                    LogUtil.buildArgsWithColor(ANSI.RED, this.session.getId(), text, e.getMessage()));
         }
     }
 
-    public void callApi(GocqActionEnum action, Map<String, Object> paramsMap) {
+    public void callApi(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.getAction());
+        requestBox.setAction(action.toString());
         requestBox.setParams(paramsMap);
         this.sessionSend(JSONObject.toJSONString(requestBox));
     }
@@ -113,17 +92,32 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
-    public String callApiWithResp(GocqActionEnum action, Map<String, Object> paramsMap) {
+    public String callApiWithResp(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
-        requestBox.setAction(action.getAction());
+        requestBox.setAction(action.toString());
         //curThread__userId__action__uuid
         String echo = Thread.currentThread().getName() + "." + this.getUserId() + "." +
-                action.getAction() + "." + UUID.randomUUID();
+                action + "." + UUID.randomUUID();
         requestBox.setEcho(echo);
         //发送请求
+        //在send前提前创建好阻塞队列, 并放入map中, 修复了0ms的数据丢失
+        LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
+        respMap.put(echo, deque);
         this.sessionSend(JSONObject.toJSONString(requestBox));
-        return waitResp(echo);
+        log.info("{}Blocking waits for gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
+        try {
+            String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
+            if (!StringUtil.hasLength(resp))
+                throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
+            log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
+            return resp;
+        } catch (InterruptedException e) {
+            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
+        } finally {
+            respMap.remove(echo);
+        }
+
     }
 
 
@@ -138,23 +132,23 @@ public class Bot {
      * @return json String
      */
     @Deprecated
-    private String callHttpApi(GocqActionEnum action, @Nullable Map<String, Object> paramsMap) {
-        String url = "http://127.0.0.1:8899/" + action.getAction();
+    private String callHttpApi(GocqAction action, @Nullable Map<String, Object> paramsMap) {
+        String url = "http://127.0.0.1:8899/" + action.toString();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
         return switch (response.getStatus()) {
-            case 401 -> throw new ActionFailed("action" + action.getAction() + " access token 未提供");
-            case 403 -> throw new ActionFailed("action" + action.getAction() + " access token 不符合");
-            case 406 -> throw new ActionFailed("action" + action.getAction() + " Content-Type 不支持" +
+            case 401 -> throw new ActionFailed("action" + action + " access token 未提供");
+            case 403 -> throw new ActionFailed("action" + action + " access token 不符合");
+            case 406 -> throw new ActionFailed("action" + action + " Content-Type 不支持" +
                     "(非 application/json 或 application/x-www-form-urlencoded");
-            case 404 -> throw new ActionFailed("action:" + action.getAction() + " API 不存在");
+            case 404 -> throw new ActionFailed("action:" + action + " API 不存在");
             case 200 -> response.body(); //除上述情况外所有情况 (具体 API 调用是否成功, 需要看 API 的 响应数据
-            default -> throw new ActionFailed("action:" + action.getAction() + " 获取数据失败");
+            default -> throw new ActionFailed("action:" + action + " 获取数据失败");
         };
     }
 
     public void deleteFriend(Long userId) {
-        this.callApiWithResp(GocqActionEnum.DELETE_FRIEND, Map.of("user_id", userId));
+        this.callApiWithResp(GocqAction.delete_friend, Map.of("user_id", userId));
     }
 
     /**
@@ -163,7 +157,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_LOGIN_INFO, null);
+        String data = this.callApiWithResp(GocqAction.get_login_info, null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -173,7 +167,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWithResp(GocqActionEnum.GET_FRIEND_LIST, null);
+        String data = this.callApiWithResp(GocqAction.get_friend_list, null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -186,7 +180,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_LIST,
+        String data = this.callApiWithResp(GocqAction.get_group_member_list,
                 Map.of("group_id", groupId, "no_cache", noCache));
         return JSONArray.parseArray(data, GroupMember.class);
     }
@@ -198,7 +192,7 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_LIST, Map.of("no_cache", noCache));
+        String data = this.callApiWithResp(GocqAction.get_group_list, Map.of("no_cache", noCache));
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
@@ -224,7 +218,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = this.callApiWithResp(GocqActionEnum.GET_GROUP_MEMBER_INFO,
+        String data = this.callApiWithResp(GocqAction.get_group_member_info,
                 Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupMember.class);
     }
@@ -237,7 +231,7 @@ public class Bot {
      * @param specialTitle special_title
      */
     public void setGroupSpecialTitle(Long groupId, Long userId, String specialTitle) {
-        this.callApi(GocqActionEnum.SET_GROUP_SPECIAL_TITLE,
+        this.callApi(GocqAction.set_group_special_title,
                 Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
     }
 
@@ -249,7 +243,7 @@ public class Bot {
      * @param card    card
      */
     public void setGroupCard(Long groupId, Long userId, String card) {
-        this.callApi(GocqActionEnum.SET_GROUP_CARD,
+        this.callApi(GocqAction.set_group_card,
                 Map.of("group_id", groupId, "user_id", userId, "card", card));
     }
 
@@ -259,7 +253,7 @@ public class Bot {
      * @param groupId group_id
      */
     public void sendGroupSign(Long groupId) {
-        this.callApi(GocqActionEnum.SEND_GROUP_SIGN, Map.of("group_id", groupId));
+        this.callApi(GocqAction.send_group_sign, Map.of("group_id", groupId));
     }
 
     /**
@@ -270,7 +264,7 @@ public class Bot {
      * @param enable  true 为设置, false 为取消
      */
     public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
-        this.callApi(GocqActionEnum.SET_GROUP_ADMIN,
+        this.callApi(GocqAction.set_group_admin,
                 Map.of("group_id", groupId, "user_id", userId, "enable", enable));
     }
 
@@ -290,7 +284,7 @@ public class Bot {
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("group_id", groupId, "message", message, "auto_escape", false);
         } else throw new IllegalMessageTypeException();
-        this.callApi(GocqActionEnum.SEND_GROUP_MSG, map);
+        this.callApi(GocqAction.send_group_msg, map);
     }
 
 
@@ -308,7 +302,7 @@ public class Bot {
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("user_id", userId, "message", message, "auto_escape", false);
         } else throw new IllegalMessageTypeException();
-        this.callApi(GocqActionEnum.SEND_PRIVATE_MSG, map);
+        this.callApi(GocqAction.send_private_msg, map);
     }
 
 
@@ -318,7 +312,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void deleteMsg(Integer messageId) {
-        this.callApi(GocqActionEnum.DELETE_MSG, Map.of("message_id", messageId));
+        this.callApi(GocqAction.delete_msg, Map.of("message_id", messageId));
     }
 
     /**
@@ -327,7 +321,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void markMsgAsRead(Integer messageId) {
-        this.callApi(GocqActionEnum.MARK_MSG_AS_READ,
+        this.callApi(GocqAction.mark_msg_as_read,
                 Map.of("message_id", messageId));
     }
 
@@ -337,7 +331,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callApiWithResp(GocqActionEnum.GET_FORWARD_MSG,
+        String data = this.callApiWithResp(GocqAction.get_forward_msg,
                 Map.of("message_id", messageId));
     }
 
@@ -348,7 +342,7 @@ public class Bot {
      * @param nodes   nodes
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
-        this.callApi(GocqActionEnum.SEND_GROUP_FORWARD_MSG,
+        this.callApi(GocqAction.send_group_forward_msg,
                 Map.of("group_id", groupId, "messages", nodes));
     }
 
@@ -359,7 +353,7 @@ public class Bot {
      * @param nodes  nodes
      */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
-        this.callApi(GocqActionEnum.SEND_PRIVATE_FORWARD_MSG,
+        this.callApi(GocqAction.send_private_forward_msg,
                 Map.of("user_id", userId, "messages", nodes));
     }
 
@@ -392,7 +386,7 @@ public class Bot {
 
 
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
-        this.callApi(GocqActionEnum.SET_GROUP_KICK,
+        this.callApi(GocqAction.set_group_kick,
                 Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
     }
 
@@ -405,7 +399,7 @@ public class Bot {
      * @param duration duration 单位秒 default 30 * 60 | 0 表示取消禁言
      */
     public void setGroupBan(Long groupId, Long userId, int duration) {
-        this.callApi(GocqActionEnum.SET_GROUP_BAN,
+        this.callApi(GocqAction.set_group_ban,
                 Map.of("group_id", groupId, "user_id", userId, "duration", duration));
     }
 
@@ -416,6 +410,6 @@ public class Bot {
      * @param enable  默认true 禁言
      */
     public void setGroupWholeBan(Long groupId, boolean enable) {
-        this.callApi(GocqActionEnum.SET_GROUP_WHOLE_BAN, Map.of("group_id", groupId, "enable", enable));
+        this.callApi(GocqAction.set_group_whole_ban, Map.of("group_id", groupId, "enable", enable));
     }
 }

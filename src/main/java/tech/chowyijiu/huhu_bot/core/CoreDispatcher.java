@@ -122,8 +122,6 @@ public class CoreDispatcher {
             //匹配前缀命令
             if (plainText.startsWith(command)) {
                 //去除触发的command, 并去掉头尾空格
-                //String argWithCQ = message.replaceFirst(command, "").trim();
-                //去除所有cq码, event.msg里是包含cq码的segment的
                 event.setCommandArgs(plainText.replaceFirst(command, "").trim());
                 handler.execute(bot, event);
                 return handler.block;

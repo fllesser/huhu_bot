@@ -13,8 +13,6 @@ import tech.chowyijiu.huhu_bot.ws.Bot;
  */
 public class RuleImpl {
 
-    //弃用, 使用会产生浪费的计算
-    //@Deprecated
     public static boolean tome(Bot bot, Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) return groupMessageEvent.isToMe();
         else return false;
@@ -40,9 +38,8 @@ public class RuleImpl {
 
     public static boolean selfOwner(Bot bot, Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) {
-            //这里本来准备就取缓存, 毕竟群主不可能也变来变去吧
-            //但好像使用缓存, 一直没有响应数据, gocq那边有问题
-            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), true);
+            //取缓存, 毕竟群主不可能也变来变去吧
+            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), false);
             return "owner".equals(groupMember.getRole());
         } else return false;
     }

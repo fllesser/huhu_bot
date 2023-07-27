@@ -41,13 +41,13 @@ public class ResourceSearchPlugin {
 
     @MessageHandler(name = "阿里云盘资源搜索 GITCAFE", commands = {".s"})
     public void search1(Bot bot, MessageEvent event) {
-        List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), GitCafeReq::get);
+        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), GitCafeReq::get);
         bot.sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
     @MessageHandler(name = "阿里云盘资源搜索 HDHIVE", commands = {".ds"})
     public void search2(Bot bot, MessageEvent event) {
-        List<ResourceData> dataList = StringUtil.hasLengthReturn(event.getCommandArgs(), HdhiveReq::get1);
+        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), HdhiveReq::get1);
         bot.sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
@@ -80,7 +80,7 @@ public class ResourceSearchPlugin {
     @MessageHandler(name = "search in cache", commands = {".cache"}, rule = RuleEnum.superuser)
     public void searchInCache(Bot bot, MessageEvent event) {
         String keyword = event.getCommandArgs();
-        String cacheData = StringUtil.hasLengthReturn(keyword, ResourceUtil::getByKeyWord);
+        String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
         bot.sendMessage(event, willSend);
     }

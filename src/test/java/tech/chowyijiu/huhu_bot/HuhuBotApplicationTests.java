@@ -17,7 +17,6 @@ import java.util.List;
 public class HuhuBotApplicationTests {
 
 
-
     //@Test
     public void testImageUtil() throws IOException {
         List<String> smallIcons = new ArrayList<>();

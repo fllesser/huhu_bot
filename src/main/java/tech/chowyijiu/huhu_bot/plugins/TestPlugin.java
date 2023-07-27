@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhu_bot.annotation.BotPlugin;
 import tech.chowyijiu.huhu_bot.annotation.MessageHandler;
-import tech.chowyijiu.huhu_bot.constant.GocqActionEnum;
+import tech.chowyijiu.huhu_bot.constant.GocqAction;
 import tech.chowyijiu.huhu_bot.core.rule.RuleEnum;
 import tech.chowyijiu.huhu_bot.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhu_bot.event.message.GroupMessageEvent;
@@ -29,9 +29,9 @@ public class TestPlugin {
     public void apiTest(Bot bot, MessageEvent event) {
         //[key:value,key:value]
         String[] args = event.getCommandArgs().split(" ");
-        GocqActionEnum action = null;
+        GocqAction action = null;
         try {
-            action = GocqActionEnum.valueOf(args[0].toUpperCase(Locale.ROOT));
+            action = GocqAction.valueOf(args[0]);
         } catch (IllegalArgumentException e) {
             bot.sendMessage(event, "没有这个API, 或huhubot暂未支持");
         }
@@ -40,8 +40,13 @@ public class TestPlugin {
         Map<String, Object> map = Arrays.stream(keyValue)
                 .map(kv -> kv.split(":"))
                 .collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
-        long start = System.currentTimeMillis();
         assert action != null;
+        if (!action.isHasResp()) {
+            bot.callApi(action, map);
+            bot.sendMessage(event, action.getRemark() + "已发送ws请求, 该api无响应数据");
+            return;
+        }
+        long start = System.currentTimeMillis();
         String resp = bot.callApiWithResp(action, map);
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
