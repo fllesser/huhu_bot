@@ -3,15 +3,13 @@ package tech.chowyijiu.huhu_bot.entity.response;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * 发送者信息
  * @author elastic chow
  * @date 13/5/2023
  */
 @Data
-public class Sender implements Serializable {
+public class Sender {
     private int age;
     private String area;
     private String card;

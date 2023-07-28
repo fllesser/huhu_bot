@@ -10,13 +10,11 @@ package tech.chowyijiu.huhu_bot.entity.response;
 import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
-import java.io.Serializable;
-
 /**
  * 群成员信息
  */
 @Data
-public class GroupMember implements Serializable {
+public class GroupMember {
     private int age;
     private String area;
     private String card;

@@ -16,7 +16,7 @@ public class ChatGptPlugin {
 
     @MessageHandler(name = "chatgpt", commands = {"gpt"}, rule = RuleEnum.superuser)
     public void defaultChatGpt(Bot bot, MessageEvent event) {
-        String resp = GptReq.chat(event.getUserId(), event.getCommandArgs());
+        String resp = GptReq.chat(event.getCommandArgs());
         bot.sendMessage(event, resp);
     }
 

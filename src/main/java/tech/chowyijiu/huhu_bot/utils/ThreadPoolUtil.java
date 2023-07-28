@@ -29,9 +29,9 @@ public class ThreadPoolUtil {
                 new ArrayBlockingQueue<>(corePoolSize * 4),
                 new CustomizableThreadFactory("process-event-"),
                 new ShareRunsPolicy("EventExecutor"));
-        Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, corePoolSize - 1, eventExecutor.getCorePoolSize(),
-                eventExecutor.getMaximumPoolSize());
-        log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}", args);
+        log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}",
+                ANSI.YELLOW, corePoolSize - 1, eventExecutor.getCorePoolSize(),
+                eventExecutor.getMaximumPoolSize(), ANSI.RESET);
     }
 
     public static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {

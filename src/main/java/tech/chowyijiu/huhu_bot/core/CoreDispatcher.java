@@ -20,7 +20,6 @@ import tech.chowyijiu.huhu_bot.event.notice.NoticeEvent;
 import tech.chowyijiu.huhu_bot.event.request.RequestEvent;
 import tech.chowyijiu.huhu_bot.exception.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.FinishedException;
-import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.ws.Bot;
 
 import java.lang.reflect.Field;
@@ -70,9 +69,9 @@ public class CoreDispatcher {
                         noticeHandlers.add(handler);
                     }
                 });
-                Object[] args = LogUtil.buildArgsWithColor(ANSI.YELLOW, pluginName, count++, botPluginMap.size(),
-                        Arrays.toString(handlerNames.toArray()));
-                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}", args);
+                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}",
+                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(),
+                        Arrays.toString(handlerNames.toArray()), ANSI.RESET);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
@@ -252,15 +251,13 @@ public class CoreDispatcher {
                 //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
             } catch (IllegalAccessException e) {
-                log.info("{}IllegalAccessException: {}{}",
-                        LogUtil.buildArgsWithColor(ANSI.RED, "handler method must be public"));
+                log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {
                 Throwable targetException = e.getTargetException();
                 if (targetException instanceof FinishedException) {
                     log.info("{} FinishedException ignored", event);
                 } else if (targetException instanceof ActionFailed) {
-                    log.info("{}ActionFailed: {}{}",
-                            LogUtil.buildArgsWithColor(ANSI.RED, targetException.getMessage()));
+                    log.info("{}ActionFailed: {}{}", ANSI.RED, targetException.getMessage(), ANSI.RESET);
                 } else {
                     targetException.printStackTrace();
                 }

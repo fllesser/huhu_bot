@@ -25,7 +25,6 @@ import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.exception.ActionFailed;
 import tech.chowyijiu.huhu_bot.exception.FinishedException;
 import tech.chowyijiu.huhu_bot.exception.IllegalMessageTypeException;
-import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 import java.io.IOException;
@@ -69,18 +68,18 @@ public class Bot {
      *
      * @param text text
      */
-    public void sessionSend(String text) {
+    private void sessionSend(String text) {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
             log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
-                    LogUtil.buildArgsWithColor(ANSI.RED, this.session.getId(), text, e.getMessage()));
+                    ANSI.RED, this.session.getId(), text, e.getMessage(), ANSI.RESET);
         }
     }
 
     public void callApi(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.toString());
+        requestBox.setAction(action.name());
         requestBox.setParams(paramsMap);
         this.sessionSend(JSONObject.toJSONString(requestBox));
     }
@@ -95,7 +94,7 @@ public class Bot {
     public String callApiWithResp(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
-        requestBox.setAction(action.toString());
+        requestBox.setAction(action.name());
         //curThread__userId__action__uuid
         String echo = Thread.currentThread().getName() + "." + this.getUserId() + "." +
                 action + "." + UUID.randomUUID();
@@ -119,9 +118,6 @@ public class Bot {
         }
 
     }
-
-
-
 
     /**
      * HTTP request API method

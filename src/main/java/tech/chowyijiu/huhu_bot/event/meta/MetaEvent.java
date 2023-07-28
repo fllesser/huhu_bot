@@ -24,4 +24,13 @@ public class MetaEvent extends Event {
     @JsonProperty("sub_type")
     private String subType;
 
+
+    public boolean connect() {
+        return "lifecycle".equals(this.getMetaEventType()) && "connect".equals(this.getSubType());
+    }
+
+    public boolean heartbeat() {
+        return "heartbeat".equals(this.getMetaEventType());
+    }
+
 }

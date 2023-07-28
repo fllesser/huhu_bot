@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 
 /**
  * @author elastic chow
@@ -16,7 +15,7 @@ import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 @NoArgsConstructor
 public class GroupMessageEvent extends MessageEvent {
 
-    private final String messageType = MessageTypeEnum.group.getType();
+    private final String messageType = "group";
 
     // 消息子类型, 正常消息是 normal,
     // 匿名消息是 anonymous,

@@ -7,12 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 import tech.chowyijiu.huhu_bot.entity.arr_message.Message;
 import tech.chowyijiu.huhu_bot.entity.response.Sender;
 import tech.chowyijiu.huhu_bot.event.Event;
-
-import java.util.Objects;
 
 /**
  * @author elastic chow
@@ -55,7 +52,7 @@ public class MessageEvent extends Event {
     public static MessageEvent build(JSONObject jsonObject) {
         String messageType = jsonObject.getString("message_type");
         MessageEvent event;
-        if (Objects.equals(messageType, MessageTypeEnum.private_.getType())) {
+        if ("private".equals(messageType)) {
             event = jsonObject.toJavaObject(PrivateMessageEvent.class);
         } else {
             event = jsonObject.toJavaObject(GroupMessageEvent.class);

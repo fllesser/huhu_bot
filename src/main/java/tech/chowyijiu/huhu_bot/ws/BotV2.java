@@ -11,7 +11,6 @@ import tech.chowyijiu.huhu_bot.constant.ANSI;
 import tech.chowyijiu.huhu_bot.constant.GocqAction;
 import tech.chowyijiu.huhu_bot.entity.request.RequestBox;
 import tech.chowyijiu.huhu_bot.exception.ActionFailed;
-import tech.chowyijiu.huhu_bot.utils.LogUtil;
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
 import java.io.IOException;
@@ -43,25 +42,6 @@ public class BotV2 {
         if (respMap.containsKey(echo)) respMap.get(echo).offer(data);
     }
 
-    /***
-     * 等待响应
-     * @param echo 回声
-     * @return String
-     */
-    public String waitResp(String echo) {
-        if (!StringUtil.hasLength(echo)) log.info("echo is empty, ignored");
-        log.info("Blocking waits for gocq to return the result, echo: {}", echo);
-        LinkedBlockingDeque<String> blockingRes = new LinkedBlockingDeque<>(1);
-        respMap.put(echo, blockingRes);
-        try {
-            return blockingRes.poll(BotV2.timeout, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
-        } finally {
-            respMap.remove(echo);
-        }
-    }
-
     /**
      * call api 最终调用的方法
      * Send a WebSocket message
@@ -73,23 +53,36 @@ public class BotV2 {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
             log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
-                    LogUtil.buildArgsWithColor(ANSI.YELLOW, this.session.getId(), text, e.getMessage()));
+                    ANSI.YELLOW, this.session.getId(), text, e.getMessage(), ANSI.RESET);
         }
     }
 
-    private String callApi(GocqAction action, Map<String, Object> paramsMap, boolean needReturn) {
+    private String callApi(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.toString());
+        requestBox.setAction(action.name());
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
-        if (needReturn) {
+        if (action.isHasResp()) {
             String echo = Thread.currentThread().getName() + "_" +
                     this.getUserId() + "_" +
                     action + "_" +
                     UUID.randomUUID().toString().replace("-", "");
             requestBox.setEcho(echo);
+            LinkedBlockingDeque<String> blockingRes = new LinkedBlockingDeque<>(1);
+            respMap.put(echo, blockingRes);
             //发送请求
             this.sessionSend(JSONObject.toJSONString(requestBox));
-            return waitResp(echo);
+            log.info("Blocking waits for gocq to return the result, echo: {}", echo);
+            try {
+                String resp = blockingRes.poll(BotV2.timeout, TimeUnit.MILLISECONDS);
+                if (!StringUtil.hasLength(resp))
+                    throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
+                log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
+                return resp;
+            } catch (InterruptedException e) {
+                throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
+            } finally {
+                respMap.remove(echo);
+            }
         } else {
             this.sessionSend(JSONObject.toJSONString(requestBox));
             return "";

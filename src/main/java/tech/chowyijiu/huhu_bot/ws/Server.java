@@ -2,17 +2,15 @@ package tech.chowyijiu.huhu_bot.ws;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tech.chowyijiu.huhu_bot.constant.ANSI;
-import tech.chowyijiu.huhu_bot.constant.MetaTypeEnum;
-import tech.chowyijiu.huhu_bot.constant.SubTypeEnum;
 import tech.chowyijiu.huhu_bot.event.Event;
 import tech.chowyijiu.huhu_bot.event.meta.MetaEvent;
 import tech.chowyijiu.huhu_bot.thread.ProcessEventTask;
-import tech.chowyijiu.huhu_bot.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,21 +62,16 @@ public class Server extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(final WebSocketSession session, final TextMessage message) {
+    public void handleTextMessage(final @NotNull WebSocketSession session, final TextMessage message) {
         final String json = message.getPayload();
         try {
             JSONObject jsonObject = JSONObject.parseObject(json);
             Event event = Event.build(jsonObject);
             if (event == null) return;
             if (event instanceof MetaEvent metaEvent) {
-                if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.heartbeat.name())) {
-                    //心跳忽略
-                    //log.info("[{}] bot[{}] heartbeat ", this.getClass().getSimpleName(), metaEvent.getSelfId());
-                    return;
-                } else if (Objects.equals(metaEvent.getMetaEventType(), MetaTypeEnum.lifecycle.name())
-                        && Objects.equals(metaEvent.getSubType(), SubTypeEnum.connect.name())) {
+                if (metaEvent.heartbeat()) return;//心跳忽略
+                else if (metaEvent.connect()) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
-
                     addBot(event.getSelfId(), session);
                     log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
@@ -97,7 +90,7 @@ public class Server extends TextWebSocketHandler {
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
         log.info("{}connect exception sessionId[{}], exception[{}]{}",
-                LogUtil.buildArgsWithColor(ANSI.YELLOW, session.getId(), exception.getMessage()));
+                ANSI.YELLOW, session.getId(), exception.getMessage(), ANSI.RESET);
         removeBot(session);
     }
 

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 
 /**
  * @author elastic chow
@@ -16,7 +15,7 @@ import tech.chowyijiu.huhu_bot.constant.MessageTypeEnum;
 @NoArgsConstructor
 public class PrivateMessageEvent extends MessageEvent {
 
-    private final String messageType = MessageTypeEnum.private_.getType();
+    private final String messageType = "private";
 
     // 消息子类型
     // 如果是好友则是 friend
