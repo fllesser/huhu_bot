@@ -103,7 +103,8 @@ public class XiaoAIUtil {
             HttpResponse response = HttpRequest.post("https://api.io.mi.com/app" + uri)
                     .header("User-Agent", "APP/com.xiaomi.mihome APPV/6.0.103 iosPassportSDK/3.9.0 iOS/14.4 miHSTS")
                     .header("x-xiaomi-protocal-flag-cli", "PROTOCAL-HTTP2")
-                    .header("Cookie", "PassportDeviceId=" + XiaoAiConfig.deviceId + ";userId=" + XiaoAiConfig.userId + ";serviceToken=" + XiaoAiConfig.serviceToken + ";")
+                    .header("Cookie", "PassportDeviceId=" + XiaoAiConfig.deviceId + ";userId="
+                            + XiaoAiConfig.userId + ";serviceToken=" + XiaoAiConfig.serviceToken + ";")
                     .form(bodyMap)
                     .execute();
             log.info("post completed, response:{}", response.body());

@@ -204,6 +204,22 @@ public class MyGroupPlugin {
 
     }
 
+    //@NoticeHandler(name = "清除不活跃成员")
+    //public void kickNotActiveMembers(Bot bot, GroupIncreaseNoticeEvent event) {
+    //    GroupInfo groupInfo = bot.getGroupInfo(event.getGroupId(), true);
+    //    if (!groupInfo.getMemberCount().equals(groupInfo.getMaxMemberCount())) {
+    //        //群没满
+    //        return;
+    //    }
+    //    List<GroupMember> groupMembers = bot.getGroupMembers(event.getGroupId(), true);
+    //    long curTime = System.currentTimeMillis();
+    //    groupMembers.stream()
+    //            .filter(gm -> !StringUtil.hasLength(gm.getTitle())  //没有群头衔
+    //                && Integer.parseInt(gm.getLevel()) <= 1         //
+    //                && curTime - gm.getLastSentTime() > 7777777)    //三个月未发言
+    //            .limit(10).forEach(gm -> bot.setGroupKick(event.getGroupId(), gm.getUserId(), false));
+    //}
+
 
     //@MessageHandler(name = "禁言", commands = {"ban", "禁"}, rule = RuleEnum.admin)
     //public void ban(Bot bot, GroupMessageEvent event) {

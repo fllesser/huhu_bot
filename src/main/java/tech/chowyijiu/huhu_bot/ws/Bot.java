@@ -104,7 +104,7 @@ public class Bot {
         LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
         respMap.put(echo, deque);
         this.sessionSend(JSONObject.toJSONString(requestBox));
-        log.info("{}Blocking waits for gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
+        log.info("{}The current thread blocks waiting for a gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
         try {
             String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
             if (!StringUtil.hasLength(resp))
@@ -190,6 +190,12 @@ public class Bot {
     public List<GroupInfo> getGroupList(boolean noCache) {
         String data = this.callApiWithResp(GocqAction.get_group_list, Map.of("no_cache", noCache));
         return JSONArray.parseArray(data, GroupInfo.class);
+    }
+
+
+    public GroupInfo getGroupInfo(Long groupId, boolean noCache) {
+        String data = this.callApiWithResp(GocqAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
+        return JSONObject.parseObject(data, GroupInfo.class);
     }
 
     /**

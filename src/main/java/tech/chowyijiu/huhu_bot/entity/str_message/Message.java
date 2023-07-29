@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhu_bot.entity.message;
+package tech.chowyijiu.huhu_bot.entity.str_message;
 
 import tech.chowyijiu.huhu_bot.utils.StringUtil;
 
