@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>tech.chowyijiu</groupId>
-    <artifactId>huhu_bot</artifactId>
+    <artifactId>huhubot</artifactId>
     <version>1.0.0</version>
-    <name>huhu_bot</name>
-    <description>huhu_bot</description>
+    <name>huhubot</name>
+    <description>huhubot</description>
 
     <properties>
         <java.version>17</java.version>
