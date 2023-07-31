@@ -39,8 +39,8 @@ public class CoreDispatcher {
 
     private final ApplicationContext ioc;
 
-    private final List<Handler> MESSAGE_HANDLER_CONTAINER = new ArrayList<>();
-    private final List<Handler> NOTICE_HANDLER_CONTAINER = new ArrayList<>();
+    private List<Handler> MESSAGE_HANDLER_CONTAINER;
+    private List<Handler> NOTICE_HANDLER_CONTAINER;
 
     //private final Map<String, Handler> HANDLER_CALL_RECORD = new HashMap<>();
 
@@ -52,7 +52,7 @@ public class CoreDispatcher {
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("{}[HUHUBOT] Start Load Plugin...{}", ANSI.YELLOW, ANSI.RESET);
+            log.info("{}huhubot starts to load plugins...{}", ANSI.YELLOW, ANSI.RESET);
             int count = 1;
             for (String pluginName : botPluginMap.keySet()) {
                 Object plugin = botPluginMap.get(pluginName);
@@ -69,26 +69,25 @@ public class CoreDispatcher {
                         noticeHandlers.add(handler);
                     }
                 });
-                log.info("{}Succeeded to load plugin[{}], progress[{}/{}], function set: {}{}",
+                log.info("{}huhubot succeeded to load plugin[{}], progress[{}/{}], function set: {}{}",
                         ANSI.YELLOW, pluginName, count++, botPluginMap.size(),
                         Arrays.toString(handlerNames.toArray()), ANSI.RESET);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
             //throw new RuntimeException("[CoreDispatcher] No plugins were found");
-            log.info("{}No plugins were found{}", ANSI.YELLOW, ANSI.RESET);
+            log.info("{}No plugin was found{}", ANSI.YELLOW, ANSI.RESET);
             return;
         }
         //根据priority对handler进行排序, 并全部加入到handlerContainer中
-        MESSAGE_HANDLER_CONTAINER.addAll(messageHandlers.stream()
+        MESSAGE_HANDLER_CONTAINER = List.copyOf(messageHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
-        NOTICE_HANDLER_CONTAINER.addAll(noticeHandlers.stream()
+        NOTICE_HANDLER_CONTAINER = List.copyOf(noticeHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
-        log.info("{}[HUHUBOT] Running...{}", ANSI.YELLOW, ANSI.RESET);
+        log.info("{}running huhubot...{}", ANSI.YELLOW, ANSI.RESET);
     }
 
     public void onMessage(final Bot bot, final MessageEvent event) {
-        log.info("{} Start Match MessageHandler", event);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.eventTypeMatch(event.getClass())) continue;
@@ -102,7 +101,6 @@ public class CoreDispatcher {
                 //continue;
             }
         }
-        log.info("{} Match MessageHandler End", event);
     }
 
     private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
@@ -143,26 +141,22 @@ public class CoreDispatcher {
     }
 
     public void onNotice(final Bot bot, final NoticeEvent event) {
-        log.info("{} Start Match NoticeHandler", event);
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.eventTypeMatch(event.getClass())) {
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
         }
-        log.info("{} Match NoticeHandler End", event);
     }
 
     @Deprecated
     public void onRequest(final Bot bot, final RequestEvent event) {
-        log.info("{} Start Match RequestHandler", event);
         for (Handler handler : new ArrayList<Handler>()) {
             if (handler.eventTypeMatch(event.getClass())) {
                 handler.execute(bot, event);
                 break;
             }
         }
-        log.info("{} Match RequestHandler End", event);
     }
 
     @Builder
@@ -174,10 +168,6 @@ public class CoreDispatcher {
         private String name;         //Handler注解里的name
         private int priority;
         private boolean block;       //false 为不阻断
-
-        //public int cutdown;         //cd 单位秒
-        //public long lastExecuteTime;//上次调用时间戳
-        //public String cdMsg;
 
         //MessageHandler
         private String[] commands;
@@ -228,27 +218,12 @@ public class CoreDispatcher {
             return handler;
         }
 
-        //@Deprecated
-        //public boolean checkCutdown(final Bot bot, final Event event) {
-        //    if (this.cutdown <= 0) return true; //设置小于0, 防止用户设置负数cutdown, 徒增以下计算
-        //    if (System.currentTimeMillis() - this.lastExecuteTime > this.cutdown * 1000L) {
-        //        return true;
-        //    } else {
-        //        //cd 没好发送cdMsg
-        //        if (StringUtils.hasLength(this.cdMsg)) {
-        //            bot.sendMessage(event, this.cdMsg, true);
-        //        }
-        //        return false;
-        //    }
-        //}
-
         public void execute(Bot bot, Event event) {
             try {
                 if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
                         , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
-                //this.lastExecuteTime = System.currentTimeMillis(); //是否需要加锁
                 method.invoke(plugin, bot, event);
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
@@ -264,7 +239,6 @@ public class CoreDispatcher {
 
             }
         }
-
 
         public boolean keyWordsHasLength() {
             return keywords.length > 0;

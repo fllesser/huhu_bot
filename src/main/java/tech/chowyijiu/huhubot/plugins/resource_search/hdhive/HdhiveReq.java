@@ -53,6 +53,7 @@ public class HdhiveReq {
         String respJson = HttpUtil.get(url2 + type, Map.of("tmdb_id", tmdbId));
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         JSONArray dataArr = jsonObject.getJSONArray("data");
+        if (dataArr == null) return null;
         ResourceData res = null;
         for (Object d : dataArr) {
             JSONObject d_ = (JSONObject) d;

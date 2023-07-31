@@ -46,6 +46,7 @@ public class ProcessEventTask implements Runnable {
 
     @Override
     public void run() {
+        log.info("{} starts to match handler", event);
         if (event instanceof MessageEvent messageEvent) {
             CORE_DISPATCHER.onMessage(bot, messageEvent);
         } else if (event instanceof NoticeEvent noticeEvent) {
@@ -53,6 +54,7 @@ public class ProcessEventTask implements Runnable {
         } else if (event instanceof RequestEvent requestEvent) {
             log.info("{}", requestEvent);
         }
+        log.info("{} matches handler end", event);
     }
 
     public static void execute(final Bot bot, final Event event) {
