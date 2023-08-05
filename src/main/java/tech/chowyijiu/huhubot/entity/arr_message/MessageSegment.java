@@ -86,7 +86,7 @@ public class MessageSegment {
 
     public static MessageSegment image(String url, int cache, int threadNum) {
         if (!url.startsWith("http"))
-            throw new IllegalArgumentException("file string must start with 'http'");
+            throw new IllegalArgumentException("url string must start with 'http'");
         return init("image", Map.of("file", url, "cache", cache, "c", threadNum));
     }
 

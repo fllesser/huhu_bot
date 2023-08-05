@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(exclude = {"data", "message", "retcode"})
-public class ApiResp {
+public class ActionResponse {
     private String data;
     private String echo; //回声
     private String message;

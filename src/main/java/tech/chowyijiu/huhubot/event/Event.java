@@ -44,7 +44,7 @@ public abstract class Event {
             event.setEventJsonObject(jsonObject);
         } else {
             StringUtil.hasLength(jsonObject.getString("echo"), echo -> {
-                ApiResp resp = jsonObject.toJavaObject(ApiResp.class);
+                ActionResponse resp = jsonObject.toJavaObject(ActionResponse.class);
                 if ("ok".equals(resp.getStatus())) Bot.putEchoResult(echo, resp.getData());
             });
         }

@@ -81,11 +81,16 @@ public class XiaoAIUtil {
 
     //}
 
-    public static void tts(String content) {
+    //小爱二代
+    public static void tts2(String content) {
         Data data = new Data(ActionParams.builder().did("700938373").siid(7).aiid(3).in(List.of(content)).build());
         XiaoAIUtil.post("/miotspec/action", data.toString());
     }
 
+    public static void tts(String content) {
+        Data data = new Data(ActionParams.builder().did("701387057").siid(5).aiid(1).in(List.of(content)).build());
+        XiaoAIUtil.post("/miotspec/action", data.toString());
+    }
 
 
     // 调用接口

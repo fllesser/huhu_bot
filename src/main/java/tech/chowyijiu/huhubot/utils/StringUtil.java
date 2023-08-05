@@ -44,7 +44,7 @@ public class StringUtil {
             //去除除字母之外的前面带的下划线
             return sb.toString().replaceAll("_", "");
         }
-        return underlineToHump(sb.toString());
+        return sb.toString();
     }
 
     //是否是数字

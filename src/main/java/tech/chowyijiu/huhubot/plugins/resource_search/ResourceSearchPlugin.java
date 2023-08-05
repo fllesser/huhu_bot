@@ -39,6 +39,13 @@ public class ResourceSearchPlugin {
         ResourceUtil.clear();
     }
 
+    @MessageHandler(name = "阿里云盘手动签到", commands = "alisign", rule = RuleEnum.superuser)
+    public void aliSignIn(Bot bot, MessageEvent event) {
+        String result = AliYunApi.signInList();
+        bot.sendMessage(event, result);
+        XiaoAIUtil.tts(result);
+    }
+
     @MessageHandler(name = "阿里云盘资源搜索 GITCAFE", commands = {".s"})
     public void search1(Bot bot, MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), GitCafeReq::get);

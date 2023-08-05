@@ -39,14 +39,16 @@ public class RuleImpl {
     public static boolean selfOwner(Bot bot, Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) {
             //取缓存, 毕竟群主不可能也变来变去吧
-            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), false);
+            GroupMember groupMember = bot.getGroupMember(
+                    groupMessageEvent.getGroupId(), bot.getUserId(), false);
             return "owner".equals(groupMember.getRole());
         } else return false;
     }
 
     public static boolean selfAdmin(Bot bot, Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) {
-            GroupMember groupMember = bot.getGroupMember(groupMessageEvent.getGroupId(), bot.getUserId(), true);
+            GroupMember groupMember = bot.getGroupMember(
+                    groupMessageEvent.getGroupId(), bot.getUserId(), true);
             String role = groupMember.getRole();
             return "admin".equals(role) || "owner".equals(role);
         } else return false;
