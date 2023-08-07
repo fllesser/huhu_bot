@@ -130,8 +130,8 @@ public class MyGroupPlugin {
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
         //if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
-        if (title.length() > 6) {
-            bot.sendMessage(event, "[bot]群头衔最多为6位");
+        if (title.length() > 18) {
+            bot.sendMessage(event, "[bot]群头衔最多18位");
             return;
         }
         for (String filter : new String[]{"群主", "管理"}) {

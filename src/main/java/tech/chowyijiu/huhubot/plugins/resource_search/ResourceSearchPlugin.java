@@ -29,7 +29,7 @@ import java.util.Objects;
 public class ResourceSearchPlugin {
 
 
-    @Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApi.signInList();
         Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
