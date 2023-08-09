@@ -18,8 +18,8 @@ public @interface MessageHandler {
     boolean block() default false;  //默认不阻断
 
     //commands 和 keywords只能指定其中一个
-    String[] commands() default {}; //命令前缀匹配, event的message字段会自动去除触发的command和前后空白符
-    String[] keywords() default {}; //关键词匹配
+    String[] commands() default {""}; //命令前缀匹配, event的message字段会自动去除触发的command和前后空白符
+    String[] keywords() default {""}; //关键词匹配
 
     //1. 如果不指定可以在插件类中定义一个属性(引用为Rule, 名称为要加规则的方法名+"Rule") = (bot, event) -> {};
     //示例: Rule testRule = (bot, event) -> { return false;}

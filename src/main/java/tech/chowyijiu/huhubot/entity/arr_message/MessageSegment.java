@@ -59,6 +59,14 @@ public class MessageSegment {
         }
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[CQ:" + type);
+        for (String next : data.keySet()) {
+            sb.append(",").append(next).append("=").append(data.get(next));
+        }
+        return sb.toString();
+    }
+
     public String text() {
         return "text".equals(type) ? getString("text") : "";
     }

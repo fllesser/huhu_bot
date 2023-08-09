@@ -8,10 +8,12 @@ import tech.chowyijiu.huhubot.annotation.NoticeHandler;
 import tech.chowyijiu.huhubot.constant.SubTypeEnum;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
+import tech.chowyijiu.huhubot.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.entity.response.GroupInfo;
 import tech.chowyijiu.huhubot.entity.response.GroupMember;
 import tech.chowyijiu.huhubot.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhubot.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 import tech.chowyijiu.huhubot.ws.Bot;
@@ -20,9 +22,7 @@ import tech.chowyijiu.huhubot.ws.Server;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author elastic chow
@@ -168,6 +168,36 @@ public class MyGroupPlugin {
                         + groupMember.getNickname() + "at你说, " + event.getMessage().plainText())
                 );
 
+    }
+
+    private final Map<String, Integer> verificationMap = new HashMap<>();
+    private final List<Long> verificationGroups = List.of(754044548L, 208248400L);
+
+    @NoticeHandler(name = "麦片哥验证1")
+    public void verify1(Bot bot, GroupIncreaseNoticeEvent event) {
+        if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
+        int i = (int) (Math.random() * 10);
+        int j = (int) (Math.random() * 10);
+        verificationMap.put(event.getGroupId() + "_" + event.getUserId(), i + j);
+        Message message = new Message().append(MessageSegment.at(event.getUserId()))
+                .append(" 取汉化前请先完成入群验证:").append("\n" + i + " + " + j + " = ?")
+                .append("\n注意:回答无需@我, 只有一次机会, 回答错误, 将会被踢出群聊");
+        bot.sendMessage(event, message);
+    }
+
+    @MessageHandler(name = "麦片哥验证2")
+    public void verify2(Bot bot, GroupMessageEvent event) {
+        if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
+        String key = event.getGroupId() + "_" + event.getUserId();
+        if (!verificationMap.containsKey(key)) return;
+        int res = verificationMap.get(key);
+        verificationMap.remove(key);
+        if (res == Integer.parseInt(event.getRawMessage())) {
+            bot.sendMessage(event, MessageSegment.at(event.getUserId()) + " 回答正确!");
+        } else {
+            bot.deleteMsg(event.getMessageId());
+            bot.setGroupKick(event.getGroupId(), event.getUserId(), false);
+        }
     }
 
     //@NoticeHandler(name = "清代肝")
