@@ -2,19 +2,19 @@ package tech.chowyijiu.huhubot.plugins.resource_search;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import tech.chowyijiu.huhubot.annotation.BotPlugin;
-import tech.chowyijiu.huhubot.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
+import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceUtil;
 import tech.chowyijiu.huhubot.plugins.resource_search.gitcafe.GitCafeReq;
 import tech.chowyijiu.huhubot.plugins.resource_search.hdhive.HdhiveReq;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
-import tech.chowyijiu.huhubot.ws.Bot;
-import tech.chowyijiu.huhubot.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Bot;
+import tech.chowyijiu.huhubot.core.ws.Server;
 
 import java.util.List;
 import java.util.Objects;

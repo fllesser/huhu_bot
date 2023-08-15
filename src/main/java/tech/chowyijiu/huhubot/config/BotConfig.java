@@ -3,7 +3,7 @@ package tech.chowyijiu.huhubot.config;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import tech.chowyijiu.huhubot.constant.ANSI;
+import tech.chowyijiu.huhubot.core.constant.ANSI;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

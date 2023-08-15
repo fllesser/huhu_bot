@@ -9,8 +9,8 @@ package tech.chowyijiu.huhubot.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import tech.chowyijiu.huhubot.constant.ANSI;
-import tech.chowyijiu.huhubot.thread.ShareRunsPolicy;
+import tech.chowyijiu.huhubot.core.constant.ANSI;
+import tech.chowyijiu.huhubot.core.thread.ShareRunsPolicy;
 
 import java.util.concurrent.*;
 

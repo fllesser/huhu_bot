@@ -2,22 +2,22 @@ package tech.chowyijiu.huhubot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import tech.chowyijiu.huhubot.annotation.BotPlugin;
-import tech.chowyijiu.huhubot.annotation.MessageHandler;
-import tech.chowyijiu.huhubot.annotation.NoticeHandler;
-import tech.chowyijiu.huhubot.constant.SubTypeEnum;
+import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
+import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
+import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.entity.arr_message.Message;
-import tech.chowyijiu.huhubot.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.entity.response.GroupInfo;
-import tech.chowyijiu.huhubot.entity.response.GroupMember;
-import tech.chowyijiu.huhubot.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.event.notice.GroupIncreaseNoticeEvent;
-import tech.chowyijiu.huhubot.event.notice.NotifyNoticeEvent;
+import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
+import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
+import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.core.event.notice.GroupIncreaseNoticeEvent;
+import tech.chowyijiu.huhubot.core.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
-import tech.chowyijiu.huhubot.ws.Bot;
-import tech.chowyijiu.huhubot.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Bot;
+import tech.chowyijiu.huhubot.core.ws.Server;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -187,7 +187,6 @@ public class MyGroupPlugin {
 
     @MessageHandler(name = "麦片哥验证2")
     public void verify2(Bot bot, GroupMessageEvent event) {
-        if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
         String key = event.getGroupId() + "_" + event.getUserId();
         if (!verificationMap.containsKey(key)) return;
         int res = verificationMap.get(key);

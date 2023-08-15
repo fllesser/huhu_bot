@@ -1,7 +1,7 @@
 package tech.chowyijiu.huhubot.core.rule;
 
-import tech.chowyijiu.huhubot.event.Event;
-import tech.chowyijiu.huhubot.ws.Bot;
+import tech.chowyijiu.huhubot.core.event.Event;
+import tech.chowyijiu.huhubot.core.ws.Bot;
 
 /**
  * @author elastic chow

@@ -1,11 +1,11 @@
 package tech.chowyijiu.huhubot.core.rule;
 
 import tech.chowyijiu.huhubot.config.BotConfig;
-import tech.chowyijiu.huhubot.entity.response.GroupMember;
-import tech.chowyijiu.huhubot.event.Event;
-import tech.chowyijiu.huhubot.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.ws.Bot;
+import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
+import tech.chowyijiu.huhubot.core.event.Event;
+import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.ws.Bot;
 
 /**
  * @author elastic chow

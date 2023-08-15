@@ -1,17 +1,17 @@
 package tech.chowyijiu.huhubot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhubot.annotation.BotPlugin;
-import tech.chowyijiu.huhubot.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
+import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.entity.arr_message.ForwardMessage;
-import tech.chowyijiu.huhubot.entity.arr_message.Message;
-import tech.chowyijiu.huhubot.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.ws.Bot;
+import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
+import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.util.LinkedHashMap;
 import java.util.List;

@@ -2,15 +2,15 @@ package tech.chowyijiu.huhubot.plugins;
 
 import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhubot.annotation.BotPlugin;
-import tech.chowyijiu.huhubot.annotation.MessageHandler;
-import tech.chowyijiu.huhubot.constant.GocqAction;
+import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
+import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.entity.arr_message.ForwardMessage;
-import tech.chowyijiu.huhubot.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.ws.Bot;
+import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
+import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.util.*;
 import java.util.stream.Collectors;
