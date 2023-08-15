@@ -6,18 +6,16 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
 import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
-import tech.chowyijiu.huhubot.core.rule.Rule;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
 import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.core.event.notice.GroupIncreaseNoticeEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NotifyNoticeEvent;
-import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
+import tech.chowyijiu.huhubot.core.rule.Rule;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,7 +27,7 @@ import java.util.*;
  * @date 18/5/2023
  */
 @Slf4j
-@BotPlugin("群组骚操作")
+@BotPlugin("huhubot-plugin-mygroup")
 @SuppressWarnings("unused")
 public class MyGroupPlugin {
 
@@ -129,11 +127,6 @@ public class MyGroupPlugin {
     @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
     public void sgst(Bot bot, GroupMessageEvent event) {
         String title = event.getCommandArgs();
-        //if (!StringUtil.hasLength(title)) event.finish("[bot]群头衔为空");
-        if (title.length() > 18) {
-            bot.sendMessage(event, "[bot]群头衔最多18位");
-            return;
-        }
         for (String filter : new String[]{"群主", "管理"}) {
             if (title.contains(filter)) {
                 title = "群猪";
@@ -158,46 +151,46 @@ public class MyGroupPlugin {
     }
 
     //todo rule可以定义哪些群需要通知我, 然后移除tome, 写到方法里判断
-    @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
+    @MessageHandler(name = "被@, 让小爱通知我", rule = RuleEnum.tome, priority = 9)
     public void atMeXiaoAiNotice(Bot bot, GroupMessageEvent event) {
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
         bot.getGroups().stream()
                 .filter(g -> g.getGroupId().equals(event.getGroupId()))
                 .findFirst()
                 .ifPresent(g -> XiaoAIUtil.tts("群" + g.getGroupName() + "内"
-                        + groupMember.getNickname() + "at你说, " + event.getMessage().plainText())
+                        + groupMember.getNickname() + "艾特你说, " + event.getMessage().getPlainText())
                 );
 
     }
 
-    private final Map<String, Integer> verificationMap = new HashMap<>();
-    private final List<Long> verificationGroups = List.of(754044548L, 208248400L);
+    //private final Map<String, Integer> verificationMap = new HashMap<>();
+    //private final List<Long> verificationGroups = List.of(754044548L, 208248400L);
 
-    @NoticeHandler(name = "麦片哥验证1")
-    public void verify1(Bot bot, GroupIncreaseNoticeEvent event) {
-        if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
-        int i = (int) (Math.random() * 10);
-        int j = (int) (Math.random() * 10);
-        verificationMap.put(event.getGroupId() + "_" + event.getUserId(), i + j);
-        Message message = new Message().append(MessageSegment.at(event.getUserId()))
-                .append(" 取汉化前请先完成入群验证:").append("\n" + i + " + " + j + " = ?")
-                .append("\n注意:回答无需@我, 只有一次机会, 回答错误, 将会被踢出群聊");
-        bot.sendMessage(event, message);
-    }
-
-    @MessageHandler(name = "麦片哥验证2")
-    public void verify2(Bot bot, GroupMessageEvent event) {
-        String key = event.getGroupId() + "_" + event.getUserId();
-        if (!verificationMap.containsKey(key)) return;
-        int res = verificationMap.get(key);
-        verificationMap.remove(key);
-        if (res == Integer.parseInt(event.getRawMessage())) {
-            bot.sendMessage(event, MessageSegment.at(event.getUserId()) + " 回答正确!");
-        } else {
-            bot.deleteMsg(event.getMessageId());
-            bot.setGroupKick(event.getGroupId(), event.getUserId(), false);
-        }
-    }
+    //@NoticeHandler(name = "麦片哥验证1")
+    //public void verify1(Bot bot, GroupIncreaseNoticeEvent event) {
+    //    if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
+    //    int i = (int) (Math.random() * 10);
+    //    int j = (int) (Math.random() * 10);
+    //    verificationMap.put(event.getGroupId() + "_" + event.getUserId(), i + j);
+    //    Message message = new Message().append(MessageSegment.at(event.getUserId()))
+    //            .append(" 取汉化前请先完成入群验证:").append("\n" + i + " + " + j + " = ?")
+    //            .append("\n注意:回答无需@我, 只有一次机会, 回答错误, 将会被踢出群聊");
+    //    bot.sendMessage(event, message);
+    //}
+    //
+    //@MessageHandler(name = "麦片哥验证2")
+    //public void verify2(Bot bot, GroupMessageEvent event) {
+    //    String key = event.getGroupId() + "_" + event.getUserId();
+    //    if (!verificationMap.containsKey(key)) return;
+    //    int res = verificationMap.get(key);
+    //    verificationMap.remove(key);
+    //    if (res == Integer.parseInt(event.getRawMessage())) {
+    //        bot.sendMessage(event, MessageSegment.at(event.getUserId()) + " 回答正确!");
+    //    } else {
+    //        bot.deleteMsg(event.getMessageId());
+    //        bot.setGroupKick(event.getGroupId(), event.getUserId(), false);
+    //    }
+    //}
 
     //@NoticeHandler(name = "清代肝")
     //public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {

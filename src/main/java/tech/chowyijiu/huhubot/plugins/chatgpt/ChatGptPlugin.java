@@ -11,7 +11,7 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
  * @date 29/6/2023
  */
 @SuppressWarnings("unused")
-@BotPlugin
+@BotPlugin("huhubot-plugin-chatgpt")
 public class ChatGptPlugin {
 
     @MessageHandler(name = "chatgpt", commands = {"gpt"}, rule = RuleEnum.superuser)

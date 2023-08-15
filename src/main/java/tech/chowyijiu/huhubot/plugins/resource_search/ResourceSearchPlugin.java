@@ -25,7 +25,8 @@ import java.util.Objects;
  * @date 17/7/2023
  */
 @Slf4j
-@BotPlugin
+@BotPlugin("huhubot-plugin-resourcesearch")
+@SuppressWarnings("unused")
 public class ResourceSearchPlugin {
 
 

@@ -32,7 +32,7 @@ public class MessageEvent extends Event {
     private String messageType;
     @JsonProperty("message_id")
     private Integer messageId;
-    //注意这里gocq要设置数组array消息格式
+    //注意这里gocq, config.yml中要设置数组array消息格式
     @JsonProperty("message")
     private Message message;
     @JsonProperty("raw_message")
@@ -41,9 +41,6 @@ public class MessageEvent extends Event {
     private Integer font; //0
     @JsonProperty("sender")
     private Sender sender;
-
-    //@JsonIgnore
-    //private Message msg;
 
     //去除匹配的命令, 保留剩余的字符串,并去掉头尾空格, 注意不会去除at
     @JsonIgnore

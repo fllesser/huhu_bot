@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @Slf4j
-@BotPlugin(name = "测试插件")
-public class TestPlugin {
+@BotPlugin(name = "huhubot-plugin-gocqapi")
+public class CallApiPlugin {
 
 
     @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)

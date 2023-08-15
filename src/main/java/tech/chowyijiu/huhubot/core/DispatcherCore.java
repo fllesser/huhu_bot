@@ -9,23 +9,24 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
-import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
-import tech.chowyijiu.huhubot.core.rule.Rule;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.event.request.RequestEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
+import tech.chowyijiu.huhubot.core.rule.Rule;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,7 +36,7 @@ import java.util.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CoreDispatcher {
+public class DispatcherCore {
 
     private final ApplicationContext ioc;
 
@@ -54,28 +55,30 @@ public class CoreDispatcher {
         if (!botPluginMap.isEmpty()) {
             log.info("{}huhubot starts to load plugins...{}", ANSI.YELLOW, ANSI.RESET);
             int count = 1;
+            StringBuilder sb;
+            //容器中的插件Bean
+            Object plugin;
             for (String pluginName : botPluginMap.keySet()) {
-                Object plugin = botPluginMap.get(pluginName);
+                plugin = botPluginMap.get(pluginName);
                 //插件功能名, 用于打印日志
-                List<String> handlerNames = new ArrayList<>();
-                Arrays.stream(plugin.getClass().getMethods()).forEach(method -> {
+                sb = new StringBuilder();
+                for (Method method : plugin.getClass().getMethods()) {
+                    Handler handler;
                     if (method.isAnnotationPresent(MessageHandler.class)) {
-                        Handler handler = Handler.buildMessageHandler(plugin, method);
-                        handlerNames.add(handler.name);
+                        handler = Handler.buildMessageHandler(plugin, method);
                         messageHandlers.add(handler);
                     } else if (method.isAnnotationPresent(NoticeHandler.class)) {
-                        Handler handler = Handler.buildNoticeHandler(plugin, method);
-                        handlerNames.add(handler.name);
+                        handler = Handler.buildNoticeHandler(plugin, method);
                         noticeHandlers.add(handler);
-                    }
-                });
-                log.info("{}huhubot succeeded to load plugin[{}], progress[{}/{}], function set: {}{}",
-                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(),
-                        Arrays.toString(handlerNames.toArray()), ANSI.RESET);
+                    } else continue;
+                    sb.append(handler.name).append(" ");
+                }
+                log.info("{}huhubot succeeded to load plugin {}, progress:{}/{}, function:{}{}",
+                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(), sb, ANSI.RESET);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            //throw new RuntimeException("[CoreDispatcher] No plugins were found");
+            //throw new RuntimeException("[DispatcherCore] No plugins were found");
             log.info("{}No plugin was found{}", ANSI.YELLOW, ANSI.RESET);
             return;
         }
@@ -90,31 +93,28 @@ public class CoreDispatcher {
     public void onMessage(final Bot bot, final MessageEvent event) {
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
-            if (!handler.eventTypeMatch(event.getClass())) continue;
+            if (!handler.match(event.getClass())) continue;
             //因为注解中的commands和keywords 默认为{}, 无需判空
-            if (handler.commandsHasLength()) {
+            if (handler.hasCommands()) {
                 if (matchCommand(bot, event, handler)) break;
-                continue;
-            }
-            if (handler.keyWordsHasLength()) {
+            } else if (handler.hasKeywords()) {
                 if (matchKeyword(bot, event, handler)) break;
-                //continue;
             }
         }
     }
 
-    private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
-        Message message = event.getMessage();
-        String plainText = message.plainText();
+    private boolean matchCommand(Bot bot, MessageEvent event, Handler handler) {
+        //String plainText = event.getMessage().plainText();
+        String plainText = event.getMessage().getPlainText();
         //如果配置了命令前缀
-        if (BotConfig.commandPrefixes.size() > 0) {
-            if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
-                //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
-                return false;
-            } else {
-                plainText = plainText.substring(1);
-            }
-        }
+        //if (BotConfig.commandPrefixes.size() > 0) {
+        //    if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
+        //        //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
+        //        return false;
+        //    } else {
+        //        plainText = plainText.substring(1);
+        //    }
+        //}
         for (String command : handler.commands) {
             //匹配前缀命令
             if (plainText.startsWith(command)) {
@@ -130,9 +130,10 @@ public class CoreDispatcher {
     /**
      * 关键词匹配
      */
-    private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
+    private boolean matchKeyword(Bot bot, MessageEvent event, Handler handler) {
+        String plainText = event.getMessage().getPlainText();
         for (String keyword : handler.keywords) {
-            if (event.getMessage().plainText().contains(keyword)) {
+            if (plainText.contains(keyword)) {
                 handler.execute(bot, event);
                 return handler.block; //
             }
@@ -140,9 +141,9 @@ public class CoreDispatcher {
         return false;
     }
 
-    public void onNotice(final Bot bot, final NoticeEvent event) {
+    public void onNotice(Bot bot, NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            if (handler.eventTypeMatch(event.getClass())) {
+            if (handler.match(event.getClass())) {
                 handler.execute(bot, event);
                 if (handler.block) break;
             }
@@ -150,9 +151,9 @@ public class CoreDispatcher {
     }
 
     @Deprecated
-    public void onRequest(final Bot bot, final RequestEvent event) {
+    public void onRequest(Bot bot, RequestEvent event) {
         for (Handler handler : new ArrayList<Handler>()) {
-            if (handler.eventTypeMatch(event.getClass())) {
+            if (handler.match(event.getClass())) {
                 handler.execute(bot, event);
                 break;
             }
@@ -240,15 +241,15 @@ public class CoreDispatcher {
             }
         }
 
-        public boolean keyWordsHasLength() {
+        public boolean hasKeywords() {
             return keywords.length > 0;
         }
 
-        public boolean commandsHasLength() {
+        public boolean hasCommands() {
             return commands.length > 0;
         }
 
-        public boolean eventTypeMatch(Class<? extends Event> eventClass) {
+        public boolean match(Class<? extends Event> eventClass) {
             return eventType.isAssignableFrom(eventClass);
         }
     }

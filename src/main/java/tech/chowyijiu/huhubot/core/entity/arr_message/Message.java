@@ -2,6 +2,8 @@ package tech.chowyijiu.huhubot.core.entity.arr_message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
  * @author elastic chow
  * @date 25/7/2023
  */
+@Getter
 public class Message extends ArrayList<MessageSegment> {
 
     @JsonIgnore
@@ -41,15 +44,14 @@ public class Message extends ArrayList<MessageSegment> {
     }
 
     /**
-     * 获取所有text信息, 去除所有cq码
-     * @return String
+     * 初始化所有text信息, 去除所有cq码
      */
-    public String plainText() {
-        if (this.plainText != null) return this.plainText;
+    @PostConstruct
+    public void plainText() {
+        //if (this.plainText != null) return this.plainText;
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this) sb.append(segment.text());
         this.plainText = sb.toString();
-        return this.plainText;
     }
 
     public List<MessageSegment> getSegmentByType(String type) {
