@@ -1,13 +1,11 @@
 package tech.chowyijiu.huhubot.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author elastic chow
  * @date 24/7/2023
  */
-@Slf4j
 @ConfigurationProperties(prefix = "xiaoai")
 public class XiaoAiConfig {
 

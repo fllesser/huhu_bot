@@ -91,6 +91,7 @@ public class DispatcherCore {
     }
 
     public void onMessage(final Bot bot, final MessageEvent event) {
+        event.getMessage().plainText();
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.match(event.getClass())) continue;

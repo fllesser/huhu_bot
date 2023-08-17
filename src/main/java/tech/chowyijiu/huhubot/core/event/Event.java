@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import tech.chowyijiu.huhubot.core.constant.PostTypeEnum;
+import tech.chowyijiu.huhubot.core.entity.request.EchoData;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.meta.MetaEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.event.request.RequestEvent;
 import tech.chowyijiu.huhubot.utils.StringUtil;
-import tech.chowyijiu.huhubot.core.ws.Bot;
 
 /**
  * @author elastic chow
@@ -43,10 +43,11 @@ public abstract class Event {
             };
             event.setEventJsonObject(jsonObject);
         } else {
-            StringUtil.hasLength(jsonObject.getString("echo"), echo -> {
-                ActionResponse resp = jsonObject.toJavaObject(ActionResponse.class);
-                if ("ok".equals(resp.getStatus())) Bot.putEchoResult(echo, resp.getData());
-            });
+            String echo = jsonObject.getString("echo");
+            if (StringUtil.hasLength(echo)) {
+                EchoData echoData = EchoData.getByEcho(echo);
+                echoData.setData(jsonObject.getString("data"));
+            }
         }
         return event;
     }

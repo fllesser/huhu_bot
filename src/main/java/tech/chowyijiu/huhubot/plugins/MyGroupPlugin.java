@@ -35,8 +35,8 @@ public class MyGroupPlugin {
 
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        final String card = "失业第" + this.countdown("2023-06-16 10:00");
-        log.info("时间群昵称开始设置 card: {}", card);
+        String card = "失业第" + this.countdown("2023-06-16 10:00");
+        log.info("Time group nicknames start to be updated card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
                     bot.setGroupCard(groupId, bot.getUserId(), card);
@@ -60,7 +60,7 @@ public class MyGroupPlugin {
         //        e.printStackTrace();
         //    }
         //});
-        log.info("时间群昵称设置完毕 card: {}", card);
+        log.info("Time group nickname set up card: {}", card);
     }
 
     private String countdown(String dateText) {
@@ -109,18 +109,20 @@ public class MyGroupPlugin {
     //    customInfoMap.put(event.getUserId(), infoBuilder.build());
     //    bot.sendGroupMessage(event.getGroupId(), "自定义群时间昵称成功, 两分钟后见效", false);
     //}
+    private final List<Long> clockGroups = List.of(768887710L, 754044548L, 208248400L, 643396867L);
+
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
-        List<Long> clockGroups = Arrays.asList(768887710L, 754044548L, 208248400L, 643396867L);
-        Server.getBots().forEach(bot -> clockGroups.forEach(groupId -> {
-                    bot.sendGroupSign(groupId);
-                    try {
-                        Thread.sleep(500L);
-                    } catch (InterruptedException ignored) {
-                    }
-                })
-        );
+        for (Bot bot : Server.getBots()) {
+            for (Long clockGroup : clockGroups) {
+                bot.sendGroupSign(clockGroup);
+                try {
+                    Thread.sleep(500L);
+                } catch (InterruptedException ignored) {
+                }
+            }
+        }
         log.info("群打卡完毕");
     }
 

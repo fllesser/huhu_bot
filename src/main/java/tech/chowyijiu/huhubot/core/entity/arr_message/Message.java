@@ -2,7 +2,6 @@ package tech.chowyijiu.huhubot.core.entity.arr_message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ public class Message extends ArrayList<MessageSegment> {
     /**
      * 初始化所有text信息, 去除所有cq码
      */
-    @PostConstruct
     public void plainText() {
         //if (this.plainText != null) return this.plainText;
         StringBuilder sb = new StringBuilder();

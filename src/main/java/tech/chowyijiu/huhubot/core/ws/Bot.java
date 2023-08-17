@@ -16,6 +16,7 @@ import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.core.entity.request.EchoData;
 import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
 import tech.chowyijiu.huhubot.core.entity.response.FriendInfo;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
@@ -25,12 +26,9 @@ import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.exception.IllegalMessageTypeException;
-import tech.chowyijiu.huhubot.utils.StringUtil;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author elastic chow
@@ -52,14 +50,10 @@ public class Bot {
         groups = this.getGroupList();
     }
 
-    private static final long timeout = 10000L;
+    //private static final long timeout = 10000L;
 
     //多个Bot对象共用
-    private static final Map<String, LinkedBlockingDeque<String>> respMap = new HashMap<>();
 
-    public static void putEchoResult(String echo, String data) {
-        if (respMap.containsKey(echo)) respMap.get(echo).offer(data);
-    }
 
 
     /**
@@ -91,32 +85,20 @@ public class Bot {
      * @param paramsMap map
      * @return json 字符串数据
      */
+    @SuppressWarnings("all")
     public String callApiWithResp(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.name());
-        //curThread__userId__action__uuid
-        String echo = Thread.currentThread().getName() + "." + this.getUserId() + "." +
-                action + "." + UUID.randomUUID();
+        //userId.action.uuid
+        String echo = (this.getUserId() + "-" + action + "-" + Math.random());
         requestBox.setEcho(echo);
-        //发送请求
-        //在send前提前创建好阻塞队列, 并放入map中, 修复了0ms的数据丢失
-        LinkedBlockingDeque<String> deque = new LinkedBlockingDeque<>(1);
-        respMap.put(echo, deque);
-        this.sessionSend(JSONObject.toJSONString(requestBox));
-        log.info("{}The current thread blocks waiting for a gocq api resp, echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
-        try {
-            String resp = deque.poll(timeout, TimeUnit.MILLISECONDS);
-            if (!StringUtil.hasLength(resp))
-                throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
-            log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
-            return resp;
-        } catch (InterruptedException e) {
-            throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
-        } finally {
-            respMap.remove(echo);
+        EchoData echoData = EchoData.newInstance(echo);
+        //因为可能存在当前线程还没wait, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再发送ws请求
+        synchronized (echoData) {
+            this.sessionSend(JSONObject.toJSONString(requestBox));
+            return echoData.waitGetData();
         }
-
     }
 
     /**

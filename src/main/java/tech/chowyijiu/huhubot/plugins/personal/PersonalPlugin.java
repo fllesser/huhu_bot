@@ -1,6 +1,9 @@
-package tech.chowyijiu.huhubot.plugins;
+package tech.chowyijiu.huhubot.plugins.personal;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import tech.chowyijiu.huhubot.config.BotConfig;
+import tech.chowyijiu.huhubot.config.WeiboConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
@@ -11,6 +14,10 @@ import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
+import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
+
+import java.util.Objects;
 
 /**
  * @author elastic chow
@@ -20,6 +27,20 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
 @BotPlugin(name = "huhubot-plugin-seveneight")
 @SuppressWarnings("unused")
 public class PersonalPlugin {
+
+
+    @Scheduled(cron = "0 1 0 * * *")
+    public void allCheck() {
+        log.info("开始超话签到");
+        boolean ok = WeiBoClient.check(WeiboConfig.pids.get(0)) && WeiBoClient.check(WeiboConfig.pids.get(1));
+        String result = "丁勇岱超话今日" + (ok ? "签到成功" : "签到失败");
+        //结果发送到测试群
+        Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
+                .sendGroupMessage(BotConfig.testGroup, result);
+        //让小爱播报
+        XiaoAIUtil.tts(result);
+        log.info("超话签到完毕, " + result);
+    }
 
     Rule replyJyGroupRule = (bot, event) -> "group".equals(((PrivateMessageEvent) event).getSubType());
 
