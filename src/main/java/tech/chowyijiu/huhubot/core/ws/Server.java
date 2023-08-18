@@ -37,7 +37,7 @@ public class Server extends TextWebSocketHandler {
      */
     public static Bot getBot(Long userId) {
         for (Bot bot : bots)
-            if (Objects.equals(bot.getUserId(), userId))
+            if (Objects.equals(bot.getSelfId(), userId))
                 return bot;
         return null;
     }

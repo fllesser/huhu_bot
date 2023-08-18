@@ -41,7 +41,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class Bot {
 
-    private final Long userId;
+    private final Long selfId;
     private final WebSocketSession session;
 
     private List<GroupInfo> groups;
@@ -86,7 +86,7 @@ public class Bot {
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.name());
         //userId.action.uuid
-        String echo = (this.getUserId() + "-" + action + "-" + Math.random());
+        String echo = (selfId + "-" + action + "-" + Math.random());
         requestBox.setEcho(echo);
         EchoData echoData = EchoData.newInstance(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
@@ -253,13 +253,13 @@ public class Bot {
      * 发送群消息
      *
      * @param groupId    群号
-     * @param message    消息
+     * @param message    消息 if String 纯文本发送 if Message or MessageSegment 转化
      * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendGroupMessage(Long groupId, Object message) {
         Map<String, Object> map;
-        if (message instanceof String s) {
-            map = Map.of("group_id", groupId, "message", s, "auto_escape", true);
+        if (message instanceof String) {
+            map = Map.of("group_id", groupId, "message", message, "auto_escape", true);
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("group_id", groupId, "message", message, "auto_escape", false);
         } else throw new IllegalMessageTypeException();
@@ -276,8 +276,8 @@ public class Bot {
      */
     public void sendPrivateMessage(Long userId, Object message) {
         Map<String, Object> map;
-        if (message instanceof String s) {
-            map = Map.of("user_id", userId, "message", s, "auto_escape", true);
+        if (message instanceof String) {
+            map = Map.of("user_id", userId, "message", message , "auto_escape", true);
         } else if (message instanceof MessageSegment || message instanceof Message) {
             map = Map.of("user_id", userId, "message", message, "auto_escape", false);
         } else throw new IllegalMessageTypeException();

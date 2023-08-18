@@ -9,6 +9,9 @@ import java.util.Map;
 /**
  * @author elastic chow
  * @date 25/7/2023
+ *
+ * 不要使用String + MessageSegment发送消息
+ * 使用Message.text().append(MessageSegment)
  */
 @Getter
 @Setter
@@ -40,12 +43,7 @@ public class MessageSegment {
     }
 
     public String getString(String key) {
-        Object o = data.get(key);
-        if (o instanceof String s) {
-            return s;
-        } else {
-            return o.toString();
-        }
+        return data.get(key).toString();
     }
 
     public Integer getInteger(String key) {
@@ -59,11 +57,14 @@ public class MessageSegment {
         }
     }
 
+    @Override
+    @Deprecated
     public String toString() {
         StringBuilder sb = new StringBuilder("[CQ:" + type);
-        for (String next : data.keySet()) {
-            sb.append(",").append(next).append("=").append(data.get(next));
+        for (String key : data.keySet()) {
+            sb.append(",").append(key).append("=").append(data.get(key));
         }
+        sb.append("]");
         return sb.toString();
     }
 
@@ -110,5 +111,47 @@ public class MessageSegment {
 
     public static MessageSegment poke(Long userId) {
         return init("poke", Map.of("qq", userId));
+    }
+
+    /**
+     * 回复指定消息
+     * [CQ:reply,id=123456]
+     * 范围: 发送/接收
+     * https://docs.go-cqhttp.org/cqcode/#%E5%9B%9E%E5%A4%8D
+     *
+     * @param messageId 回复时所引用的消息id, 必须为本群消息.
+     * @return MessageSegment
+     */
+    public static MessageSegment reply(Long messageId) {
+        return init("reply", Map.of("id", messageId));
+    }
+
+    /**
+     * 回复自定义消息
+     * 范围: 发送/接收
+     * https://docs.go-cqhttp.org/cqcode/#%E5%9B%9E%E5%A4%8D
+     *
+     * @param text      自定义回复的信息
+     * @param qq        自定义回复时的自定义QQ, 如果使用自定义信息必须指定.
+     * @param timestamp 自定义回复时的时间, 格式为Unix时间
+     * @param seq       起始消息序号, 可通过 get_msg 获得
+     * @return MessageSegment
+     */
+    public static MessageSegment reply(String text, Long qq, Long timestamp, Long seq) {
+        return init("reply", Map.of("text", text, "qq", qq, "time", timestamp, "seq", seq));
+    }
+
+
+    /**
+     * 链接分享
+     * https://docs.go-cqhttp.org/cqcode/#%E9%93%BE%E6%8E%A5%E5%88%86%E4%BA%AB
+     * @param url 	要分享的URL
+     * @param title 标题
+     * @param content 发送时可选, 内容描述
+     * @param imageUrl 发送时可选, 图片 URL
+     * @return MessageSegment
+     */
+    public static MessageSegment share(String url, String title, String content, String imageUrl) {
+        return init("share", Map.of("url", url, "title", title, "content", content, "image", imageUrl));
     }
 }

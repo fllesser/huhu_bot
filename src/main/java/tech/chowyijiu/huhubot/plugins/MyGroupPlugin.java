@@ -39,7 +39,7 @@ public class MyGroupPlugin {
         log.info("Time group nicknames start to be updated card: {}", card);
         Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
-                    bot.setGroupCard(groupId, bot.getUserId(), card);
+                    bot.setGroupCard(groupId, bot.getSelfId(), card);
                     try {
                         Thread.sleep(2000L);
                     } catch (InterruptedException ignored) {
@@ -141,8 +141,8 @@ public class MyGroupPlugin {
     Rule replyPokeRule = (bot, event) -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
         return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
-                && bot.getUserId().equals(notifyNoticeEvent.getTargetId())    //被戳的是bot
-                && !bot.getUserId().equals(notifyNoticeEvent.getUserId());    //不是bot号自己戳的
+                && bot.getSelfId().equals(notifyNoticeEvent.getTargetId())    //被戳的是bot
+                && !bot.getSelfId().equals(notifyNoticeEvent.getUserId());    //不是bot号自己戳的
     };
 
     @NoticeHandler(name = "群内回戳", priority = 0)

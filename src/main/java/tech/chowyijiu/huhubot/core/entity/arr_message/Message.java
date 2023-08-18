@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.entity.arr_message;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
@@ -28,11 +27,21 @@ public class Message extends ArrayList<MessageSegment> {
         return false;
     }
 
+    /**
+     * 追加文本消息
+     * @param text String
+     * @return this
+     */
     public Message append(String text) {
         this.add(MessageSegment.text(text));
         return this;
     }
 
+    /**
+     * 追加非文本消息
+     * @param segment MessageSegment
+     * @return this
+     */
     public Message append(MessageSegment segment) {
         this.add(segment);
         return this;
@@ -44,6 +53,7 @@ public class Message extends ArrayList<MessageSegment> {
 
     /**
      * 初始化所有text信息, 去除所有cq码
+     * 即合并所有[CQ:text,text=?]中的?
      */
     public void plainText() {
         //if (this.plainText != null) return this.plainText;
@@ -52,13 +62,20 @@ public class Message extends ArrayList<MessageSegment> {
         this.plainText = sb.toString();
     }
 
+    /**
+     * 根据MessageSegment的type获取指定类型的所有消息段
+     * 比如 测试[CQ:at,qq=123123]测试[CQ:at,qq=123123]测试
+     * 使用getSegmentByType("at")可以得到[MessageSegment([CQ:at,qq=123123]), MessageSegment([CQ:at,qq=123123])]
+     * @param type String
+     * @return List<MessageSegment>
+     */
     public List<MessageSegment> getSegmentByType(String type) {
         return this.stream().filter(seg -> seg.getType().equals(type)).toList();
     }
 
-    @Override
-    public String toString() {
-        //return this.plainText;
-        return JSONObject.toJSONString(this);
-    }
+    //@Override
+    //public String toString() {
+    //    //return this.plainText;
+    //    return JSONObject.toJSONString(this);
+    //}
 }
