@@ -1,6 +1,8 @@
 package tech.chowyijiu.huhubot;
 
 import cn.hutool.http.HttpRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.test.context.SpringBootTest;
 import tech.chowyijiu.huhubot.plugins.fortnite.FortniteApi;
 import tech.chowyijiu.huhubot.plugins.fortnite.ShopEntry;
 import tech.chowyijiu.huhubot.utils.ImageUtil;
@@ -12,8 +14,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-//@SpringBootTest
+@SpringBootTest
 @SuppressWarnings("all")
+@Slf4j
 public class HuhuBotApplicationTests {
 
 
@@ -36,6 +39,7 @@ public class HuhuBotApplicationTests {
         }).toArray(BufferedImage[]::new);
         ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     }
+
 
 
 

@@ -39,7 +39,7 @@ public class EchoData {
         } finally {
             ECHO_DATA_MAP.remove(echo);
         }
-        return data;
+        return this.data;
     }
 
     public synchronized void setData(String data) {

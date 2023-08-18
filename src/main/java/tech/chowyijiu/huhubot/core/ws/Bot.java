@@ -50,11 +50,6 @@ public class Bot {
         groups = this.getGroupList();
     }
 
-    //private static final long timeout = 10000L;
-
-    //多个Bot对象共用
-
-
 
     /**
      * call api 最终调用的方法
@@ -94,7 +89,7 @@ public class Bot {
         String echo = (this.getUserId() + "-" + action + "-" + Math.random());
         requestBox.setEcho(echo);
         EchoData echoData = EchoData.newInstance(echo);
-        //因为可能存在当前线程还没wait, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再发送ws请求
+        //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
             this.sessionSend(JSONObject.toJSONString(requestBox));
             return echoData.waitGetData();

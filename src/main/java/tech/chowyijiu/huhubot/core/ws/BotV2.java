@@ -9,17 +9,12 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
 import tech.chowyijiu.huhubot.core.constant.GocqAction;
+import tech.chowyijiu.huhubot.core.entity.request.EchoData;
 import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
-import tech.chowyijiu.huhubot.core.exception.ActionFailed;
-import tech.chowyijiu.huhubot.utils.StringUtil;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author elastic chow
@@ -34,13 +29,6 @@ public class BotV2 {
 
     private final Long userId;
     private final WebSocketSession session;
-
-    public static final long timeout = 5000L;
-    private final Map<String, LinkedBlockingDeque<String>> respMap = new HashMap<>();
-
-    public void putEchoResult(String echo, String data) {
-        if (respMap.containsKey(echo)) respMap.get(echo).offer(data);
-    }
 
     /**
      * call api 最终调用的方法
@@ -57,31 +45,19 @@ public class BotV2 {
         }
     }
 
+    @SuppressWarnings("all")
     private String callApi(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         requestBox.setAction(action.name());
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         if (action.isHasResp()) {
-            String echo = Thread.currentThread().getName() + "_" +
-                    this.getUserId() + "_" +
-                    action + "_" +
-                    UUID.randomUUID().toString().replace("-", "");
+            String echo = (this.getUserId() + "-" + action + "-" + Math.random());
             requestBox.setEcho(echo);
-            LinkedBlockingDeque<String> blockingRes = new LinkedBlockingDeque<>(1);
-            respMap.put(echo, blockingRes);
-            //发送请求
-            this.sessionSend(JSONObject.toJSONString(requestBox));
-            log.info("Blocking waits for gocq to return the result, echo: {}", echo);
-            try {
-                String resp = blockingRes.poll(BotV2.timeout, TimeUnit.MILLISECONDS);
-                if (!StringUtil.hasLength(resp))
-                    throw new ActionFailed("echo:" + echo + ", api请求超时, 或者该api无响应数据");
-                log.info("{}Accepted a response for echo:{}{}", ANSI.BLUE, echo, ANSI.RESET);
-                return resp;
-            } catch (InterruptedException e) {
-                throw new ActionFailed("等待响应数据线程中断异常, echo:" + echo);
-            } finally {
-                respMap.remove(echo);
+            EchoData echoData = EchoData.newInstance(echo);
+            //因为可能存在当前线程还没wait, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再发送ws请求
+            synchronized (echoData) {
+                this.sessionSend(JSONObject.toJSONString(requestBox));
+                return echoData.waitGetData();
             }
         } else {
             this.sessionSend(JSONObject.toJSONString(requestBox));

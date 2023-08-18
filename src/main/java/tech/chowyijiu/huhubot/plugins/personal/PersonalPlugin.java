@@ -32,8 +32,16 @@ public class PersonalPlugin {
     @Scheduled(cron = "0 1 0 * * *")
     public void allCheck() {
         log.info("开始超话签到");
-        boolean ok = WeiBoClient.check(WeiboConfig.pids.get(0)) && WeiBoClient.check(WeiboConfig.pids.get(1));
-        String result = "丁勇岱超话今日" + (ok ? "签到成功" : "签到失败");
+        boolean ok = true;
+        for (String pid : WeiboConfig.pids) {
+            ok = ok && WeiBoClient.check(pid);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        String result = "勇远期岱超话今日" + (ok ? "签到成功" : "签到失败");
         //结果发送到测试群
         Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
