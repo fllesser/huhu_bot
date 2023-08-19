@@ -15,7 +15,7 @@ import java.util.List;
  * @date 26/7/2023
  */
 @SuppressWarnings("unuesd")
-@BotPlugin("huhubot-plugin-pet")
+@BotPlugin("huhubot-plugin-api")
 public class ApiPlugin {
 
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"}, rule = RuleEnum.superuser)

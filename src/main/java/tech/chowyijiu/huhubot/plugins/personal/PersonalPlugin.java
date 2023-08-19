@@ -60,15 +60,17 @@ public class PersonalPlugin {
                 .append("[bot]").append(MessageSegment.at(event.getUserId()))
                 .append("请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了");
         bot.sendGroupMessage(event.getSender().getGroupId(), message);
-        //String videoUrl = "https://www.bilibili.com/video/BV1Xg411x7S2";
-        //String imgUrl = "https://i0.hdslb.com/bfs/face/08de07fb5f5324d6b0da45a4cdb224de7af30171.webp@240w_240h_1c_1s_!web-avatar-space-header.webp";
-        //bot.sendGroupMessage(event.getSender().getGroupId(), MessageSegment.share(videoUrl, "汉化教程", "看完了再问问题", imgUrl));
     }
 
     @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
     @Deprecated
     public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
         bot.sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
+    }
+
+    @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
+    public void echo(Bot bot, MessageEvent event) {
+        bot.sendMessage(event, event.getCommandArgs());
     }
 
     //@MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
@@ -81,10 +83,4 @@ public class PersonalPlugin {
     //    List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
     //    bot.sendGroupForwardMsg(event.getGroupId(), nodes);
     //}
-
-    @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
-    public void echo(Bot bot, MessageEvent event) {
-        bot.sendMessage(event, event.getCommandArgs());
-    }
-
 }

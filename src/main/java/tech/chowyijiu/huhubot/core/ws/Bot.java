@@ -83,13 +83,14 @@ public class Bot {
         return echoData;
     }
 
-    public static void fillEchoData(String echo, String data) {
+    public static void transferData(String echo, String data) {
         if (!ECHO_DATA_MAP.containsKey(echo)) return;
         EchoData echoData = ECHO_DATA_MAP.get(echo);
-        echoData.setData(data);
+        echoData.syncSetAndNotify(data);
     }
 
     static class EchoData {
+
         private static final long timeout = 10000L;
 
         private final String echo;
@@ -99,8 +100,7 @@ public class Bot {
             this.echo = echo;
         }
 
-        private synchronized String waitGetData(Bot bot, String json) {
-            bot.sessionSend(json);
+        private String waitAndGet() {
             try {
                 this.wait(timeout);
             } catch (InterruptedException e) {
@@ -111,7 +111,7 @@ public class Bot {
             return this.data;
         }
 
-        private synchronized void setData(String data) {
+        private synchronized void syncSetAndNotify(String data) {
             this.data = data;
             this.notify();
         }
@@ -125,7 +125,7 @@ public class Bot {
      * @return json 字符串数据
      */
     @SuppressWarnings("all")
-    public String callApiWithResp(GocqAction action, Map<String, Object> paramsMap) {
+    public String callApiWaitResp(GocqAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.name());
@@ -134,7 +134,10 @@ public class Bot {
         requestBox.setEcho(echo);
         EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
-        return echoData.waitGetData(this, JSONObject.toJSONString(requestBox));
+        synchronized (echoData) {
+            this.sessionSend(JSONObject.toJSONString(requestBox));
+            return echoData.waitAndGet();
+        }
     }
 
     /**
@@ -162,7 +165,7 @@ public class Bot {
     }
 
     public void deleteFriend(Long userId) {
-        this.callApiWithResp(GocqAction.delete_friend, Map.of("user_id", userId));
+        this.callApiWaitResp(GocqAction.delete_friend, Map.of("user_id", userId));
     }
 
     /**
@@ -171,7 +174,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWithResp(GocqAction.get_login_info, null);
+        String data = this.callApiWaitResp(GocqAction.get_login_info, null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -181,7 +184,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWithResp(GocqAction.get_friend_list, null);
+        String data = this.callApiWaitResp(GocqAction.get_friend_list, null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -194,7 +197,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = this.callApiWithResp(GocqAction.get_group_member_list,
+        String data = this.callApiWaitResp(GocqAction.get_group_member_list,
                 Map.of("group_id", groupId, "no_cache", noCache));
         return JSONArray.parseArray(data, GroupMember.class);
     }
@@ -206,13 +209,13 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callApiWithResp(GocqAction.get_group_list, Map.of("no_cache", noCache));
+        String data = this.callApiWaitResp(GocqAction.get_group_list, Map.of("no_cache", noCache));
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
 
     public GroupInfo getGroupInfo(Long groupId, boolean noCache) {
-        String data = this.callApiWithResp(GocqAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
+        String data = this.callApiWaitResp(GocqAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupInfo.class);
     }
 
@@ -238,7 +241,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = this.callApiWithResp(GocqAction.get_group_member_info,
+        String data = this.callApiWaitResp(GocqAction.get_group_member_info,
                 Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupMember.class);
     }
@@ -351,7 +354,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callApiWithResp(GocqAction.get_forward_msg,
+        String data = this.callApiWaitResp(GocqAction.get_forward_msg,
                 Map.of("message_id", messageId));
     }
 

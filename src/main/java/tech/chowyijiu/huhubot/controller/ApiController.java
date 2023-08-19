@@ -18,7 +18,6 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ApiController {
 
-
     @PostMapping("/sendMessage")
     public ResponseEntity<String> sendMessage(@RequestBody Map<String, String> data) {
         System.out.println(data.get("text"));

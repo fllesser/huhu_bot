@@ -47,7 +47,7 @@ public class CallApiPlugin {
             return;
         }
         long start = System.currentTimeMillis();
-        String resp = bot.callApiWithResp(action, map);
+        String resp = bot.callApiWaitResp(action, map);
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
         if (resp.startsWith("{")) {
