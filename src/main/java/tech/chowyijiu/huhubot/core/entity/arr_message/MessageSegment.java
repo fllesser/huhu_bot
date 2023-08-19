@@ -9,12 +9,13 @@ import java.util.Map;
 /**
  * @author elastic chow
  * @date 25/7/2023
- *
+ * <p>
  * 不要使用String + MessageSegment发送消息
  * 使用Message.text().append(MessageSegment)
  */
 @Getter
 @Setter
+@SuppressWarnings("unused")
 public class MessageSegment {
 
     private String type;
@@ -23,7 +24,7 @@ public class MessageSegment {
     public MessageSegment() {
     }
 
-    public MessageSegment(String type, Map<String, Object> data) {
+    private MessageSegment(String type, Map<String, Object> data) {
         this.type = type;
         this.data = data;
     }
@@ -73,30 +74,30 @@ public class MessageSegment {
     }
 
 
-    public static MessageSegment init(String type, Map<String, Object> data) {
+    public static MessageSegment build(String type, Map<String, Object> data) {
         return new MessageSegment(type, data);
     }
 
     public static MessageSegment text(String text) {
-        return init("text", Map.of("text", text));
+        return build("text", Map.of("text", text));
     }
 
     public static MessageSegment at(Long userId) {
-        return init("at", Map.of("qq", userId));
+        return build("at", Map.of("qq", userId));
     }
 
     public static MessageSegment atAll() {
-        return init("at", Map.of("qq", "all"));
+        return build("at", Map.of("qq", "all"));
     }
 
     public static MessageSegment tts(String text) {
-        return init("tts", Map.of("text", text));
+        return build("tts", Map.of("text", text));
     }
 
     public static MessageSegment image(String url, int cache, int threadNum) {
         if (!url.startsWith("http"))
             throw new IllegalArgumentException("url string must start with 'http'");
-        return init("image", Map.of("file", url, "cache", cache, "c", threadNum));
+        return build("image", Map.of("file", url, "cache", cache, "c", threadNum));
     }
 
     public static MessageSegment image(String url, int cache) {
@@ -106,11 +107,11 @@ public class MessageSegment {
     public static MessageSegment image(String file) {
         if (!file.startsWith("http") && !file.startsWith("file://") && !file.startsWith("base64://"))
             throw new IllegalArgumentException("file string must start with 'http' or 'file://' or 'base64://'");
-        return init("image", Map.of("file", file));
+        return build("image", Map.of("file", file));
     }
 
     public static MessageSegment poke(Long userId) {
-        return init("poke", Map.of("qq", userId));
+        return build("poke", Map.of("qq", userId));
     }
 
     /**
@@ -123,7 +124,7 @@ public class MessageSegment {
      * @return MessageSegment
      */
     public static MessageSegment reply(Long messageId) {
-        return init("reply", Map.of("id", messageId));
+        return build("reply", Map.of("id", messageId));
     }
 
     /**
@@ -138,20 +139,21 @@ public class MessageSegment {
      * @return MessageSegment
      */
     public static MessageSegment reply(String text, Long qq, Long timestamp, Long seq) {
-        return init("reply", Map.of("text", text, "qq", qq, "time", timestamp, "seq", seq));
+        return build("reply", Map.of("text", text, "qq", qq, "time", timestamp, "seq", seq));
     }
 
 
     /**
      * 链接分享
      * https://docs.go-cqhttp.org/cqcode/#%E9%93%BE%E6%8E%A5%E5%88%86%E4%BA%AB
-     * @param url 	要分享的URL
-     * @param title 标题
-     * @param content 发送时可选, 内容描述
+     *
+     * @param url      要分享的URL
+     * @param title    标题
+     * @param content  发送时可选, 内容描述
      * @param imageUrl 发送时可选, 图片 URL
      * @return MessageSegment
      */
     public static MessageSegment share(String url, String title, String content, String imageUrl) {
-        return init("share", Map.of("url", url, "title", title, "content", content, "image", imageUrl));
+        return build("share", Map.of("url", url, "title", title, "content", content, "image", imageUrl));
     }
 }

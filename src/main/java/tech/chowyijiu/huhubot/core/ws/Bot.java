@@ -16,7 +16,6 @@ import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.core.entity.request.EchoData;
 import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
 import tech.chowyijiu.huhubot.core.entity.response.FriendInfo;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
@@ -28,7 +27,10 @@ import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.exception.IllegalMessageTypeException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -73,6 +75,48 @@ public class Bot {
         this.sessionSend(JSONObject.toJSONString(requestBox));
     }
 
+    private static final Map<String, EchoData> ECHO_DATA_MAP = new HashMap<>();
+
+    private static EchoData buildEchoDataToMap(String echo) {
+        EchoData echoData = new EchoData(echo);
+        ECHO_DATA_MAP.put(echo, echoData);
+        return echoData;
+    }
+
+    public static void fillEchoData(String echo, String data) {
+        if (!ECHO_DATA_MAP.containsKey(echo)) return;
+        EchoData echoData = ECHO_DATA_MAP.get(echo);
+        echoData.setData(data);
+    }
+
+    static class EchoData {
+        private static final long timeout = 10000L;
+
+        private final String echo;
+        private String data;
+
+        private EchoData(String echo) {
+            this.echo = echo;
+        }
+
+        private synchronized String waitGetData(Bot bot, String json) {
+            bot.sessionSend(json);
+            try {
+                this.wait(timeout);
+            } catch (InterruptedException e) {
+                throw new ActionFailed("等待响应数据, 出现线程中断异常, echo:" + echo);
+            } finally {
+                ECHO_DATA_MAP.remove(echo);
+            }
+            return this.data;
+        }
+
+        private synchronized void setData(String data) {
+            this.data = data;
+            this.notify();
+        }
+    }
+
     /**
      * 用于有响应数据的gocq api
      *
@@ -88,12 +132,9 @@ public class Bot {
         //userId.action.uuid
         String echo = (selfId + "-" + action + "-" + Math.random());
         requestBox.setEcho(echo);
-        EchoData echoData = EchoData.newInstance(echo);
+        EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
-        synchronized (echoData) {
-            this.sessionSend(JSONObject.toJSONString(requestBox));
-            return echoData.waitGetData();
-        }
+        return echoData.waitGetData(this, JSONObject.toJSONString(requestBox));
     }
 
     /**

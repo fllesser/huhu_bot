@@ -23,7 +23,6 @@ public class ForwardMessage {
     @JSONField(name = "data")
     private Node data;
 
-
     private ForwardMessage(String name, Long uin, Object content) {
         this.data = new Node(name, uin, content);
     }

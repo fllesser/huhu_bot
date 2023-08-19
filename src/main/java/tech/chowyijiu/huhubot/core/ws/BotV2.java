@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.ws;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -8,13 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
-import tech.chowyijiu.huhubot.core.constant.GocqAction;
-import tech.chowyijiu.huhubot.core.entity.request.EchoData;
-import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -45,25 +39,25 @@ public class BotV2 {
         }
     }
 
-    @SuppressWarnings("all")
-    private String callApi(GocqAction action, Map<String, Object> paramsMap) {
-        RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.name());
-        Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
-        if (action.isHasResp()) {
-            String echo = (this.getUserId() + "-" + action + "-" + Math.random());
-            requestBox.setEcho(echo);
-            EchoData echoData = EchoData.newInstance(echo);
-            //因为可能存在当前线程还没wait, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再发送ws请求
-            synchronized (echoData) {
-                this.sessionSend(JSONObject.toJSONString(requestBox));
-                return echoData.waitGetData();
-            }
-        } else {
-            this.sessionSend(JSONObject.toJSONString(requestBox));
-            return "";
-        }
-    }
+    //@SuppressWarnings("all")
+    //private String callApi(GocqAction action, Map<String, Object> paramsMap) {
+    //    RequestBox requestBox = new RequestBox();
+    //    requestBox.setAction(action.name());
+    //    Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
+    //    if (action.isHasResp()) {
+    //        String echo = (this.getUserId() + "-" + action + "-" + Math.random());
+    //        requestBox.setEcho(echo);
+    //        EchoData echoData = EchoData.newInstance(echo);
+    //        //因为可能存在当前线程还没wait, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再发送ws请求
+    //        synchronized (echoData) {
+    //            this.sessionSend(JSONObject.toJSONString(requestBox));
+    //            return echoData.waitGetData();
+    //        }
+    //    } else {
+    //        this.sessionSend(JSONObject.toJSONString(requestBox));
+    //        return "";
+    //    }
+    //}
 
 
 }
