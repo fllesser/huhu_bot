@@ -24,7 +24,7 @@ public class NoticeEvent extends Event {
     @JsonProperty("notice_type")
     private String noticeType;
 
-    public static NoticeEvent build(JSONObject jsonObject) {
+    public static NoticeEvent build(final JSONObject jsonObject) {
         String noticeType = jsonObject.getString("notice_type");
         return switch (NoticeTypeEnum.valueOf(noticeType)) {
             case notify -> jsonObject.toJavaObject(NotifyNoticeEvent.class);

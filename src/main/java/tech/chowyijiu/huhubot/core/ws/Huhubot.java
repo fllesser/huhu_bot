@@ -12,34 +12,27 @@ import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.meta.MetaEvent;
 import tech.chowyijiu.huhubot.core.thread.ProcessEventTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author elastic chow
  * @date 13/5/2023
  */
 @Slf4j
-public class Server extends TextWebSocketHandler {
+public class Huhubot extends TextWebSocketHandler {
 
-    private static final List<Bot> bots = new ArrayList<>();
+    private static final Map<Long, Bot> BOT_MAP = new HashMap<>();
 
-    public static int getConnections() {
-        return bots.size();
+    private static void addBot(Long userId, WebSocketSession session) {
+        BOT_MAP.put(userId, new Bot(userId, session));
     }
 
-    /**
-     * 根据userId获取Bot
-     *
-     * @param userId qq号
-     * @return Bot
-     */
-    public static Bot getBot(Long userId) {
-        for (Bot bot : bots)
-            if (Objects.equals(bot.getSelfId(), userId))
-                return bot;
-        return null;
+    public static Bot getBot(Long selfId) {
+        return BOT_MAP.get(selfId);
+    }
+
+    public static int getConnections() {
+        return BOT_MAP.size();
     }
 
     /**
@@ -48,15 +41,11 @@ public class Server extends TextWebSocketHandler {
      * @return List<Bot>
      */
     public static List<Bot> getBots() {
-        return bots;
-    }
-
-    public static void addBot(Long userId, WebSocketSession session) {
-        bots.add(new Bot(userId, session));
+        return BOT_MAP.values().stream().toList();
     }
 
     @Override
-    public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(final WebSocketSession session) {
         log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
                 session.getRemoteAddress(), getConnections() + 1, ANSI.RESET);
     }
@@ -65,8 +54,7 @@ public class Server extends TextWebSocketHandler {
     public void handleTextMessage(final @NotNull WebSocketSession session, final TextMessage message) {
         final String json = message.getPayload();
         try {
-            JSONObject jsonObject = JSONObject.parseObject(json);
-            Event event = Event.build(jsonObject);
+            final Event event = Event.build(JSONObject.parseObject(json));
             if (event == null) return;
             if (event instanceof MetaEvent metaEvent) {
                 if (metaEvent.heartbeat()) return;//心跳忽略
@@ -80,7 +68,7 @@ public class Server extends TextWebSocketHandler {
             }
             //测试
             //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
-            ProcessEventTask.execute(getBot(event.getSelfId()), event);
+            ProcessEventTask.execute(BOT_MAP.get(event.getSelfId()), event);
         } catch (Exception e) {
             log.error("handleTextMessage exception", e);
         }
@@ -102,9 +90,12 @@ public class Server extends TextWebSocketHandler {
     }
 
     private void removeBot(WebSocketSession session) {
-        bots.removeIf(bot -> bot.getSession() == session);
+        for (Bot bot : getBots()) {
+            if (bot.getSession() == session) {
+                BOT_MAP.remove(bot.getSelfId());
+            }
+        }
     }
-
 
 
 }

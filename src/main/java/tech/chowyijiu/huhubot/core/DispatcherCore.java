@@ -13,7 +13,6 @@ import tech.chowyijiu.huhubot.core.constant.ANSI;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
-import tech.chowyijiu.huhubot.core.event.request.RequestEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.rule.Rule;
@@ -104,7 +103,7 @@ public class DispatcherCore {
         }
     }
 
-    private boolean matchCommand(Bot bot, MessageEvent event, Handler handler) {
+    private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
         //String plainText = event.getMessage().plainText();
         String plainText = event.getMessage().getPlainText();
         //如果配置了命令前缀
@@ -131,7 +130,7 @@ public class DispatcherCore {
     /**
      * 关键词匹配
      */
-    private boolean matchKeyword(Bot bot, MessageEvent event, Handler handler) {
+    private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
         String plainText = event.getMessage().getPlainText();
         for (String keyword : handler.keywords) {
             if (plainText.contains(keyword)) {
@@ -142,7 +141,7 @@ public class DispatcherCore {
         return false;
     }
 
-    public void onNotice(Bot bot, NoticeEvent event) {
+    public void onNotice(final Bot bot, final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
             if (handler.match(event.getClass())) {
                 handler.execute(bot, event);
@@ -151,15 +150,15 @@ public class DispatcherCore {
         }
     }
 
-    @Deprecated
-    public void onRequest(Bot bot, RequestEvent event) {
-        for (Handler handler : new ArrayList<Handler>()) {
-            if (handler.match(event.getClass())) {
-                handler.execute(bot, event);
-                break;
-            }
-        }
-    }
+    //@Deprecated
+    //public void onRequest(final Bot bot, final RequestEvent event) {
+    //    for (Handler handler : new ArrayList<Handler>()) {
+    //        if (handler.match(event.getClass())) {
+    //            handler.execute(bot, event);
+    //            break;
+    //        }
+    //    }
+    //}
 
     @Builder
     static class Handler {
@@ -220,7 +219,7 @@ public class DispatcherCore {
             return handler;
         }
 
-        public void execute(Bot bot, Event event) {
+        public void execute(final Bot bot, final Event event) {
             try {
                 if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"

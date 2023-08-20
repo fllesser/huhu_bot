@@ -9,7 +9,7 @@ import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -60,7 +60,7 @@ public class FortnitePlugin {
             map.put(name, message);
         }
         nodes = ForwardMessage.quickBuild(501273515L, map);
-        for (Bot bot : Server.getBots()) {
+        for (Bot bot : Huhubot.getBots()) {
             bot.sendGroupForwardMsg(754044548L, nodes);
             Thread.sleep(1000 * 10L);
             bot.sendGroupForwardMsg(208248400L, nodes);

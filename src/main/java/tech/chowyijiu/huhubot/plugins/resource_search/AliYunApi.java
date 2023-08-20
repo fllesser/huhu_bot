@@ -36,6 +36,7 @@ public class AliYunApi {
         ACCESS_TOKEN = jsonObject.getString("access_token");
         //需要+8个小时
         String et = jsonObject.getString("expire_time");
+        if (!StringUtil.hasLength(et)) throw new RuntimeException("refresh token expired");
         LocalDateTime utc = LocalDateTime.parse(et, formatter);
         EXPIRE_TIME = utc.plusHours(8L);
         return ACCESS_TOKEN;

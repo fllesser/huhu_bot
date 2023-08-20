@@ -14,7 +14,7 @@ import tech.chowyijiu.huhubot.plugins.resource_search.hdhive.HdhiveReq;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +33,7 @@ public class ResourceSearchPlugin {
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApi.signInList();
-        Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
+        Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
         //清除搜索
@@ -42,7 +42,12 @@ public class ResourceSearchPlugin {
 
     @MessageHandler(name = "阿里云盘手动签到", commands = "alisign", rule = RuleEnum.superuser)
     public void aliSignIn(Bot bot, MessageEvent event) {
-        String result = AliYunApi.signInList();
+        String result;
+        try {
+            result = AliYunApi.signInList();
+        } catch (RuntimeException e) {
+            result = "阿里云盘签到失败, refresh token 可能过期";
+        }
         bot.sendMessage(event, result);
         XiaoAIUtil.tts(result);
     }
@@ -73,8 +78,13 @@ public class ResourceSearchPlugin {
         int index = Integer.parseInt(no);
         ResourceData data = ResourceUtil.get(index);
         if (data != null) {
-            boolean success = AliYunApi.fileCopy(data.getShareId());
+            boolean success = false;
             String willSend = "转存[" + index + "]" + data.getName();
+            try {
+                success = AliYunApi.fileCopy(data.getShareId());
+            } catch (Exception e) {
+                willSend = "refresh token expired, " + willSend;
+            }
             if (success) {
                 willSend += "成功\n删除Openwrt阿里云盘缓存" + (OpenwrtReq.invalidateCache() ? "成功" : "失败");
             } else {

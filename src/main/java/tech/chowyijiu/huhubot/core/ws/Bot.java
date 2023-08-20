@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhubot.core.ws;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
@@ -27,10 +28,7 @@ import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.exception.IllegalMessageTypeException;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author elastic chow
@@ -130,7 +128,7 @@ public class Bot {
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.name());
         //userId.action.uuid
-        String echo = (selfId + "-" + action + "-" + Math.random());
+        String echo = UUID.fastUUID().toString(true);
         requestBox.setEcho(echo);
         EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend

@@ -8,7 +8,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.util.WebAppRootListener;
-import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 
 
 
@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketConfigurer, ServletContextIniti
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new Server(),"/ws").setAllowedOrigins("*");
+        registry.addHandler(new Huhubot(),"/ws").setAllowedOrigins("*");
     }
 
 

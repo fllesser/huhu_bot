@@ -14,7 +14,7 @@ import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
 import java.util.Objects;
@@ -45,7 +45,7 @@ public class PersonalPlugin {
         boolean ok =  WeiBoClient.check(pid);
         String result = "勇远期岱超话今日" + (ok ? "签到成功" : "签到失败");
         //结果发送到测试群
-        Objects.requireNonNull(Server.getBot(BotConfig.superUsers.get(0)))
+        Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         //让小爱播报
         XiaoAIUtil.tts(result);

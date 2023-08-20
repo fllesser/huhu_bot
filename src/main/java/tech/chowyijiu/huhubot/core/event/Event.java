@@ -31,7 +31,7 @@ public abstract class Event {
     private String postType;
     private Long time;
 
-    public static Event build(JSONObject jsonObject) {
+    public static Event build(final JSONObject jsonObject) {
         String postType = jsonObject.getString("post_type");
         Event event = null;
         if (StringUtil.hasLength(postType)) {

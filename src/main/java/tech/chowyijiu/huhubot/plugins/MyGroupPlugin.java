@@ -14,7 +14,7 @@ import tech.chowyijiu.huhubot.core.event.notice.NotifyNoticeEvent;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.Server;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
 import java.time.Duration;
@@ -37,7 +37,7 @@ public class MyGroupPlugin {
     public void dateGroupCard() {
         String card = "失业第" + this.countdown("2023-06-16 10:00");
         log.info("Time group nicknames start to be updated card: {}", card);
-        Server.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+        Huhubot.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
                     bot.setGroupCard(groupId, bot.getSelfId(), card);
                     try {
@@ -114,7 +114,7 @@ public class MyGroupPlugin {
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
-        for (Bot bot : Server.getBots()) {
+        for (Bot bot : Huhubot.getBots()) {
             for (Long clockGroup : clockGroups) {
                 bot.sendGroupSign(clockGroup);
                 try {

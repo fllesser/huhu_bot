@@ -46,7 +46,7 @@ public class MessageEvent extends Event {
     @JsonIgnore
     private String commandArgs;
 
-    public static MessageEvent build(JSONObject jsonObject) {
+    public static MessageEvent build(final JSONObject jsonObject) {
         String messageType = jsonObject.getString("message_type");
         MessageEvent event;
         if ("private".equals(messageType)) {
