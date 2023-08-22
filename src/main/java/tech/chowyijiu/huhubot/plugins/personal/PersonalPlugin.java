@@ -1,7 +1,6 @@
 package tech.chowyijiu.huhubot.plugins.personal;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.config.WeiboConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
@@ -29,12 +28,12 @@ import java.util.Objects;
 public class PersonalPlugin {
 
 
-    @Scheduled(cron = "0 1 0 * * *")
+    //@Scheduled(cron = "0 1 0 * * *")
     public void scheduledCheck0() {
         check(WeiboConfig.pids.get(0));
     }
 
-    @Scheduled(cron = "0 30 8 * * *")
+    //@Scheduled(cron = "0 30 8 * * *")
     public void scheduledCheck1() {
         check(WeiboConfig.pids.get(1));
     }

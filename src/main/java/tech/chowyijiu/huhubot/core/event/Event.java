@@ -42,7 +42,7 @@ public abstract class Event {
                 case meta_event -> jsonObject.toJavaObject(MetaEvent.class);
             };
             event.setEventJsonObject(jsonObject);
-        } else Bot.transferData(jsonObject.getString("echo"), jsonObject.getString("data"));
+        } else Bot.transferData(jsonObject.getLong("echo"), jsonObject.getString("data"));
         return event;
     }
 

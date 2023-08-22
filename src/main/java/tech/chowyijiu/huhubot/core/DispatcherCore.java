@@ -77,7 +77,6 @@ public class DispatcherCore {
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            //throw new RuntimeException("[DispatcherCore] No plugins were found");
             log.info("{}No plugin was found{}", ANSI.YELLOW, ANSI.RESET);
             return;
         }
@@ -95,51 +94,14 @@ public class DispatcherCore {
             //判断事件类型
             if (!handler.match(event.getClass())) continue;
             //因为注解中的commands和keywords 默认为{}, 无需判空
-            if (handler.hasCommands()) {
-                if (matchCommand(bot, event, handler)) break;
-            } else if (handler.hasKeywords()) {
-                if (matchKeyword(bot, event, handler)) break;
+            if (handler.commands.length > 0) {
+                if (handler.matchCommand(bot, event)) break;
+            } else if (handler.keywords.length > 0) {
+                if (handler.matchKeyword(bot, event)) break;
             }
         }
     }
 
-    private boolean matchCommand(final Bot bot, final MessageEvent event, final Handler handler) {
-        //String plainText = event.getMessage().plainText();
-        String plainText = event.getMessage().getPlainText();
-        //如果配置了命令前缀
-        //if (BotConfig.commandPrefixes.size() > 0) {
-        //    if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
-        //        //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
-        //        return false;
-        //    } else {
-        //        plainText = plainText.substring(1);
-        //    }
-        //}
-        for (String command : handler.commands) {
-            //匹配前缀命令
-            if (plainText.startsWith(command)) {
-                //去除触发的command, 并去掉头尾空格
-                event.setCommandArgs(plainText.replaceFirst(command, "").trim());
-                handler.execute(bot, event);
-                return handler.block;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 关键词匹配
-     */
-    private boolean matchKeyword(final Bot bot, final MessageEvent event, final Handler handler) {
-        String plainText = event.getMessage().getPlainText();
-        for (String keyword : handler.keywords) {
-            if (plainText.contains(keyword)) {
-                handler.execute(bot, event);
-                return handler.block; //
-            }
-        }
-        return false;
-    }
 
     public void onNotice(final Bot bot, final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
@@ -191,12 +153,23 @@ public class DispatcherCore {
                 this.rule = rule.getRule();
             } else {
                 String RuleName = method.getName() + "Rule";
-                try {
-                    Field field = plugin.getClass().getDeclaredField(RuleName);
+                Field field = null;
+                for (Field f : plugin.getClass().getDeclaredFields()) {
+                    if (RuleName.equals(f.getName())) {
+                        field = f;
+                        break;
+                    }
+                }
+                if (field != null) {
                     field.setAccessible(true);
-                    Object obj = field.get(plugin);
+                    Object obj = null;
+                    try {
+                        obj = field.get(plugin);
+                    } catch (IllegalAccessException ignored) {
+                    }
                     if (obj instanceof Rule) this.rule = (Rule) obj;
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                } else {
+                    this.rule = null;
                 }
             }
         }
@@ -219,13 +192,54 @@ public class DispatcherCore {
             return handler;
         }
 
+        /**
+         * 命令匹配
+         */
+        private boolean matchCommand(final Bot bot, final MessageEvent event) {
+            //String plainText = event.getMessage().plainText();
+            String plainText = event.getMessage().getPlainText();
+            //如果配置了命令前缀
+            //if (BotConfig.commandPrefixes.size() > 0) {
+            //    if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
+            //        //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
+            //        return false;
+            //    } else {
+            //        plainText = plainText.substring(1);
+            //    }
+            //}
+            for (String command : this.commands) {
+                //匹配前缀命令
+                if (plainText.startsWith(command)) {
+                    //去除触发的command, 并去掉头尾空格
+                    event.setCommandArgs(plainText.replaceFirst(command, "").trim());
+                    this.execute(bot, event);
+                    return this.block;
+                }
+            }
+            return false;
+        }
+
+        /**
+         * 关键词匹配
+         */
+        private boolean matchKeyword(final Bot bot, final MessageEvent event) {
+            String plainText = event.getMessage().getPlainText();
+            for (String keyword : this.keywords) {
+                if (plainText.contains(keyword)) {
+                    this.execute(bot, event);
+                    return this.block; //
+                }
+            }
+            return false;
+        }
+
         public void execute(final Bot bot, final Event event) {
             try {
                 if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
                         , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
-                method.invoke(plugin, bot, event);
+                this.method.invoke(this.plugin, bot, event);
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {
@@ -241,13 +255,6 @@ public class DispatcherCore {
             }
         }
 
-        public boolean hasKeywords() {
-            return keywords.length > 0;
-        }
-
-        public boolean hasCommands() {
-            return commands.length > 0;
-        }
 
         public boolean match(Class<? extends Event> eventClass) {
             return eventType.isAssignableFrom(eventClass);

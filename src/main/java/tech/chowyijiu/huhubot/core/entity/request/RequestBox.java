@@ -14,6 +14,6 @@ public class RequestBox {
 
     private String action;
     private Map<String, Object> params;
-    private String echo; //回声, 如果请求时指定了 echo, 那么响应也会包含 echo
+    private long echo; //回声, 如果请求时指定了 echo, 那么响应也会包含 echo
 
 }

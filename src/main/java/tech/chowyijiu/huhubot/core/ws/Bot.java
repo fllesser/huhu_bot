@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.ws;
 
-import cn.hutool.core.lang.UUID;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
@@ -26,9 +25,13 @@ import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.exception.IllegalMessageTypeException;
+import tech.chowyijiu.huhubot.core.utils.MistIdGenerator;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -73,15 +76,15 @@ public class Bot {
         this.sessionSend(JSONObject.toJSONString(requestBox));
     }
 
-    private static final Map<String, EchoData> ECHO_DATA_MAP = new HashMap<>();
+    private static final Map<Long, EchoData> ECHO_DATA_MAP = new HashMap<>();
 
-    private static EchoData buildEchoDataToMap(String echo) {
+    private static EchoData buildEchoDataToMap(long echo) {
         EchoData echoData = new EchoData(echo);
         ECHO_DATA_MAP.put(echo, echoData);
         return echoData;
     }
 
-    public static void transferData(String echo, String data) {
+    public static void transferData(long echo, String data) {
         if (!ECHO_DATA_MAP.containsKey(echo)) return;
         EchoData echoData = ECHO_DATA_MAP.get(echo);
         echoData.syncSetAndNotify(data);
@@ -91,10 +94,10 @@ public class Bot {
 
         private static final long timeout = 10000L;
 
-        private final String echo;
+        private final long echo;
         private String data;
 
-        private EchoData(String echo) {
+        private EchoData(long echo) {
             this.echo = echo;
         }
 
@@ -127,8 +130,7 @@ public class Bot {
         RequestBox requestBox = new RequestBox();
         Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
         requestBox.setAction(action.name());
-        //userId.action.uuid
-        String echo = UUID.fastUUID().toString(true);
+        long echo = MistIdGenerator.nextId();
         requestBox.setEcho(echo);
         EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
