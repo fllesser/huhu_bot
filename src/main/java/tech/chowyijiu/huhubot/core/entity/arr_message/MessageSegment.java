@@ -110,6 +110,15 @@ public class MessageSegment {
         return build("image", Map.of("file", file));
     }
 
+    /**
+     * 戳一戳
+     * [CQ:poke,qq=123456]
+     * 范围: 发送 群聊
+     * https://docs.go-cqhttp.org/cqcode/#%E6%88%B3%E4%B8%80%E6%88%B3
+     *
+     * @param userId 需要戳的成员
+     * @return MessageSegment
+     */
     public static MessageSegment poke(Long userId) {
         return build("poke", Map.of("qq", userId));
     }

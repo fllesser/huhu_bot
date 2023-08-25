@@ -32,7 +32,7 @@ public class MessageEvent extends Event {
     private String messageType;
     @JsonProperty("message_id")
     private Integer messageId;
-    //注意这里gocq, config.yml中要设置数组array消息格式
+    //注意gocq, config.yml中要设置数组array消息格式
     @JsonProperty("message")
     private Message message;
     @JsonProperty("raw_message")

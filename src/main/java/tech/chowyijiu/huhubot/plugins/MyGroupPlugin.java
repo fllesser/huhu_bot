@@ -153,7 +153,7 @@ public class MyGroupPlugin {
     }
 
     //todo rule可以定义哪些群需要通知我, 然后移除tome, 写到方法里判断
-    @MessageHandler(name = "被@, 让小爱通知我", rule = RuleEnum.tome, priority = 9)
+    @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
     public void atMeXiaoAiNotice(Bot bot, GroupMessageEvent event) {
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
         bot.getGroups().stream()
