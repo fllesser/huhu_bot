@@ -29,10 +29,10 @@ public class GroupMessageEvent extends MessageEvent {
     private String anonymous;
     //是否at bot
     @JsonIgnore
-    private boolean toMe = false;
+    private Boolean toMe = null;
 
     public boolean isToMe() {
-        toMe = this.getMessage().checkToMe(this.getSelfId());
+        if (toMe == null) toMe = this.getMessage().checkToMe(this.getSelfId());
         return toMe;
     }
 
