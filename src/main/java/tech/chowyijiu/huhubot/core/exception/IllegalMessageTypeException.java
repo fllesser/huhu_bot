@@ -10,7 +10,4 @@ public class IllegalMessageTypeException extends RuntimeException {
         super("The type of message must be one of the String, MessageSegment, Message");
     }
 
-    public IllegalMessageTypeException(Throwable cause) {
-        super("The type of message must be one of the String, MessageSegment, Message", cause);
-    }
 }

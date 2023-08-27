@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhubot.core.thread;
 
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.DispatcherCore;
 import tech.chowyijiu.huhubot.core.event.Event;
@@ -18,23 +20,12 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @SuppressWarnings("all")
+@RequiredArgsConstructor
+@ToString
 public class ProcessEventTask implements Runnable {
 
     private final Bot bot;
     private final Event event;
-
-    @Override
-    public String toString() {
-        return "ProcessEventTask{" +
-                "bot=" + bot.getSelfId() +
-                ", event=" + event +
-                '}';
-    }
-
-    private ProcessEventTask(Bot bot, Event event) {
-        this.bot = bot;
-        this.event = event;
-    }
 
     private static final ThreadPoolExecutor EVENT_EXECUTOR;
     private static final DispatcherCore DISPATCHER_CORE;

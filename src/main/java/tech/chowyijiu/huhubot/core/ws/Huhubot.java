@@ -41,6 +41,7 @@ public class Huhubot extends TextWebSocketHandler {
      * @return List<Bot>
      */
     public static List<Bot> getBots() {
+        //values和map是绑定的, 防止用户对其更改
         return BOT_MAP.values().stream().toList();
     }
 
@@ -90,11 +91,8 @@ public class Huhubot extends TextWebSocketHandler {
     }
 
     private void removeBot(WebSocketSession session) {
-        for (Bot bot : getBots()) {
-            if (bot.getSession() == session) {
-                BOT_MAP.remove(bot.getSelfId());
-            }
-        }
+        //对map.values的更改会作用于map
+        BOT_MAP.values().removeIf(bot -> bot.getSession() == session);
     }
 
 

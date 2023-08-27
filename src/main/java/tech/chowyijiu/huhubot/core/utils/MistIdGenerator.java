@@ -18,7 +18,7 @@ public class MistIdGenerator {
     // 随机因子二
     private final static Random randomTwo = new Random();
 
-    // 生成一个全局唯一的ID
+    //生成一个全局唯一的ID
     public static long nextId() {
         // 获取自增数，并对其取模，防止超出范围
         // 自增数占用的位数 47
