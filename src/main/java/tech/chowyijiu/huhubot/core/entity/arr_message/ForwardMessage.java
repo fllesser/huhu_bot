@@ -23,14 +23,16 @@ public class ForwardMessage {
     @JSONField(name = "data")
     private Node data;
 
-    private ForwardMessage(String name, Long uin, Object content) {
-        this.data = new Node(name, uin, content);
+    private ForwardMessage() {
+
     }
 
     private static ForwardMessage instance(String name, Long uin, Object content) {
         if (!(content instanceof String) && !(content instanceof MessageSegment) && !(content instanceof Message))
             throw new IllegalMessageTypeException();
-        return new ForwardMessage(name, uin, content);
+        ForwardMessage forwardMessage = new ForwardMessage();
+        forwardMessage.setData(new Node(name, uin, content));
+        return forwardMessage;
     }
 
     @Data
@@ -43,7 +45,7 @@ public class ForwardMessage {
     }
 
     /**
-     * 快速构建 name uin相同
+     * 快速构建 name uin 恒定
      *
      * @param name     name
      * @param uin      userId

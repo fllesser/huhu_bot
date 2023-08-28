@@ -34,7 +34,7 @@ public class ThreadPoolUtil {
                 eventExecutor.getMaximumPoolSize(), ANSI.RESET);
     }
 
-    public static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {
+    static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {
 
         public ProcessEventThreadPoolExecutor(
                 int corePoolSize, int maximumPoolSize, long keepAliveTime,

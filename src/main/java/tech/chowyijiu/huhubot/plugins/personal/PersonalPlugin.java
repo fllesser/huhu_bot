@@ -55,15 +55,14 @@ public class PersonalPlugin {
 
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
     public void replyJyGroup(Bot bot, PrivateMessageEvent event) {
-        Message message = new Message()
-                .append("[bot]").append(MessageSegment.at(event.getUserId()))
+        Message message = Message.text("[bot]").append(MessageSegment.at(event.getUserId()))
                 .append("请认真观看教程视频 https://www.bilibili.com/video/BV1Xg411x7S2 不要再发临时会话问我或者其他管理了");
         bot.sendGroupMessage(event.getSender().getGroupId(), message);
     }
 
-    @MessageHandler(name = "文字转语音测试", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
+    @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
     @Deprecated
-    public void replyTtsMessage(Bot bot, GroupMessageEvent event) {
+    public void textToTts(Bot bot, GroupMessageEvent event) {
         bot.sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
     }
 

@@ -5,14 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.constant.GocqAction;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -55,6 +59,7 @@ public class CallApiPlugin {
         } else if (resp.startsWith("[")) {
             List<Object> messages = new ArrayList<>();
             messages.add(costTime);
+            messages.add(MessageSegment.image("https://pic2.zhimg.com/80/v2-d9a3bd17467c3b51e35c95cbbfe6a755_1440w.webp"));
             messages.addAll(JSONArray.parseArray(resp, String.class).stream()
                     .limit(98).toList());
             List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), messages);

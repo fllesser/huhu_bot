@@ -1,6 +1,9 @@
 # huhu_bot
 nonebot2, 但是jvav
 
+# jetbrains
+Request ID=18082023/12302698
+
 ## 介绍
 1. java(springboot), 基于go-cqhttp, websocket反向连接的qq机器人;
 2. 支持被多个go-cqhttp连接;

@@ -21,7 +21,7 @@ import java.util.*;
 @Slf4j
 public class Huhubot extends TextWebSocketHandler {
 
-    private static final Map<Long, Bot> BOT_MAP = new HashMap<>();
+    private static final Map<Long, Bot> BOT_MAP = new HashMap<>(1);
 
     private static void addBot(Long userId, WebSocketSession session) {
         BOT_MAP.put(userId, new Bot(userId, session));
@@ -91,7 +91,7 @@ public class Huhubot extends TextWebSocketHandler {
     }
 
     private void removeBot(WebSocketSession session) {
-        //对map.values的更改会作用于map
+        //对map.values()的更改会作用于map
         BOT_MAP.values().removeIf(bot -> bot.getSession() == session);
     }
 
