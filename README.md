@@ -1,9 +1,6 @@
 # huhu_bot
 nonebot2, 但是jvav
 
-# jetbrains
-Request ID=18082023/12302698
-
 ## 介绍
 1. java(springboot), 基于go-cqhttp, websocket反向连接的qq机器人;
 2. 支持被多个go-cqhttp连接;
@@ -49,4 +46,12 @@ public class DemoPlugin {
 }
 ```
 
-参考项目 [haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server) [nonebot2](https://github.com/nonebot/nonebot2)
+
+
+## 鸣谢
+IntelliJ IDEA 是一个在各个方面都最大程度地提高开发人员的生产力的 IDE，适用于 JVM 平台语言。
+
+特别感谢 JetBrains 为开源项目提供免费的 IntelliJ IDEA 等 IDE 的授权
+![JetBrains Logo](jb_beam.png)
+
+特别感谢 [nonebot2](https://github.com/nonebot/nonebot2) ,[haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server) 的开发人员, 让我学到了很多东西
