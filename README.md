@@ -1,4 +1,4 @@
-# huhu_bot
+# Huhubot
 nonebot2, 但是jvav
 
 ## 介绍
@@ -7,13 +7,13 @@ nonebot2, 但是jvav
 3. 类似于nonebot2的插件编写方式
 
 ## 使用要点
-go-cqhttp 反向ws地址设置如 ws://127.0.0.1:8888/huhu/ws
+1. go-cqhttp 反向ws地址配置如 ws://127.0.0.1:8888/huhu/ws
+
 
 ## TODO
 1. 连续对话
 2. 适配频道
-3. 自定义合并转发[已支持]
-4. springboot-starter 分离plugin
+3. 跨平台
 
 ## 插件编写方式
 1. 新建一个类加上`@BotPlugin("指定名称,用于加载时打印日志")` 和 `@SuppressWarnings("unused")`
