@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author elastic chow
@@ -60,7 +59,8 @@ public class Bot {
      *
      * @param text text
      */
-    private void sessionSend(String text) {
+    private void sessionSend(RequestBox requestBox) {
+        String text = JSONObject.toJSONString(requestBox);
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
@@ -70,10 +70,8 @@ public class Bot {
     }
 
     public void callApi(GocqAction action, Map<String, Object> paramsMap) {
-        RequestBox requestBox = new RequestBox();
-        requestBox.setAction(action.name());
-        requestBox.setParams(paramsMap);
-        this.sessionSend(JSONObject.toJSONString(requestBox));
+        RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).build();
+        this.sessionSend(requestBox);
     }
 
     private static final Map<Long, EchoData> ECHO_DATA_MAP = new HashMap<>();
@@ -127,15 +125,12 @@ public class Bot {
      */
     @SuppressWarnings("all")
     public String callApiWaitResp(GocqAction action, Map<String, Object> paramsMap) {
-        RequestBox requestBox = new RequestBox();
-        Optional.ofNullable(paramsMap).ifPresent(requestBox::setParams);
-        requestBox.setAction(action.name());
         long echo = MistIdGenerator.nextId();
-        requestBox.setEcho(echo);
+        RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).echo(echo).build();
         EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
-            this.sessionSend(JSONObject.toJSONString(requestBox));
+            this.sessionSend(requestBox);
             return echoData.waitAndGet();
         }
     }

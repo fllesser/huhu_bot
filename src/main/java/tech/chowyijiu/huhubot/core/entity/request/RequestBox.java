@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhubot.core.entity.request;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.Map;
 
@@ -9,7 +10,8 @@ import java.util.Map;
  * @author elastic chow
  * @date 13/5/2023
  */
-@Data
+@Builder
+@Getter
 public class RequestBox {
 
     private String action;
