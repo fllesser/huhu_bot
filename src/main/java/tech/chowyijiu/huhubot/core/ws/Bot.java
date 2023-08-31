@@ -56,8 +56,7 @@ public class Bot {
     /**
      * call api 最终调用的方法
      * Send a WebSocket message
-     *
-     * @param text text
+     * @param requestBox box
      */
     private void sessionSend(RequestBox requestBox) {
         String text = JSONObject.toJSONString(requestBox);
@@ -145,7 +144,7 @@ public class Bot {
      */
     @Deprecated
     private String callHttpApi(GocqAction action, @Nullable Map<String, Object> paramsMap) {
-        String url = "http://127.0.0.1:8899/" + action.toString();
+        String url = "http://127.0.0.1:8899/" + action.name();
         HttpRequest request = HttpRequest.get(url).form(paramsMap);
         HttpResponse response = request.execute();
         return switch (response.getStatus()) {

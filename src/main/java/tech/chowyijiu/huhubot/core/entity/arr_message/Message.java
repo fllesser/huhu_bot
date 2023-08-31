@@ -18,7 +18,7 @@ public class Message extends ArrayList<MessageSegment> {
 
     public boolean checkToMe(Long selfId) {
         for (MessageSegment segment : this) {
-            if ("at".equals(segment.getType()) ) {
+            if ("at".equals(segment.getType())) {
                 String qq = segment.getString("qq");
                 if ("all".equals(qq)) return true;
                 else return Long.parseLong(qq) == selfId;
@@ -29,6 +29,7 @@ public class Message extends ArrayList<MessageSegment> {
 
     /**
      * 追加文本消息
+     *
      * @param text String
      * @return this
      */
@@ -39,6 +40,7 @@ public class Message extends ArrayList<MessageSegment> {
 
     /**
      * 追加非文本消息
+     *
      * @param segment MessageSegment
      * @return this
      */
@@ -65,12 +67,17 @@ public class Message extends ArrayList<MessageSegment> {
     /**
      * 根据MessageSegment的type获取指定类型的所有消息段
      * 比如 测试[CQ:at,qq=123123]测试[CQ:at,qq=123123]测试
-     * 使用getSegmentByType("at")可以得到[MessageSegment([CQ:at,qq=123123]), MessageSegment([CQ:at,qq=123123])]
+     * 使用get("at")可以得到[MessageSegment([CQ:at,qq=123123]), MessageSegment([CQ:at,qq=123123])]
+     *
      * @param type String
      * @return List<MessageSegment>
      */
-    public List<MessageSegment> getSegmentByType(String type) {
+    public List<MessageSegment> get(String type) {
         return this.stream().filter(seg -> seg.getType().equals(type)).toList();
+    }
+
+    public MessageSegment get(String type, int index) {
+        return get(type).get(index);
     }
 
     //@Override
