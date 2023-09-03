@@ -77,7 +77,9 @@ public class Message extends ArrayList<MessageSegment> {
     }
 
     public MessageSegment get(String type, int index) {
-        return get(type).get(index);
+        List<MessageSegment> segments = this.get(type);
+        if (segments.size() > index) return segments.get(index);
+        return null;
     }
 
     //@Override

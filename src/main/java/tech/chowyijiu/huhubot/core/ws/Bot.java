@@ -338,8 +338,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void markMsgAsRead(Integer messageId) {
-        this.callApi(GocqAction.mark_msg_as_read,
-                Map.of("message_id", messageId));
+        this.callApi(GocqAction.mark_msg_as_read, Map.of("message_id", messageId));
     }
 
     /**
@@ -348,8 +347,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callApiWaitResp(GocqAction.get_forward_msg,
-                Map.of("message_id", messageId));
+        String data = this.callApiWaitResp(GocqAction.get_forward_msg, Map.of("message_id", messageId));
     }
 
     /**
@@ -359,8 +357,7 @@ public class Bot {
      * @param nodes   nodes
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
-        this.callApi(GocqAction.send_group_forward_msg,
-                Map.of("group_id", groupId, "messages", nodes));
+        this.callApi(GocqAction.send_group_forward_msg, Map.of("group_id", groupId, "messages", nodes));
     }
 
     /**
@@ -370,8 +367,7 @@ public class Bot {
      * @param nodes  nodes
      */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
-        this.callApi(GocqAction.send_private_forward_msg,
-                Map.of("user_id", userId, "messages", nodes));
+        this.callApi(GocqAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
     }
 
 
@@ -416,8 +412,7 @@ public class Bot {
      * @param duration duration 单位秒 default 30 * 60 | 0 表示取消禁言
      */
     public void setGroupBan(Long groupId, Long userId, int duration) {
-        this.callApi(GocqAction.set_group_ban,
-                Map.of("group_id", groupId, "user_id", userId, "duration", duration));
+        this.callApi(GocqAction.set_group_ban, Map.of("group_id", groupId, "user_id", userId, "duration", duration));
     }
 
     /**

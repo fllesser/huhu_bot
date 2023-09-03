@@ -14,8 +14,8 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
 public class RuleImpl {
 
     public static boolean tome(Bot bot, Event event) {
-        if (event instanceof GroupMessageEvent groupMessageEvent) return groupMessageEvent.isToMe();
-        else return false;
+        if (event instanceof GroupMessageEvent gme) return gme.isToMe();
+        return false;
     }
 
     public static boolean superuser(Bot bot, Event event) {

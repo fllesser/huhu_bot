@@ -105,10 +105,8 @@ public class DispatcherCore {
 
     public void onNotice(final Bot bot, final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            if (handler.match(event.getClass())) {
-                handler.execute(bot, event);
-                if (handler.block) break;
-            }
+            boolean block = handler.matchNotice(bot, event);
+            if (block) break;
         }
     }
 
@@ -142,7 +140,7 @@ public class DispatcherCore {
             //在method的形参中定位事件类型
             for (Class<?> clazz : method.getParameterTypes()) {
                 if (Event.class.isAssignableFrom(clazz)) {
-                    eventType = clazz;
+                    this.eventType = clazz;
                     break;
                 }
             }
@@ -152,9 +150,9 @@ public class DispatcherCore {
             if (!rule.equals(RuleEnum.default_)) {
                 this.rule = rule.getRule();
             } else {
-                String RuleName = method.getName() + "Rule";
+                String RuleName = this.method.getName() + "Rule";
                 Field field = null;
-                for (Field f : plugin.getClass().getDeclaredFields()) {
+                for (Field f : this.plugin.getClass().getDeclaredFields()) {
                     if (RuleName.equals(f.getName())) {
                         field = f;
                         break;
@@ -167,7 +165,7 @@ public class DispatcherCore {
                         obj = field.get(plugin);
                     } catch (IllegalAccessException ignored) {
                     }
-                    if (obj instanceof Rule) this.rule = (Rule) obj;
+                    if (obj instanceof Rule ruleObj) this.rule = ruleObj;
                 } else {
                     this.rule = null;
                 }
@@ -233,7 +231,15 @@ public class DispatcherCore {
             return false;
         }
 
-        public void execute(final Bot bot, final Event event) {
+        private boolean matchNotice(final Bot bot, final NoticeEvent event) {
+            if (this.match(event.getClass())) {
+                this.execute(bot, event);
+                return this.block;
+            }
+            return false;
+        }
+
+        private void execute(final Bot bot, final Event event) {
             try {
                 if (rule != null && !rule.check(bot, event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
