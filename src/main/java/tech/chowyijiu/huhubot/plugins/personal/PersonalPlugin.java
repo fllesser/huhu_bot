@@ -16,6 +16,9 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
 import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 /**
@@ -71,6 +74,30 @@ public class PersonalPlugin {
         bot.sendMessage(event, event.getCommandArgs());
     }
 
+
+    @MessageHandler(name = "ping", commands = "ping", rule = RuleEnum.superuser)
+    public void ping(Bot bot, MessageEvent event) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("ping", "-c", "1", "www.google.com");
+            Process process = processBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("time=")) {
+                    int start = line.indexOf("time=") + 5;
+                    int end = line.indexOf(" ms");
+                    System.out.println(line.substring(start, end));
+                }
+            }
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                System.out.println("Ping failed");
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     //@MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
     //public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
     //    LinkedHashMap<String, Object> map = new LinkedHashMap<>();

@@ -217,7 +217,7 @@ public class MyGroupPlugin {
     //}
 
 
-    //Rule giveAdminRule = (bot, event) -> RuleImpl.selfOwner(bot, event)
+    //Rule giveAdminRule = (bot, event) -> RuleReference.selfOwner(bot, event)
     //        && "message_sent".equals(event.getPostType());
     //
     ///**

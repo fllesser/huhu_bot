@@ -12,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 public enum RuleEnum {
 
     default_("默认", (bot, event) -> true),
-    tome("@机器人", RuleImpl::tome),
-    superuser("使用者为超级用户", RuleImpl::superuser),
-    owner("使用者为群主", RuleImpl::owner),
-    admin("使用者为 管理 or 群主 or 超级用户", RuleImpl::admin),
-    self_owner("本体为群主", RuleImpl::selfOwner),
-    self_admin("本体为管理 or 群主", RuleImpl::selfAdmin);
+    tome("@机器人", RuleReference::tome),
+    superuser("使用者为超级用户", RuleReference::superuser),
+    owner("使用者为群主", RuleReference::owner),
+    admin("使用者为 管理 or 群主 or 超级用户", RuleReference::admin),
+    self_owner("本体为群主", RuleReference::selfOwner),
+    self_admin("本体为管理 or 群主", RuleReference::selfAdmin);
 
     private final String description;
     private final Rule rule;
