@@ -165,4 +165,38 @@ public class MessageSegment {
     public static MessageSegment share(String url, String title, String content, String imageUrl) {
         return build("share", Map.of("url", url, "title", title, "content", content, "image", imageUrl));
     }
+
+    /**
+     * 语音
+     * https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3
+     * file支持
+     * 绝对路径，例如 file:///xxx/xx/xxx.mp3
+     * 网络 URL，例如 https://xxx.com/xxx.mp3
+     * Base64 编码，例如 base64://...
+     * @param file  语音文件名
+     * @param magic 发送时可选, 默认 0, 设置为 1 表示变声
+     * @return MessageSegment
+     */
+    public static MessageSegment record(String file, int magic) {
+        if (!file.startsWith("http") && !file.startsWith("file://") && !file.startsWith("base64://"))
+            throw new IllegalArgumentException("file string must start with 'http' or 'file://' or 'base64://'");
+        return build("record", Map.of("file", file, "magic", magic));
+    }
+
+    /**
+     * 语音
+     * https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3
+     * @param file 语音网络路径
+     * @param magic 发送时可选, 默认 0, 设置为 1 表示变声
+     * @param cache 只在通过网络 URL 发送时有效, 表示是否使用已缓存的文件, 默认 1
+     * @param proxy 只在通过网络 URL 发送时有效, 表示是否通过代理下载文件 ( 需通过环境变量或配置文件配置代理 ) , 默认 1
+     * @param timeout 只在通过网络 URL 发送时有效, 单位秒, 表示下载网络文件的超时时间 , 默认不超时
+     * @return MessageSegment
+     */
+    public static MessageSegment record(String file, int magic, int cache, int proxy, int timeout) {
+        if (!file.startsWith("http"))
+            throw new IllegalArgumentException("file string must start with 'http'");
+        return build("record", Map.of("file", file, "magic", magic,
+                "cache", cache, "proxy", proxy, "timeout", timeout));
+    }
 }

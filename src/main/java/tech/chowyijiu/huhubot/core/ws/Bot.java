@@ -296,11 +296,10 @@ public class Bot {
      */
     public void sendGroupMessage(Long groupId, Object message) {
         Map<String, Object> map;
-        if (message instanceof String) {
-            map = Map.of("group_id", groupId, "message", message, "auto_escape", true);
-        } else if (message instanceof MessageSegment || message instanceof Message) {
-            map = Map.of("group_id", groupId, "message", message, "auto_escape", false);
-        } else throw new IllegalMessageTypeException();
+        boolean autoEscape = message instanceof String;
+        if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+            throw new IllegalMessageTypeException();
+        map = Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape);
         this.callApi(GocqAction.send_group_msg, map);
     }
 
@@ -314,11 +313,10 @@ public class Bot {
      */
     public void sendPrivateMessage(Long userId, Object message) {
         Map<String, Object> map;
-        if (message instanceof String) {
-            map = Map.of("user_id", userId, "message", message , "auto_escape", true);
-        } else if (message instanceof MessageSegment || message instanceof Message) {
-            map = Map.of("user_id", userId, "message", message, "auto_escape", false);
-        } else throw new IllegalMessageTypeException();
+        boolean autoEscape = message instanceof String;
+        if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+            throw new IllegalMessageTypeException();
+        map = Map.of("user_id", userId, "message", message , "auto_escape", autoEscape);
         this.callApi(GocqAction.send_private_msg, map);
     }
 

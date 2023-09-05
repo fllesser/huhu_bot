@@ -46,21 +46,6 @@ public class MyGroupPlugin {
                     } catch (InterruptedException ignored) {
                     }
                 }));
-        //customInfoMap.keySet().forEach(userId -> {
-        //    String customCard = "";
-        //    CustomInfo customInfo = customInfoMap.get(userId);
-        //    if ("now".equals(customInfo.type)) {
-        //        customCard = customInfo.suffix + LocalDateTime.now().format(formatter);
-        //    } else if ("countdown".equals(customInfo.type)) {
-        //        customCard = customInfo.suffix + this.countdown(customInfo.date);
-        //    }
-        //    Server.getBots().get(0).setGroupCard(customInfo.groupId, customInfo.userId, customCard);
-        //    try {
-        //        Thread.sleep(1000L);
-        //    } catch (InterruptedException e) {
-        //        e.printStackTrace();
-        //    }
-        //});
         log.info("Time group nickname set up card: {}", card);
     }
 
@@ -75,41 +60,6 @@ public class MyGroupPlugin {
         return days + "天" + hours + "时" + minutes + "分";
     }
 
-    //private final Map<Long, CustomInfo> customInfoMap = new HashMap<>();
-
-    //@Builder
-    //static class CustomInfo {
-    //    private Long userId;
-    //    private Long groupId;
-    //    private String type;    //now / countdown
-    //    private String date;    //"2023-06-16 10:00"
-    //    private String suffix;  //前缀
-    //}
-
-    /**
-     * 两分钟一改
-     * cgtn now 前缀
-     * cgtn cutdown/前缀/2023-06-16 10:00
-     */
-    //@MessageHandler(name = "自定义时间群昵称", commands = {"cgtn"}, rule = RuleEnum.self_admin)
-    //public void customDateCard(Bot bot, GroupMessageEvent event) {
-    //    if (customInfoMap.size() >= 30) event.finish("定制人数已上限");
-    //    String commandArgs = event.getCommandArgs();
-    //    val infoBuilder = CustomInfo.builder()
-    //            .userId(event.getUserId()).groupId(event.getGroupId());
-    //    if (commandArgs.startsWith("now")) {
-    //        infoBuilder.type("now").suffix(commandArgs.replaceFirst("now", ""));
-    //    } else if (commandArgs.startsWith("cutdown")) {
-    //        String[] argsArr = commandArgs.split("/");
-    //        if (argsArr.length == 3) {
-    //            infoBuilder.type("cutdown").suffix(argsArr[1]).date(argsArr[2]);
-    //        } else {
-    //            event.finish("格式有误:\n1.cgtn now 前缀\n2.cgtn cutdown/前缀/2023-06-16 10:00");
-    //        }
-    //    }
-    //    customInfoMap.put(event.getUserId(), infoBuilder.build());
-    //    bot.sendGroupMessage(event.getGroupId(), "自定义群时间昵称成功, 两分钟后见效", false);
-    //}
     private final List<Long> clockGroups = List.of(768887710L, 754044548L, 208248400L, 643396867L);
 
     @Scheduled(cron = "0 0 0 * * *")
@@ -128,34 +78,36 @@ public class MyGroupPlugin {
     }
 
     @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
-    public void sgst(Bot bot, GroupMessageEvent event) {
+    public void sgst(GroupMessageEvent event) {
         String title = event.getCommandArgs();
-        for (String filter : new String[]{"群主", "管理"}) {
+        for (String filter : new String[]{"群主", "管理", "主群"}) {
             if (title.contains(filter)) {
                 title = "群猪";
                 break;
             }
         }
-        bot.setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
+        event.getBot().setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
     }
 
-    Rule replyPokeRule = (bot, event) -> {
+    Rule replyPokeRule = event -> {
         NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
+        Bot bot = event.getBot();
         return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
                 && bot.getSelfId().equals(notifyNoticeEvent.getTargetId())    //被戳的是bot
                 && !bot.getSelfId().equals(notifyNoticeEvent.getUserId());    //不是bot号自己戳的
     };
 
     @NoticeHandler(name = "群内回戳", priority = 0)
-    public void replyPoke(Bot bot, NotifyNoticeEvent event) {
+    public void replyPoke(NotifyNoticeEvent event) {
         if (event.getGroupId() != null) {
-            bot.sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
+            event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
         }
     }
 
     //todo rule可以定义哪些群需要通知我, 然后移除tome, 写到方法里判断
     @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
-    public void atMeXiaoAiNotice(Bot bot, GroupMessageEvent event) {
+    public void atMeXiaoAiNotice(GroupMessageEvent event) {
+        Bot bot = event.getBot();
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
         bot.getGroups().stream()
                 .filter(g -> g.getGroupId().equals(event.getGroupId()))

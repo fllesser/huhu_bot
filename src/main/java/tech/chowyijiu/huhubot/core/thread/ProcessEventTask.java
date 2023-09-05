@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.thread;
 
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.DispatcherCore;
@@ -10,7 +9,6 @@ import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.event.request.RequestEvent;
 import tech.chowyijiu.huhubot.utils.IocUtil;
 import tech.chowyijiu.huhubot.utils.ThreadPoolUtil;
-import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -20,12 +18,14 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @SuppressWarnings("all")
-@RequiredArgsConstructor
 @ToString
 public class ProcessEventTask implements Runnable {
 
-    private final Bot bot;
     private final Event event;
+
+    private ProcessEventTask(Event event) {
+        this.event = event;
+    }
 
     private static final ThreadPoolExecutor EVENT_EXECUTOR;
     private static final DispatcherCore DISPATCHER_CORE;
@@ -34,23 +34,22 @@ public class ProcessEventTask implements Runnable {
         EVENT_EXECUTOR = ThreadPoolUtil.getEventExecutor();
         DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
     }
-
+    //
     @Override
     public void run() {
         log.info("{} starts to match handler", event);
         if (event instanceof MessageEvent messageEvent) {
-            DISPATCHER_CORE.onMessage(bot, messageEvent);
+            DISPATCHER_CORE.onMessage(messageEvent);
         } else if (event instanceof NoticeEvent noticeEvent) {
-            DISPATCHER_CORE.onNotice(bot, noticeEvent);
+            DISPATCHER_CORE.onNotice(noticeEvent);
         } else if (event instanceof RequestEvent requestEvent) {
             log.info("{}", requestEvent);
         }
         log.info("{} matches handler end", event);
     }
 
-    public static void execute(final Bot bot, final Event event) {
-        EVENT_EXECUTOR.execute(new ProcessEventTask(bot, event));
+    public static void execute(final Event event) {
+        EVENT_EXECUTOR.execute(new ProcessEventTask(event));
     }
-
 
 }

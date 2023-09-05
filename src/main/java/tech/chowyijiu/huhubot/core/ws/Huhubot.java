@@ -12,7 +12,9 @@ import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.meta.MetaEvent;
 import tech.chowyijiu.huhubot.core.thread.ProcessEventTask;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author elastic chow
@@ -69,7 +71,8 @@ public class Huhubot extends TextWebSocketHandler {
             }
             //测试
             //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
-            ProcessEventTask.execute(BOT_MAP.get(event.getSelfId()), event);
+            event.setBot(BOT_MAP.get(event.getSelfId()));
+            ProcessEventTask.execute(event);
         } catch (Exception e) {
             log.error("handleTextMessage exception", e);
         }

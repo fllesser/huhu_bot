@@ -13,39 +13,41 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
  */
 public class RuleReference {
 
-    public static boolean tome(Bot bot, Event event) {
+    public static boolean tome(Event event) {
         if (event instanceof GroupMessageEvent gme) return gme.isToMe();
         return false;
     }
 
-    public static boolean superuser(Bot bot, Event event) {
+    public static boolean superuser(Event event) {
         if (event instanceof MessageEvent me) return BotConfig.isSuperUser(me.getUserId());
         else return false;
     }
 
-    public static boolean owner(Bot bot, Event event) {
+    public static boolean owner(Event event) {
         if (event instanceof GroupMessageEvent gme) return "owner".equals(gme.getSender().getRole());
         else return false;
     }
 
-    public static boolean admin(Bot bot, Event event) {
+    public static boolean admin(Event event) {
         if (event instanceof GroupMessageEvent gme) {
             String role = gme.getSender().getRole();
             return "admin".equals(role) || "owner".equals(role) || BotConfig.isSuperUser(gme.getUserId());
         } else return false;
     }
 
-    public static boolean selfOwner(Bot bot, Event event) {
+    public static boolean selfOwner(Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) {
             //取缓存, 毕竟群主不可能也变来变去吧
+            Bot bot = event.getBot();
             GroupMember groupMember = bot.getGroupMember(
                     groupMessageEvent.getGroupId(), bot.getSelfId(), false);
             return "owner".equals(groupMember.getRole());
         } else return false;
     }
 
-    public static boolean selfAdmin(Bot bot, Event event) {
+    public static boolean selfAdmin(Event event) {
         if (event instanceof GroupMessageEvent gme) {
+            Bot bot = event.getBot();
             GroupMember groupMember = bot.getGroupMember(
                     gme.getGroupId(), bot.getSelfId(), true);
             String role = groupMember.getRole();

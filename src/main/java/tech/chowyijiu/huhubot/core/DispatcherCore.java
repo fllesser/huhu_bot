@@ -17,7 +17,6 @@ import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -88,37 +87,27 @@ public class DispatcherCore {
         log.info("{}running huhubot...{}", ANSI.YELLOW, ANSI.RESET);
     }
 
-    public void onMessage(final Bot bot, final MessageEvent event) {
+    public void onMessage(final MessageEvent event) {
         event.getMessage().plainText();
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.match(event.getClass())) continue;
             //因为注解中的commands和keywords 默认为{}, 无需判空
             if (handler.commands.length > 0) {
-                if (handler.matchCommand(bot, event)) break;
+                if (handler.matchCommand(event)) break;
             } else if (handler.keywords.length > 0) {
-                if (handler.matchKeyword(bot, event)) break;
+                if (handler.matchKeyword(event)) break;
             }
         }
     }
 
 
-    public void onNotice(final Bot bot, final NoticeEvent event) {
+    public void onNotice(final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            boolean block = handler.matchNotice(bot, event);
+            boolean block = handler.matchNotice(event);
             if (block) break;
         }
     }
-
-    //@Deprecated
-    //public void onRequest(final Bot bot, final RequestEvent event) {
-    //    for (Handler handler : new ArrayList<Handler>()) {
-    //        if (handler.match(event.getClass())) {
-    //            handler.execute(bot, event);
-    //            break;
-    //        }
-    //    }
-    //}
 
     @Builder
     static class Handler {
@@ -193,24 +182,14 @@ public class DispatcherCore {
         /**
          * 命令匹配
          */
-        private boolean matchCommand(final Bot bot, final MessageEvent event) {
-            //String plainText = event.getMessage().plainText();
+        private boolean matchCommand(final MessageEvent event) {
             String plainText = event.getMessage().getPlainText();
-            //如果配置了命令前缀
-            //if (BotConfig.commandPrefixes.size() > 0) {
-            //    if (BotConfig.commandPrefixes.stream().map(Object::toString).noneMatch(plainText::startsWith)) {
-            //        //配置了命令前缀, 没有命令前缀的消息, 直接结束这个handler的后续匹配
-            //        return false;
-            //    } else {
-            //        plainText = plainText.substring(1);
-            //    }
-            //}
             for (String command : this.commands) {
                 //匹配前缀命令
                 if (plainText.startsWith(command)) {
                     //去除触发的command, 并去掉头尾空格
                     event.setCommandArgs(plainText.replaceFirst(command, "").trim());
-                    this.execute(bot, event);
+                    this.execute(event);
                     return this.block;
                 }
             }
@@ -220,32 +199,32 @@ public class DispatcherCore {
         /**
          * 关键词匹配
          */
-        private boolean matchKeyword(final Bot bot, final MessageEvent event) {
+        private boolean matchKeyword(final MessageEvent event) {
             String plainText = event.getMessage().getPlainText();
             for (String keyword : this.keywords) {
                 if (plainText.contains(keyword)) {
-                    this.execute(bot, event);
+                    this.execute(event);
                     return this.block; //
                 }
             }
             return false;
         }
 
-        private boolean matchNotice(final Bot bot, final NoticeEvent event) {
+        private boolean matchNotice(final NoticeEvent event) {
             if (this.match(event.getClass())) {
-                this.execute(bot, event);
+                this.execute(event);
                 return this.block;
             }
             return false;
         }
 
-        private void execute(final Bot bot, final Event event) {
+        private void execute(final Event event) {
             try {
-                if (rule != null && !rule.check(bot, event)) return;
+                if (rule != null && !rule.check(event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
                         , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
                         , this.name, this.priority, ANSI.RESET);
-                this.method.invoke(this.plugin, bot, event);
+                this.method.invoke(this.plugin, event);
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {

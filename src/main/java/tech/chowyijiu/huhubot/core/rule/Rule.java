@@ -1,7 +1,6 @@
 package tech.chowyijiu.huhubot.core.rule;
 
 import tech.chowyijiu.huhubot.core.event.Event;
-import tech.chowyijiu.huhubot.core.ws.Bot;
 
 /**
  * @author elastic chow
@@ -9,6 +8,6 @@ import tech.chowyijiu.huhubot.core.ws.Bot;
  */
 @FunctionalInterface
 public interface Rule {
-    boolean check(Bot bot, Event event);
+    boolean check(Event event);
 }
 

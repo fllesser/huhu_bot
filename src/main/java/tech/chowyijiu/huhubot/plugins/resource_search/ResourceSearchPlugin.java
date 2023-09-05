@@ -29,7 +29,6 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ResourceSearchPlugin {
 
-
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApi.signInList();
@@ -41,36 +40,36 @@ public class ResourceSearchPlugin {
     }
 
     @MessageHandler(name = "阿里云盘手动签到", commands = "alisign", rule = RuleEnum.superuser)
-    public void aliSignIn(Bot bot, MessageEvent event) {
+    public void aliSignIn(MessageEvent event) {
         String result;
         try {
             result = AliYunApi.signInList();
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
-        bot.sendMessage(event, result);
+        event.getBot().sendMessage(event, result);
         XiaoAIUtil.tts(result);
     }
 
     @MessageHandler(name = "阿里云盘资源搜索 GITCAFE", commands = {".s"})
-    public void search1(Bot bot, MessageEvent event) {
+    public void search1(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), GitCafeReq::get);
-        bot.sendMessage(event, ResourceUtil.buildString(dataList));
+        event.getBot().sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
     @MessageHandler(name = "阿里云盘资源搜索 HDHIVE", commands = {".ds"})
-    public void search2(Bot bot, MessageEvent event) {
+    public void search2(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), HdhiveReq::get1);
-        bot.sendMessage(event, ResourceUtil.buildString(dataList));
+        event.getBot().sendMessage(event, ResourceUtil.buildString(dataList));
     }
 
     /**
      * .save/保存 搜索时的关键词 序号
      */
-    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1,
-            rule = RuleEnum.superuser, block = true)
-    public void save(Bot bot, MessageEvent event) {
+    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, rule = RuleEnum.superuser, block = true)
+    public void save(MessageEvent event) {
         String no = event.getCommandArgs();
+        Bot bot = event.getBot();
         if (!StringUtil.isDigit(no)) {
             bot.sendMessage(event, "参数应为数字");
             return;
@@ -96,10 +95,10 @@ public class ResourceSearchPlugin {
     }
 
     @MessageHandler(name = "search in cache", commands = {".cache"}, rule = RuleEnum.superuser)
-    public void searchInCache(Bot bot, MessageEvent event) {
+    public void searchInCache(MessageEvent event) {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
-        bot.sendMessage(event, willSend);
+        event.getBot().sendMessage(event, willSend);
     }
 }

@@ -22,13 +22,12 @@ import tech.chowyijiu.huhubot.utils.StringUtil;
 @Setter
 public abstract class Event {
 
-    @JsonIgnore
-    private JSONObject eventJsonObject;
+    @JsonIgnore private JSONObject eventJsonObject;
 
-    @JsonProperty("self_id")
-    private Long selfId;
-    @JsonProperty("post_type")
-    private String postType;
+    @JsonIgnore private Bot bot;
+
+    @JsonProperty("self_id") private Long selfId;
+    @JsonProperty("post_type") private String postType;
     private Long time;
 
     public static Event build(final JSONObject jsonObject) {

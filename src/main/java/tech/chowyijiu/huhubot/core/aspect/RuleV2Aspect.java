@@ -35,7 +35,7 @@ public class RuleV2Aspect {
 
         log.info("Bot:{}, Event:{}", bot, event);
         Object result = null;
-        if (annotation.rule().getRule().check(bot, event)) {
+        if (annotation.rule().getRule().check(event)) {
             try {
                 result = joinPoint.proceed();
             } catch (Throwable e) {

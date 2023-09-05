@@ -1,19 +1,18 @@
 package tech.chowyijiu.huhubot.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+import tech.chowyijiu.huhubot.core.constant.ANSI;
+import tech.chowyijiu.huhubot.core.thread.ShareRunsPolicy;
+import java.util.concurrent.*;
+
 /**
  * 线程池工厂
  *
  * @author elastic chow
  * @date 13/5/2023
  */
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import tech.chowyijiu.huhubot.core.constant.ANSI;
-import tech.chowyijiu.huhubot.core.thread.ShareRunsPolicy;
-
-import java.util.concurrent.*;
-
 @Slf4j
 public class ThreadPoolUtil {
     private ThreadPoolUtil() {
@@ -44,7 +43,7 @@ public class ThreadPoolUtil {
         }
 
         @Override
-        public void execute(Runnable task) {
+        public void execute(@NotNull Runnable task) {
             //log.info("[ThreadPool] Accepted a {}", task.getClass().getSimpleName());
             super.execute(task);
         }
