@@ -13,14 +13,8 @@ import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Huhubot;
-import tech.chowyijiu.huhubot.utils.StringUtil;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,7 +26,6 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class PersonalPlugin {
 
-
     //@Scheduled(cron = "0 1 0 * * *")
     public void scheduledCheck0() {
         check(WeiboConfig.pids.get(0));
@@ -42,7 +35,6 @@ public class PersonalPlugin {
     public void scheduledCheck1() {
         check(WeiboConfig.pids.get(1));
     }
-
 
     public void check(String pid) {
         log.info("开始超话签到");
@@ -76,63 +68,11 @@ public class PersonalPlugin {
         event.getBot().sendMessage(event, event.getCommandArgs());
     }
 
-    Map<Long, Long> idLastMap = new HashMap<>();
 
-    @MessageHandler(name = "遥遥领先", keywords = "遥遥领先")
+    @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"}, coolDown = 60)
     public void yaoYaoLingXian(MessageEvent event) {
-        long now = System.currentTimeMillis();
-        Long id = event instanceof GroupMessageEvent gme ? gme.getGroupId() : event.getUserId();
-        Long last = idLastMap.getOrDefault(id, 0L);
-        if (now - 60000 < last) return;
         event.getBot().sendMessage(event,
                 MessageSegment.record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));
-        idLastMap.put(id, now);
     }
 
-    //@MessageHandler(name = "自检", commands = "check", rule = RuleEnum.superuser)
-    public void check(MessageEvent event) {
-        ProcessBuilder processBuilder = new ProcessBuilder("ps -eo pid,command|grep -v grep|grep", "huhubot");
-        Process process = null;
-        try {
-            process = processBuilder.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (process == null) return;
-        String line = null;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            line = reader.readLine();
-            String[] split = line.split("java");
-            line = split[0].trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (!StringUtil.hasLength(line) || !StringUtil.isDigit(line)) return;
-        processBuilder = new ProcessBuilder("jstat -gc", line);
-        process = null;
-        try {
-            process = processBuilder.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (process == null) return;
-        line = null;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            line = reader.readLine();
-            String[] split = line.split("java");
-            line = split[0].trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    //@MessageHandler(name = "测试发送群转发消息", commands = "转发", rule = RuleEnum.superuser)
-    //public void testSendGroupForwardMsg(Bot bot, GroupMessageEvent event) {
-    //    LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-    //    map.put("1", "转发消息是完全不可信的");
-    //    map.put("2", "昵称内容头像均可自定义");
-    //    map.put("3", "连演员啥的都不需要请捏");
-    //    map.put("4", "当然此条也是不可信的哈");
-    //    List<ForwardMessage> nodes = ForwardMessage.quickBuild(bot.getUserId(), map);
-    //    bot.sendGroupForwardMsg(event.getGroupId(), nodes);
-    //}
 }

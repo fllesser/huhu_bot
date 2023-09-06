@@ -26,8 +26,7 @@ public @interface MessageHandler {
     //2. 可以在注解中指定RuleEnum中已有的规则
     RuleEnum rule() default RuleEnum.default_;
 
-    //放弃
-    //int cutdown() default 0;    // cd 单位 s
-    //String cdMsg() default "";
 
+    //String cdMsg() default "";
+    int coolDown() default 0; // cd 单位 s
 }

@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhubot.core;
 
+import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.utils.TimeLimiter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -124,6 +126,7 @@ public class DispatcherCore {
         private String[] keywords;
 
         private Rule rule;
+        private int coolDown;
 
         private void initEventType() {
             //在method的形参中定位事件类型
@@ -164,7 +167,8 @@ public class DispatcherCore {
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
-                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).build();
+                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).coolDown(mh.coolDown())
+                    .build();
             handler.initEventType();
             handler.initRule(mh.rule());
             return handler;
@@ -173,7 +177,8 @@ public class DispatcherCore {
         public static Handler buildNoticeHandler(Object plugin, Method method) {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(nh.name())
-                    .priority(nh.priority()).build();
+                    .priority(nh.priority()).coolDown(nh.coolDown())
+                    .build();
             handler.initEventType();
             handler.initRule(nh.rule());
             return handler;
@@ -220,6 +225,15 @@ public class DispatcherCore {
 
         private void execute(final Event event) {
             try {
+                //先校验冷却
+                if (coolDown != 0) {
+                    JSONObject jsonObject = event.getEventJsonObject();
+                    Long groupId = jsonObject.getLong("group_id");
+                    Long id = groupId != null ? groupId : jsonObject.getLong("user_id");
+                    if (TimeLimiter.limiting(
+                            plugin.getClass().getName() + method.getName() + id, this.coolDown)) return;
+                }
+                //再判断规则
                 if (rule != null && !rule.check(event)) return;
                 log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
                         , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
