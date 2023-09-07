@@ -1,5 +1,7 @@
 package tech.chowyijiu.huhubot.core.utils;
 
+import org.springframework.scheduling.annotation.Scheduled;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,5 +19,10 @@ public class TimeLimiter {
         if (now - milliseconds * 1000L < last) return true;
         map.put(key, now);
         return false;
+    }
+
+    @Scheduled(cron = "0 0 5 * * *")
+    public void clear() {
+        map.clear();
     }
 }

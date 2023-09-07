@@ -2,6 +2,7 @@ package tech.chowyijiu.huhubot.plugins.api_;
 
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.GuessPost;
@@ -17,7 +18,8 @@ import java.util.List;
 @BotPlugin("huhubot-plugin-api")
 public class ApiPlugin {
 
-    @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"}, rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
     public void sx(MessageEvent event) {
         String word = event.getCommandArgs();
         List<String> trans = StringUtil.hasLength(word, GuessPost::guess);

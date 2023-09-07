@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
@@ -77,7 +78,8 @@ public class MyGroupPlugin {
         log.info("群打卡完毕");
     }
 
-    @MessageHandler(name = "头衔自助", commands = {"sgst"}, rule = RuleEnum.self_owner)
+    @RuleCheck(rule = RuleEnum.self_owner)
+    @MessageHandler(name = "头衔自助", commands = {"sgst"})
     public void sgst(GroupMessageEvent event) {
         String title = event.getCommandArgs();
         for (String filter : new String[]{"群主", "管理", "主群"}) {
@@ -99,13 +101,20 @@ public class MyGroupPlugin {
 
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(NotifyNoticeEvent event) {
+        Bot bot = event.getBot();
+        if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
+                || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
+                || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的)
+        ) {
+            return;
+        }
         if (event.getGroupId() != null) {
             event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
         }
     }
 
-    //todo rule可以定义哪些群需要通知我, 然后移除tome, 写到方法里判断
-    @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, rule = RuleEnum.tome, priority = 9)
+    @RuleCheck(rule = RuleEnum.tome)
+    @MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, priority = 9)
     public void atMeXiaoAiNotice(GroupMessageEvent event) {
         Bot bot = event.getBot();
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
@@ -169,7 +178,7 @@ public class MyGroupPlugin {
     //}
 
 
-    //Rule giveAdminRule = (bot, event) -> RuleReference.selfOwner(bot, event)
+    //RuleCheck giveAdminRule = (bot, event) -> RuleReference.selfOwner(bot, event)
     //        && "message_sent".equals(event.getPostType());
     //
     ///**

@@ -1,10 +1,10 @@
 package tech.chowyijiu.huhubot.core;
 
-import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
@@ -17,10 +17,7 @@ import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.rule.Rule;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.utils.TimeLimiter;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -62,7 +59,8 @@ public class DispatcherCore {
                 plugin = botPluginMap.get(pluginName);
                 //插件功能名, 用于打印日志
                 sb = new StringBuilder();
-                for (Method method : plugin.getClass().getMethods()) {
+                //开启aop后, 使用aop增强的Bean会变成代理类对象, 代理类不包含原始类的注解
+                for (Method method : AopUtils.getTargetClass(plugin).getDeclaredMethods()) {
                     Handler handler;
                     if (method.isAnnotationPresent(MessageHandler.class)) {
                         handler = Handler.buildMessageHandler(plugin, method);
@@ -126,7 +124,6 @@ public class DispatcherCore {
         private String[] keywords;
 
         private Rule rule;
-        private int coolDown;
 
         private void initEventType() {
             //在method的形参中定位事件类型
@@ -138,49 +135,21 @@ public class DispatcherCore {
             }
         }
 
-        private void initRule(RuleEnum rule) {
-            if (!rule.equals(RuleEnum.default_)) {
-                this.rule = rule.getRule();
-            } else {
-                String RuleName = this.method.getName() + "Rule";
-                Field field = null;
-                for (Field f : this.plugin.getClass().getDeclaredFields()) {
-                    if (RuleName.equals(f.getName())) {
-                        field = f;
-                        break;
-                    }
-                }
-                if (field != null) {
-                    field.setAccessible(true);
-                    Object obj = null;
-                    try {
-                        obj = field.get(plugin);
-                    } catch (IllegalAccessException ignored) {
-                    }
-                    if (obj instanceof Rule ruleObj) this.rule = ruleObj;
-                } else {
-                    this.rule = null;
-                }
-            }
-        }
-
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
-                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).coolDown(mh.coolDown())
+                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords())
                     .build();
             handler.initEventType();
-            handler.initRule(mh.rule());
             return handler;
         }
 
         public static Handler buildNoticeHandler(Object plugin, Method method) {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(nh.name())
-                    .priority(nh.priority()).coolDown(nh.coolDown())
+                    .priority(nh.priority())
                     .build();
             handler.initEventType();
-            handler.initRule(nh.rule());
             return handler;
         }
 
@@ -225,20 +194,10 @@ public class DispatcherCore {
 
         private void execute(final Event event) {
             try {
-                //先校验冷却
-                if (coolDown != 0) {
-                    JSONObject jsonObject = event.getEventJsonObject();
-                    Long groupId = jsonObject.getLong("group_id");
-                    Long id = groupId != null ? groupId : jsonObject.getLong("user_id");
-                    if (TimeLimiter.limiting(
-                            plugin.getClass().getName() + method.getName() + id, this.coolDown)) return;
-                }
-                //再判断规则
-                if (rule != null && !rule.check(event)) return;
-                log.info("{}{} will be handled by Plugin[{}] Function[{}] Priority[{}]{}"
-                        , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
-                        , this.name, this.priority, ANSI.RESET);
                 this.method.invoke(this.plugin, event);
+                //log.info("{}{} is handled by Plugin[{}] Function[{}] Priority[{}]{}"
+                //        , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
+                //        , this.name, this.priority, ANSI.RESET);
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {

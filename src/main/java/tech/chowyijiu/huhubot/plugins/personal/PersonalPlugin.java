@@ -4,13 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.config.WeiboConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
+import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
@@ -48,8 +49,8 @@ public class PersonalPlugin {
         log.info("超话签到完毕, " + result);
     }
 
-    Rule replyJyGroupRule = event -> "group".equals(((PrivateMessageEvent) event).getSubType());
 
+    @RuleCheck(rule = RuleEnum.temp_session)
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
     public void replyJyGroup(PrivateMessageEvent event) {
         Message message = Message.text("[bot]").append(MessageSegment.at(event.getUserId()))
@@ -57,19 +58,21 @@ public class PersonalPlugin {
         event.getBot().sendGroupMessage(event.getSender().getGroupId(), message);
     }
 
+    @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
-    @Deprecated
     public void textToTts(GroupMessageEvent event) {
         event.getBot().sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
     }
 
-    @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "echo", commands = "echo")
     public void echo(MessageEvent event) {
         event.getBot().sendMessage(event, event.getCommandArgs());
     }
 
 
-    @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"}, coolDown = 60)
+    @CoolDown
+    @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
     public void yaoYaoLingXian(MessageEvent event) {
         event.getBot().sendMessage(event,
                 MessageSegment.record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));

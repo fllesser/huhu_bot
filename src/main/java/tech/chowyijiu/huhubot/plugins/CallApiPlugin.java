@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
@@ -29,7 +30,8 @@ import java.util.stream.Collectors;
 public class CallApiPlugin {
 
 
-    @MessageHandler(name = "callApi", commands = "api", rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "callApi", commands = "api")
     public void apiTest(MessageEvent event) {
         //[key:value,key:value]
         Bot bot = event.getBot();

@@ -5,6 +5,7 @@ import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 
 /**
@@ -53,6 +54,13 @@ public class RuleReference {
             String role = groupMember.getRole();
             return "admin".equals(role) || "owner".equals(role);
         } else return false;
+    }
+
+    public static boolean tempSession(Event event) {
+        if (event instanceof PrivateMessageEvent pme) {
+            return "group".equals(pme.getSubType());
+        }
+        return false;
     }
 
 }

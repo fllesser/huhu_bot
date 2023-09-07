@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.config.BotConfig;
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
@@ -35,11 +36,12 @@ public class ResourceSearchPlugin {
         Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
-        //清除搜索
+        //清除搜索缓存
         ResourceUtil.clear();
     }
 
-    @MessageHandler(name = "阿里云盘手动签到", commands = "alisign", rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "阿里云盘手动签到", commands = "alisign")
     public void aliSignIn(MessageEvent event) {
         String result;
         try {
@@ -66,7 +68,8 @@ public class ResourceSearchPlugin {
     /**
      * .save/保存 搜索时的关键词 序号
      */
-    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, rule = RuleEnum.superuser, block = true)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, block = true)
     public void save(MessageEvent event) {
         String no = event.getCommandArgs();
         Bot bot = event.getBot();
@@ -94,7 +97,8 @@ public class ResourceSearchPlugin {
 
     }
 
-    @MessageHandler(name = "search in cache", commands = {".cache"}, rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "search in cache", commands = {".cache"})
     public void searchInCache(MessageEvent event) {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);

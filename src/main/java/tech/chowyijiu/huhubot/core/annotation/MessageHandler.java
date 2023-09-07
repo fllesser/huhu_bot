@@ -21,12 +21,9 @@ public @interface MessageHandler {
     String[] commands() default {}; //命令前缀匹配, event的message字段会自动去除触发的command和前后空白符
     String[] keywords() default {}; //关键词匹配
 
-    //1. 如果不指定可以在插件类中定义一个属性(引用为Rule, 名称为要加规则的方法名+"Rule") = (bot, event) -> {};
-    //示例: Rule testRule = (bot, event) -> { return false;}
+    //1. 如果不指定可以在插件类中定义一个属性(引用为Rule, 名称为要加规则的方法名+"RuleCheck") = (bot, event) -> {};
+    //示例: RuleCheck testRule = (bot, event) -> { return false;}
     //2. 可以在注解中指定RuleEnum中已有的规则
     RuleEnum rule() default RuleEnum.default_;
 
-
-    //String cdMsg() default "";
-    int coolDown() default 0; // cd 单位 s
 }
