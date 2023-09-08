@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface CoolDown {
-    int time() default 60; // cd 单位 s
+    int seconds() default 60; // cd 单位 s
 }

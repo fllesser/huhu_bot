@@ -7,7 +7,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
@@ -24,8 +23,7 @@ import java.lang.reflect.Method;
 @Slf4j
 @Component
 @Aspect
-@Order(value = 1)
-public class HandlerAspect {
+public class CheckAspect {
 
     @Pointcut("@annotation(tech.chowyijiu.huhubot.core.annotation.RuleCheck) || @annotation(tech.chowyijiu.huhubot.core.annotation.CoolDown)")
     public void pointcut() {
@@ -35,11 +33,12 @@ public class HandlerAspect {
     public Object doAround(ProceedingJoinPoint joinPoint, Event event) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String handlerName = signature.getDeclaringTypeName() + "." + signature.getName();
-        log.info("HandlerAspect-Around, Event:{}, Handler:{}", event, handlerName);
+        log.info("CheckAspect-Around, Event:{}, Handler:{}", event, handlerName);
         Method method = signature.getMethod();
         //校验规则
-        if (method.isAnnotationPresent(RuleCheck.class) && !method.getAnnotation(RuleCheck.class).rule().getRule().check(event)) {
-            log.info("RuleCheck mismatch, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
+        if (method.isAnnotationPresent(RuleCheck.class) &&
+                !method.getAnnotation(RuleCheck.class).rule().getRule().check(event)) {
+            log.info("Rule mismatch, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
             return null;
         }
         //校验cd
@@ -49,11 +48,12 @@ public class HandlerAspect {
             JSONObject jsonObject = event.getEventJsonObject();
             Long groupId = jsonObject.getLong("group_id");
             Long id = groupId != null ? groupId : jsonObject.getLong("user_id");
-            if (TimeLimiter.limiting(handlerName + id, cd.time())) {
+            if (TimeLimiter.limiting(handlerName + id, cd.seconds())) {
                 log.info("Cooling down, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
                 return null;
             }
         }
+        //log.info("Check passed, this call will continue, Event:{}, Handler:{}", event, handlerName);
         return joinPoint.proceed();
     }
 

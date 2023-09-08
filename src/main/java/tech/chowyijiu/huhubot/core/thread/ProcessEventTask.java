@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.thread;
 
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.DispatcherCore;
 import tech.chowyijiu.huhubot.core.event.Event;
@@ -17,15 +16,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @date 14/5/2023
  */
 @Slf4j
-@SuppressWarnings("all")
-@ToString
-public class ProcessEventTask implements Runnable {
-
-    private final Event event;
-
-    private ProcessEventTask(Event event) {
-        this.event = event;
-    }
+public record ProcessEventTask(Event event) implements Runnable {
 
     private static final ThreadPoolExecutor EVENT_EXECUTOR;
     private static final DispatcherCore DISPATCHER_CORE;
@@ -34,7 +25,7 @@ public class ProcessEventTask implements Runnable {
         EVENT_EXECUTOR = ThreadPoolUtil.getEventExecutor();
         DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
     }
-    //
+
     @Override
     public void run() {
         log.info("{} starts to match handler", event);

@@ -19,10 +19,8 @@ import tech.chowyijiu.huhubot.core.event.Event;
 public class MetaEvent extends Event {
 
     private final String postType = PostTypeEnum.meta_event.name();
-    @JsonProperty("meta_event_type")
-    private String metaEventType;
-    @JsonProperty("sub_type")
-    private String subType;
+    @JsonProperty("meta_event_type") private String metaEventType;
+    @JsonProperty("sub_type") private String subType;
 
 
     public boolean connect() {

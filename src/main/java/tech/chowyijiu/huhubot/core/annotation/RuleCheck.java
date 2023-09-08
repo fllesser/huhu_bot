@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RuleCheck {
-    RuleEnum rule() default RuleEnum.default_;
+    RuleEnum rule();
 }

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RuleEnum {
 
-    default_("默认", event -> true),
     tome("@机器人", RuleReference::tome),
     superuser("使用者为超级用户", RuleReference::superuser),
     owner("使用者为群主", RuleReference::owner),

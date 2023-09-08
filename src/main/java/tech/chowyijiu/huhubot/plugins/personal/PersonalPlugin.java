@@ -59,7 +59,7 @@ public class PersonalPlugin {
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"}, rule = RuleEnum.superuser)
+    @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
     public void textToTts(GroupMessageEvent event) {
         event.getBot().sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
     }
@@ -71,7 +71,7 @@ public class PersonalPlugin {
     }
 
 
-    @CoolDown
+    @CoolDown(seconds = 120)
     @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
     public void yaoYaoLingXian(MessageEvent event) {
         event.getBot().sendMessage(event,

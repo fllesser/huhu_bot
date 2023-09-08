@@ -60,6 +60,7 @@ public class DispatcherCore {
                 //插件功能名, 用于打印日志
                 sb = new StringBuilder();
                 //开启aop后, 使用aop增强的Bean会变成代理类对象, 代理类不包含原始类的注解
+                //所以需要使用AopUtils.getTargetClass()获取原始类
                 for (Method method : AopUtils.getTargetClass(plugin).getDeclaredMethods()) {
                     Handler handler;
                     if (method.isAnnotationPresent(MessageHandler.class)) {
@@ -76,7 +77,8 @@ public class DispatcherCore {
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            log.info("{}No plugin was found{}", ANSI.YELLOW, ANSI.RESET);
+            log.info("{}No plugin was found{}, this application will exit", ANSI.YELLOW, ANSI.RESET);
+            System.exit(0);
             return;
         }
         //根据priority对handler进行排序, 并全部加入到handlerContainer中
@@ -104,8 +106,7 @@ public class DispatcherCore {
 
     public void onNotice(final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
-            boolean block = handler.matchNotice(event);
-            if (block) break;
+            if (handler.matchNotice(event)) break;
         }
     }
 
@@ -195,9 +196,6 @@ public class DispatcherCore {
         private void execute(final Event event) {
             try {
                 this.method.invoke(this.plugin, event);
-                //log.info("{}{} is handled by Plugin[{}] Function[{}] Priority[{}]{}"
-                //        , ANSI.YELLOW, event, this.plugin.getClass().getSimpleName()
-                //        , this.name, this.priority, ANSI.RESET);
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {
@@ -209,7 +207,6 @@ public class DispatcherCore {
                 } else {
                     targetException.printStackTrace();
                 }
-
             }
         }
 

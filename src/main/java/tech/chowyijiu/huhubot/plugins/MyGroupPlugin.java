@@ -104,10 +104,8 @@ public class MyGroupPlugin {
         Bot bot = event.getBot();
         if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
                 || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
-                || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的)
-        ) {
-            return;
-        }
+                || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
+        ) return;
         if (event.getGroupId() != null) {
             event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
         }
@@ -126,6 +124,8 @@ public class MyGroupPlugin {
                 );
 
     }
+
+
 
     //private final Map<String, Integer> verificationMap = new HashMap<>();
     //private final List<Long> verificationGroups = List.of(754044548L, 208248400L);
