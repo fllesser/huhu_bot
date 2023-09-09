@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhubot.core.aspect;
+package tech.chowyijiu.huhubot.core.aop;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.event.Event;
-import tech.chowyijiu.huhubot.core.utils.TimeLimiter;
+import tech.chowyijiu.huhubot.core.utils.CoolDownLimiter;
 
 import java.lang.reflect.Method;
 
@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 @Slf4j
 @Component
 @Aspect
-public class CheckAspect {
+public class RuleAndCDChecker {
 
     @Pointcut("@annotation(tech.chowyijiu.huhubot.core.annotation.RuleCheck) || @annotation(tech.chowyijiu.huhubot.core.annotation.CoolDown)")
     public void pointcut() {
@@ -33,12 +33,12 @@ public class CheckAspect {
     public Object doAround(ProceedingJoinPoint joinPoint, Event event) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String handlerName = signature.getDeclaringTypeName() + "." + signature.getName();
-        log.info("CheckAspect-Around, Event:{}, Handler:{}", event, handlerName);
+        log.info("RuleAndCDChecker-Around, Event:{}, Handler:{}", event, handlerName);
         Method method = signature.getMethod();
         //校验规则
         if (method.isAnnotationPresent(RuleCheck.class) &&
                 !method.getAnnotation(RuleCheck.class).rule().getRule().check(event)) {
-            log.info("Rule mismatch, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
+            //log.info("Rule mismatch, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
             return null;
         }
         //校验cd
@@ -48,8 +48,11 @@ public class CheckAspect {
             JSONObject jsonObject = event.getEventJsonObject();
             Long groupId = jsonObject.getLong("group_id");
             Long id = groupId != null ? groupId : jsonObject.getLong("user_id");
-            if (TimeLimiter.limiting(handlerName + id, cd.seconds())) {
-                log.info("Cooling down, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
+            if (CoolDownLimiter.check(handlerName + id, cd.seconds())) {
+                //log.info("Cooling down, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
+                //if (StringUtil.hasLength(cd.msg())) {
+                //    event.getBot().sendMessage(event, "冷却中");
+                //}
                 return null;
             }
         }

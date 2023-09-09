@@ -24,15 +24,20 @@ nonebot2, 但是jvav
 ## 示例插件
 
 ```Java
+import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+
 @Slf4j
 @BotPlugin("demo")
 @SuppressWarnings("unused")
 public class DemoPlugin {
 
-    @MessageHandler(name = "echo", commands = "echo", rule = RuleEnum.superuser)
-    public void echo(Bot bot, MessageEvent event) {
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "echo", commands = "echo")
+    public void echo(MessageEvent event) {
         //event.getCommandArgs()不包含触发的命令
         //message 支持 String, MessageSegment, Message三种类型
+        //event.getBot();
+        Bot bot = event.getBot();
         //1. String -> 纯文本消息
         bot.sendMessage(event, event.getCommandArgs());
         //2. MessageSegment -> 发送文字, 图片, 语音等消息
@@ -54,4 +59,4 @@ IntelliJ IDEA 是一个在各个方面都最大程度地提高开发人员的生
 特别感谢 JetBrains 为开源项目提供免费的 IntelliJ IDEA 等 IDE 的授权
 ![JetBrains Logo](jb_beam.png)
 
-特别感谢 [nonebot2](https://github.com/nonebot/nonebot2) ,[haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server) 的开发人员, 让我学到了很多东西
+特别感谢 [nonebot2](https://github.com/nonebot/nonebot2) ,[haruhibot](https://gitee.com/Lelouch-cc/haruhibot-server)

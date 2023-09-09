@@ -51,4 +51,12 @@ public class StringUtil {
     public static boolean isDigit(String str) {
         return hasLength(str) && str.chars().allMatch(Character::isDigit);
     }
+
+    private static final Pattern letterAndNumberPattern = Pattern.compile("[a-zA-Z0-9]+");
+
+    public static String getFirstLAN(String str) {
+        Matcher matcher = letterAndNumberPattern.matcher(str);
+        if (matcher.find()) return matcher.group(0);
+        return "";
+    }
 }

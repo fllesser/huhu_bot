@@ -11,4 +11,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface CoolDown {
     int seconds() default 60; // cd 单位 s
+    String msg() default "";
 }

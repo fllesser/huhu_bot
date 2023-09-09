@@ -9,14 +9,14 @@ import java.util.Map;
  * @author flless
  * @date 6/9/2023
  */
-public class TimeLimiter {
+public class CoolDownLimiter {
 
     private static final Map<String, Long> map = new HashMap<>();
 
-    public static boolean limiting(String key, int milliseconds) {
+    public static boolean check(String key, int seconds) {
         long now = System.currentTimeMillis();
         Long last = map.getOrDefault(key, 0L);
-        if (now - milliseconds * 1000L < last) return true;
+        if (now - seconds * 1000L < last) return true;
         map.put(key, now);
         return false;
     }

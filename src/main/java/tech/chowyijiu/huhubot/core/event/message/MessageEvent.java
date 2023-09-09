@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.core.entity.response.MessageInfo;
 import tech.chowyijiu.huhubot.core.entity.response.Sender;
 import tech.chowyijiu.huhubot.core.event.Event;
 
@@ -46,6 +48,12 @@ public class MessageEvent extends Event {
             event = jsonObject.toJavaObject(GroupMessageEvent.class);
         }
         return event;
+    }
+
+    public MessageInfo getReply() {
+        MessageSegment segment = this.message.get(0);
+        if (!"reply".equals(segment.getType())) return null;
+        return this.getBot().getMsg(segment.getInteger("id"));
     }
 
 

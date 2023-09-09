@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhubot.core.rule;
+package tech.chowyijiu.huhubot.core.aop.rule;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

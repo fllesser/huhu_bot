@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhubot.core.rule;
+package tech.chowyijiu.huhubot.core.aop.rule;
 
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.entity.response.GroupMember;

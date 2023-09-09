@@ -17,10 +17,7 @@ import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
-import tech.chowyijiu.huhubot.core.entity.response.FriendInfo;
-import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
-import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
-import tech.chowyijiu.huhubot.core.entity.response.SelfInfo;
+import tech.chowyijiu.huhubot.core.entity.response.*;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
@@ -223,6 +220,18 @@ public class Bot {
         // 或者GroupMessageEvent进来,看看groups里有没有这个groupId
         this.groups = this.getGroupList(true);
         return this.groups;
+    }
+
+    /**
+     * 获取消息
+     * @param messageId //message_id	int32	消息id
+     * @return MessageInfo
+     */
+    public MessageInfo getMsg(Integer messageId) {
+        String data = this.callApiWaitResp(GocqAction.get_msg, Map.of("message_id", messageId));
+        JSONObject jsonObject = JSONObject.parseObject(data);
+        return jsonObject.toJavaObject(MessageInfo.class);
+        //return JSONObject.parseObject(data, MessageInfo.class);// 不知道为啥会报错
     }
 
     /**

@@ -1,7 +1,5 @@
 package tech.chowyijiu.huhubot.core.annotation;
 
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-
 import java.lang.annotation.*;
 
 /**

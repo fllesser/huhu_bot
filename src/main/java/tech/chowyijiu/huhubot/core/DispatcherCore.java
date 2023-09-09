@@ -16,7 +16,7 @@ import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
-import tech.chowyijiu.huhubot.core.rule.Rule;
+import tech.chowyijiu.huhubot.core.aop.rule.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

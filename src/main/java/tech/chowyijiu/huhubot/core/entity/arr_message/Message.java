@@ -26,6 +26,7 @@ public class Message extends ArrayList<MessageSegment> {
         return false;
     }
 
+
     /**
      * 追加文本消息
      *
@@ -57,10 +58,9 @@ public class Message extends ArrayList<MessageSegment> {
      * 即合并所有[CQ:text,text=?]中的?
      */
     public void plainText() {
-        //if (this.plainText != null) return this.plainText;
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this) sb.append(segment.text());
-        this.plainText = sb.toString();
+        this.plainText = sb.toString().trim();
     }
 
     /**

@@ -12,7 +12,7 @@ import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 

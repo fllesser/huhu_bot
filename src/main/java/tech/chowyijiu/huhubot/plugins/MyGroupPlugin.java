@@ -6,14 +6,13 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
 import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NotifyNoticeEvent;
-import tech.chowyijiu.huhubot.core.rule.Rule;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
@@ -90,14 +89,6 @@ public class MyGroupPlugin {
         }
         event.getBot().setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
     }
-
-    Rule replyPokeRule = event -> {
-        NotifyNoticeEvent notifyNoticeEvent = (NotifyNoticeEvent) event;
-        Bot bot = event.getBot();
-        return SubTypeEnum.poke.name().equals(notifyNoticeEvent.getSubType()) //戳一戳事件
-                && bot.getSelfId().equals(notifyNoticeEvent.getTargetId())    //被戳的是bot
-                && !bot.getSelfId().equals(notifyNoticeEvent.getUserId());    //不是bot号自己戳的
-    };
 
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(NotifyNoticeEvent event) {
