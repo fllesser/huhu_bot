@@ -1,7 +1,6 @@
 package tech.chowyijiu.huhubot.core.entity.arr_message;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import tech.chowyijiu.huhubot.core.exception.IllegalDataException;
 
 import java.util.Map;
@@ -15,20 +14,13 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SuppressWarnings("unused")
 public class MessageSegment {
 
     private String type;
     private Map<String, Object> data;
-
-    public MessageSegment() {
-    }
-
-    private MessageSegment(String type, Map<String, Object> data) {
-        this.type = type;
-        this.data = data;
-    }
-
 
     public Long getLong(String key) {
         Object o = data.get(key);
@@ -61,6 +53,7 @@ public class MessageSegment {
     @Override
     @Deprecated
     public String toString() {
+        if ("text".equals(this.getType())) return this.getString("text");
         StringBuilder sb = new StringBuilder("[CQ:" + type);
         for (String key : data.keySet()) {
             sb.append(",").append(key).append("=").append(data.get(key));

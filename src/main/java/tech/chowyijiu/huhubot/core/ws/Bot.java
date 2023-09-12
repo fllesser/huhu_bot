@@ -19,6 +19,8 @@ import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.request.RequestBox;
 import tech.chowyijiu.huhubot.core.entity.response.*;
 import tech.chowyijiu.huhubot.core.event.Event;
+import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
 import tech.chowyijiu.huhubot.core.exception.IllegalMessageTypeException;
@@ -36,23 +38,21 @@ import java.util.Map;
 @Slf4j
 @Getter
 @ToString
-@SuppressWarnings("unused")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class Bot {
 
     private final Long selfId;
     private final WebSocketSession session;
 
+    //群列表
     private List<GroupInfo> groups;
-
-    public void update() {
-        groups = this.getGroupList();
-    }
 
 
     /**
      * call api 最终调用的方法
      * Send a WebSocket message
+     *
      * @param requestBox box
      */
     private void sessionSend(RequestBox requestBox) {
@@ -204,34 +204,28 @@ public class Bot {
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
+    public List<GroupInfo> getGroupList() {
+        this.groups = this.getGroupList(false);
+        return this.groups;
+    }
 
     public GroupInfo getGroupInfo(Long groupId, boolean noCache) {
         String data = this.callApiWaitResp(GocqAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupInfo.class);
     }
 
-    /**
-     * 不使用缓存获取群列表
-     *
-     * @return List<GroupInfo>
-     */
-    public List<GroupInfo> getGroupList() {
-        //todo 想想在哪里更新groups最好, 目前感觉最好是 入群/退群更新,
-        // 或者GroupMessageEvent进来,看看groups里有没有这个groupId
-        this.groups = this.getGroupList(true);
-        return this.groups;
-    }
 
     /**
      * 获取消息
-     * @param messageId //message_id	int32	消息id
+     *
+     * @param messageId message_id int32 消息id
      * @return MessageInfo
      */
     public MessageInfo getMsg(Integer messageId) {
         String data = this.callApiWaitResp(GocqAction.get_msg, Map.of("message_id", messageId));
         JSONObject jsonObject = JSONObject.parseObject(data);
         return jsonObject.toJavaObject(MessageInfo.class);
-        //return JSONObject.parseObject(data, MessageInfo.class);// 不知道为啥会报错
+        //return JSONObject.parseObject(data, MessageInfo.class);//
     }
 
     /**
@@ -295,13 +289,12 @@ public class Bot {
     }
 
 
-
     /**
      * 发送群消息
      *
-     * @param groupId    群号
-     * @param message    消息 if String 纯文本发送 if Message or MessageSegment 转化
-     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * @param groupId 群号
+     * @param message 消息 if String 纯文本发送 if Message or MessageSegment 转化
+     *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendGroupMessage(Long groupId, Object message) {
         Map<String, Object> map;
@@ -316,16 +309,16 @@ public class Bot {
     /**
      * 发送私聊消息
      *
-     * @param userId     对方qq
-     * @param message    消息
-     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * @param userId  对方qq
+     * @param message 消息
+     *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendPrivateMessage(Long userId, Object message) {
         Map<String, Object> map;
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        map = Map.of("user_id", userId, "message", message , "auto_escape", autoEscape);
+        map = Map.of("user_id", userId, "message", message, "auto_escape", autoEscape);
         this.callApi(GocqAction.send_private_msg, map);
     }
 
@@ -377,13 +370,21 @@ public class Bot {
         this.callApi(GocqAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
     }
 
+    public void sendForwardMsg(MessageEvent event, List<ForwardMessage> nodes) {
+       if (event instanceof GroupMessageEvent gme) {
+           this.sendGroupForwardMsg(gme.getGroupId(), nodes);
+       } else {
+           this.sendPrivateForwardMsg(event.getUserId(), nodes);
+       }
+    }
+
 
     /**
      * 根据事件, 来发送对应的消息
      *
-     * @param event      event object
-     * @param message    消息 Message | MessageSegment | String
-     * autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
+     * @param event   event object
+     * @param message 消息 Message | MessageSegment | String
+     *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendMessage(Event event, Object message) {
         JSONObject jsonObject = event.getEventJsonObject();

@@ -27,6 +27,7 @@ public class GuessPost {
         HttpResponse response = HttpRequest.post(url).addHeaders(headers)
                 .body(JSONObject.toJSONString(body)).execute();
         JSONArray jsonArray = JSONArray.parseArray(response.body());
+        if (jsonArray.size() == 0) return null;
         JSONObject jsonObject = (JSONObject) jsonArray.get(0);
         return jsonObject.getList("trans", String.class);
     }

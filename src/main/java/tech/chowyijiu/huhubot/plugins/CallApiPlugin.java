@@ -5,13 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.ws.Bot;
 
 import java.util.ArrayList;
@@ -65,11 +63,7 @@ public class CallApiPlugin {
             messages.add(MessageSegment.image("https://pic2.zhimg.com/80/v2-d9a3bd17467c3b51e35c95cbbfe6a755_1440w.webp"));
             messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
             List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), messages);
-            if (event instanceof GroupMessageEvent) {
-                bot.sendGroupForwardMsg(((GroupMessageEvent) event).getGroupId(), nodes);
-            } else if (event instanceof PrivateMessageEvent) {
-                bot.sendPrivateForwardMsg(event.getUserId(), nodes);
-            }
+            bot.sendForwardMsg(event, nodes);
         }
     }
 

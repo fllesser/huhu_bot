@@ -107,13 +107,9 @@ public class MyGroupPlugin {
     public void atMeXiaoAiNotice(GroupMessageEvent event) {
         Bot bot = event.getBot();
         GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
-        bot.getGroups().stream()
-                .filter(g -> g.getGroupId().equals(event.getGroupId()))
-                .findFirst()
-                .ifPresent(g -> XiaoAIUtil.tts("群" + g.getGroupName() + "内"
-                        + groupMember.getNickname() + "艾特你说, " + event.getMessage().getPlainText())
-                );
-
+        GroupInfo groupInfo = bot.getGroupInfo(event.getGroupId(), false);
+        XiaoAIUtil.tts("群" + groupInfo.getGroupName() + "内"
+                + groupMember.getNickname() + "艾特你说, " + event.getMessage().getPlainText());
     }
 
 

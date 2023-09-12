@@ -33,7 +33,7 @@ public class RuleAndCDChecker {
     public Object doAround(ProceedingJoinPoint joinPoint, Event event) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String handlerName = signature.getDeclaringTypeName() + "." + signature.getName();
-        log.info("RuleAndCDChecker-Around, Event:{}, Handler:{}", event, handlerName);
+        //log.info("RuleAndCDChecker-Around, Event:{}, Handler:{}", event, handlerName);
         Method method = signature.getMethod();
         //校验规则
         if (method.isAnnotationPresent(RuleCheck.class) &&
@@ -56,7 +56,7 @@ public class RuleAndCDChecker {
                 return null;
             }
         }
-        //log.info("Check passed, this call will continue, Event:{}, Handler:{}", event, handlerName);
+        //log.info("{}Check passed, Event:{}, Handler:{}{}", ANSI.YELLOW, event, handlerName, ANSI.RESET);
         return joinPoint.proceed();
     }
 
