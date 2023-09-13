@@ -15,14 +15,9 @@ import java.lang.annotation.*;
 @Documented
 @Component
 public @interface BotPlugin {
-    @AliasFor(
-            annotation = Component.class
-    )
+    @AliasFor(annotation = Component.class)
     String value() default "";
 
-    @AliasFor(
-            annotation = Component.class,
-            value = "value"
-    )
+    @AliasFor(annotation = Component.class, value = "value")
     String name() default "";
 }

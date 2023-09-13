@@ -21,7 +21,8 @@ import tech.chowyijiu.huhubot.core.event.Event;
 public class NoticeEvent extends Event {
 
     private final String postType = PostTypeEnum.notice.name();
-    @JsonProperty("notice_type") private String noticeType;
+    @JsonProperty("notice_type")
+    private String noticeType;
 
     public static NoticeEvent build(final JSONObject jsonObject) {
         String noticeType = jsonObject.getString("notice_type");
@@ -39,8 +40,6 @@ public class NoticeEvent extends Event {
             case essence, offline_file, client_status -> jsonObject.toJavaObject(NoticeEvent.class);
         };
     }
-
-
 
 
 }

@@ -24,16 +24,25 @@ import tech.chowyijiu.huhubot.core.event.Event;
 @NoArgsConstructor
 public class MessageEvent extends Event {
 
-    @JsonProperty("post_type") private String postType; //message message_sent
-    @JsonProperty("sub_type") private String subType; //group, public
-    @JsonProperty("user_id") private Long userId;
-    @JsonProperty("message_type") private String messageType;
-    @JsonProperty("message_id") private Integer messageId;
+    @JsonProperty("post_type")
+    private String postType; //message message_sent
+    @JsonProperty("sub_type")
+    private String subType; //group, public
+    @JsonProperty("user_id")
+    private Long userId;
+    @JsonProperty("message_type")
+    private String messageType;
+    @JsonProperty("message_id")
+    private Integer messageId;
     //注意gocq, config.yml中要设置数组array消息格式
-    @JsonProperty("message") private Message message;
-    @JsonProperty("raw_message") private String rawMessage;
-    @JsonProperty("font") private Integer font; //0
-    @JsonProperty("sender") private Sender sender;
+    @JsonProperty("message")
+    private Message message;
+    @JsonProperty("raw_message")
+    private String rawMessage;
+    @JsonProperty("font")
+    private Integer font; //0
+    @JsonProperty("sender")
+    private Sender sender;
 
     //去除匹配的命令, 保留剩余的字符串,并去掉头尾空格, 注意不会去除at
     @JsonIgnore
