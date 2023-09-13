@@ -22,5 +22,4 @@ public class IocUtil {
         return applicationContext.getBean(clazz);
     }
 
-
 }

@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhubot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
@@ -34,6 +35,7 @@ public class MyGroupPlugin {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+    @Async
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
         String card = "失业第" + this.countdown("2023-06-16 10:00");

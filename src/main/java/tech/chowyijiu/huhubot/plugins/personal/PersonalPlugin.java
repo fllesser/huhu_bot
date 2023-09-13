@@ -1,22 +1,16 @@
 package tech.chowyijiu.huhubot.plugins.personal;
 
 import lombok.extern.slf4j.Slf4j;
-import tech.chowyijiu.huhubot.config.BotConfig;
-import tech.chowyijiu.huhubot.config.WeiboConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.ws.Huhubot;
-import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
-
-import java.util.Objects;
 
 /**
  * @author elastic chow
@@ -28,26 +22,26 @@ import java.util.Objects;
 public class PersonalPlugin {
 
     //@Scheduled(cron = "0 1 0 * * *")
-    public void scheduledCheck0() {
-        check(WeiboConfig.pids.get(0));
-    }
-
-    //@Scheduled(cron = "0 30 8 * * *")
-    public void scheduledCheck1() {
-        check(WeiboConfig.pids.get(1));
-    }
-
-    public void check(String pid) {
-        log.info("开始超话签到");
-        boolean ok = WeiBoClient.check(pid);
-        String result = "勇远期岱超话今日" + (ok ? "签到成功" : "签到失败");
-        //结果发送到测试群
-        Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
-                .sendGroupMessage(BotConfig.testGroup, result);
-        //让小爱播报
-        XiaoAIUtil.tts(result);
-        log.info("超话签到完毕, " + result);
-    }
+    //public void scheduledCheck0() {
+    //    check(WeiboConfig.pids.get(0));
+    //}
+    //
+    ////@Scheduled(cron = "0 30 8 * * *")
+    //public void scheduledCheck1() {
+    //    check(WeiboConfig.pids.get(1));
+    //}
+    //
+    //public void check(String pid) {
+    //    log.info("开始超话签到");
+    //    boolean ok = WeiBoClient.check(pid);
+    //    String result = "超话今日" + (ok ? "签到成功" : "签到失败");
+    //    //结果发送到测试群
+    //    Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
+    //            .sendGroupMessage(BotConfig.testGroup, result);
+    //    //让小爱播报
+    //    XiaoAIUtil.tts(result);
+    //    log.info("超话签到完毕, " + result);
+    //}
 
 
     @RuleCheck(rule = RuleEnum.temp_session)

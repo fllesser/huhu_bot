@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhubot.plugins.resource_search;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
@@ -30,6 +31,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ResourceSearchPlugin {
 
+    @Async
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApi.signInList();
