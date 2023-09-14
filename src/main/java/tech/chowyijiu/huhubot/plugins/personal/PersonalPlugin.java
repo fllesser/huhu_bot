@@ -21,27 +21,7 @@ import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 @SuppressWarnings("unused")
 public class PersonalPlugin {
 
-    //@Scheduled(cron = "0 1 0 * * *")
-    //public void scheduledCheck0() {
-    //    check(WeiboConfig.pids.get(0));
-    //}
-    //
-    ////@Scheduled(cron = "0 30 8 * * *")
-    //public void scheduledCheck1() {
-    //    check(WeiboConfig.pids.get(1));
-    //}
-    //
-    //public void check(String pid) {
-    //    log.info("开始超话签到");
-    //    boolean ok = WeiBoClient.check(pid);
-    //    String result = "超话今日" + (ok ? "签到成功" : "签到失败");
-    //    //结果发送到测试群
-    //    Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
-    //            .sendGroupMessage(BotConfig.testGroup, result);
-    //    //让小爱播报
-    //    XiaoAIUtil.tts(result);
-    //    log.info("超话签到完毕, " + result);
-    //}
+
 
 
     @RuleCheck(rule = RuleEnum.temp_session)
@@ -56,12 +36,6 @@ public class PersonalPlugin {
     @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
     public void textToTts(GroupMessageEvent event) {
         event.getBot().sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
-    }
-
-    @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "echo", commands = "echo")
-    public void echo(MessageEvent event) {
-        event.getBot().sendMessage(event, event.getCommandArgs());
     }
 
 

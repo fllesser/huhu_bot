@@ -10,13 +10,13 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
+import tech.chowyijiu.huhubot.core.aop.rule.Rule;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
-import tech.chowyijiu.huhubot.core.aop.rule.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 
 /**
@@ -94,6 +95,7 @@ public class DispatcherCore {
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             //判断事件类型
             if (!handler.match(event.getClass())) continue;
+            if (!handler.status) continue; //是关闭的
             //因为注解中的commands和keywords 默认为{}, 无需判空
             if (handler.commands.length > 0) {
                 if (handler.matchCommand(event)) break;
@@ -103,9 +105,9 @@ public class DispatcherCore {
         }
     }
 
-
     public void onNotice(final NoticeEvent event) {
         for (Handler handler : NOTICE_HANDLER_CONTAINER) {
+            if (!handler.status) continue;
             if (handler.matchNotice(event)) break;
         }
     }
@@ -126,6 +128,8 @@ public class DispatcherCore {
 
         private Rule rule;
 
+        private boolean status;
+
         private void initEventType() {
             //在method的形参中定位事件类型
             for (Class<?> clazz : method.getParameterTypes()) {
@@ -139,7 +143,7 @@ public class DispatcherCore {
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
-                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords())
+                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).status(true)
                     .build();
             handler.initEventType();
             return handler;
@@ -148,7 +152,7 @@ public class DispatcherCore {
         public static Handler buildNoticeHandler(Object plugin, Method method) {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(nh.name())
-                    .priority(nh.priority())
+                    .priority(nh.priority()).status(true)
                     .build();
             handler.initEventType();
             return handler;
@@ -214,6 +218,53 @@ public class DispatcherCore {
         public boolean match(Class<? extends Event> eventClass) {
             return eventType.isAssignableFrom(eventClass);
         }
+    }
+
+
+    /**
+     * 逻辑关闭
+     */
+    public boolean logicClose(String handlerName) {
+        for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
+            if (handlerName.equals(handler.name)) {
+                handler.status = false;
+                return true;
+            }
+        }
+        for (Handler handler : NOTICE_HANDLER_CONTAINER) {
+            if (handlerName.equals(handler.name)) {
+                handler.status = false;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 逻辑开启
+     */
+    public boolean logicOpen(String handlerName) {
+        for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
+            if (handlerName.equals(handler.name)) {
+                handler.status = true;
+                return true;
+            }
+        }
+        for (Handler handler : NOTICE_HANDLER_CONTAINER) {
+            if (handlerName.equals(handler.name)) {
+                handler.status = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public String getHandlerNames() {
+        StringBuilder sb = new StringBuilder();
+        Stream.concat(MESSAGE_HANDLER_CONTAINER.stream(), NOTICE_HANDLER_CONTAINER.stream())
+                .forEach(handler -> sb.append(handler.name).append(" "));
+        return sb.toString();
     }
 
 }
