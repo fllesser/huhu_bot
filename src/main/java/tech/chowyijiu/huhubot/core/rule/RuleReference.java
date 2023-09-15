@@ -1,6 +1,7 @@
 package tech.chowyijiu.huhubot.core.rule;
 
 import tech.chowyijiu.huhubot.config.BotConfig;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
@@ -20,7 +21,14 @@ public class RuleReference {
     }
 
     public static boolean toAll(Event event) {
-        if (event instanceof GroupMessageEvent gme) return gme.isToMe();
+        if (event instanceof GroupMessageEvent gme) {
+            for (MessageSegment segment : gme.getMessage()) {
+                if ("at".equals(segment.getType())) {
+                    //这里就直接return吧, 毕竟不会有人又@全体又单独@谁
+                    return "all".equals(segment.getString("qq"));
+                }
+            }
+        }
         return false;
     }
 

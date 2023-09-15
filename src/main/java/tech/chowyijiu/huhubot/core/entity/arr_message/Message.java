@@ -20,7 +20,8 @@ public class Message extends ArrayList<MessageSegment> {
         for (MessageSegment segment : this) {
             if ("at".equals(segment.getType())) {
                 String qq = segment.getString("qq");
-                if ("all".equals(qq) || Long.parseLong(qq) == selfId) return true;
+                //qq只有all或者纯数字的情况
+                if (!"all".equals(qq) && Long.parseLong(qq) == selfId) return true;
             }
         }
         return false;
