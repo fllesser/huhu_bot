@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
-import tech.chowyijiu.huhubot.core.aop.rule.Rule;
+import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;

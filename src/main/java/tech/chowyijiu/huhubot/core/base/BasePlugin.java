@@ -4,7 +4,7 @@ import tech.chowyijiu.huhubot.core.DispatcherCore;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.utils.IocUtil;
 
@@ -13,6 +13,7 @@ import tech.chowyijiu.huhubot.utils.IocUtil;
  * @date 13/9/2023
  */
 @BotPlugin("huhubot-plugin-base")
+@SuppressWarnings("unused")
 public class BasePlugin {
 
 
@@ -24,7 +25,7 @@ public class BasePlugin {
 
 
     @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "功能关闭", commands = "off")
+    @MessageHandler(name = "功能关闭", commands = "close")
     public void close(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
         String arg = event.getCommandArgs();
@@ -32,11 +33,11 @@ public class BasePlugin {
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "功能开启", commands = "on")
+    @MessageHandler(name = "功能开启", commands = "open")
     public void open(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
         String arg = event.getCommandArgs();
-        event.getBot().sendMessage(event, "开启" + arg + (core.logicClose(arg) ? "成功" : "失败"));
+        event.getBot().sendMessage(event, "开启" + arg + (core.logicOpen(arg) ? "成功" : "失败"));
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
@@ -46,4 +47,5 @@ public class BasePlugin {
         String handlerNames = core.getHandlerNames();
         event.getBot().sendMessage(event, handlerNames);
     }
+
 }

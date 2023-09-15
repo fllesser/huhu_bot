@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhubot.core.aop.rule;
+package tech.chowyijiu.huhubot.core.rule;
 
 import tech.chowyijiu.huhubot.core.event.Event;
 

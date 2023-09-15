@@ -1,4 +1,4 @@
-package tech.chowyijiu.huhubot.core.aop.rule;
+package tech.chowyijiu.huhubot.core.rule;
 
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
@@ -38,7 +38,7 @@ public class RuleReference {
 
     public static boolean selfOwner(Event event) {
         if (event instanceof GroupMessageEvent groupMessageEvent) {
-            //取缓存, 毕竟群主不可能也变来变去吧
+            //取缓存, 毕竟群主不可能变来变去吧
             Bot bot = event.getBot();
             GroupMember groupMember = bot.getGroupMember(
                     groupMessageEvent.getGroupId(), bot.getSelfId(), false);

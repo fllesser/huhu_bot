@@ -7,7 +7,7 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;

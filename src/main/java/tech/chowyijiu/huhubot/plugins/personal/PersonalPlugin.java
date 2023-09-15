@@ -5,7 +5,7 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
@@ -20,9 +20,7 @@ import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
 @BotPlugin(name = "huhubot-plugin-seveneight")
 @SuppressWarnings("unused")
 public class PersonalPlugin {
-
-
-
+    
 
     @RuleCheck(rule = RuleEnum.temp_session)
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
@@ -34,7 +32,7 @@ public class PersonalPlugin {
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
-    public void textToTts(GroupMessageEvent event) {
+    public void tts(GroupMessageEvent event) {
         event.getBot().sendMessage(event, MessageSegment.tts(event.getCommandArgs()));
     }
 

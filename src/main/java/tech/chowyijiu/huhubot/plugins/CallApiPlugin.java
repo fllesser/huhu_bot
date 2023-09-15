@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.core.entity.arr_message.ForwardMessage;
 import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;

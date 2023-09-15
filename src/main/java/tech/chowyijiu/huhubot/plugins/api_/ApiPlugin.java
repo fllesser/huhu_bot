@@ -3,7 +3,7 @@ package tech.chowyijiu.huhubot.plugins.api_;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.aop.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.response.MessageInfo;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author elastic chow
  * @date 26/7/2023
  */
-@SuppressWarnings("unuesd")
+@SuppressWarnings("unused")
 @BotPlugin("huhubot-plugin-api")
 public class ApiPlugin {
 
