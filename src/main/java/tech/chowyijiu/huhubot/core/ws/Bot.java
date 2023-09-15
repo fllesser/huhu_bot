@@ -1,14 +1,11 @@
 package tech.chowyijiu.huhubot.core.ws;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
@@ -131,29 +128,6 @@ public class Bot {
         }
     }
 
-    /**
-     * HTTP request API method
-     * gocq 需配置 http
-     *
-     * @param action    action
-     * @param paramsMap parameters
-     * @return json String
-     */
-    @Deprecated
-    private String callHttpApi(GocqAction action, @Nullable Map<String, Object> paramsMap) {
-        String url = "http://127.0.0.1:8899/" + action.name();
-        HttpRequest request = HttpRequest.get(url).form(paramsMap);
-        HttpResponse response = request.execute();
-        return switch (response.getStatus()) {
-            case 401 -> throw new ActionFailed("action" + action + " access token 未提供");
-            case 403 -> throw new ActionFailed("action" + action + " access token 不符合");
-            case 406 -> throw new ActionFailed("action" + action + " Content-Type 不支持" +
-                    "(非 application/json 或 application/x-www-form-urlencoded");
-            case 404 -> throw new ActionFailed("action:" + action + " API 不存在");
-            case 200 -> response.body(); //除上述情况外所有情况 (具体 API 调用是否成功, 需要看 API 的 响应数据
-            default -> throw new ActionFailed("action:" + action + " 获取数据失败");
-        };
-    }
 
     public void deleteFriend(Long userId) {
         this.callApiWaitResp(GocqAction.delete_friend, Map.of("user_id", userId));
