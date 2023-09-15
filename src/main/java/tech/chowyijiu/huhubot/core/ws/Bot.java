@@ -342,8 +342,6 @@ public class Bot {
     }
 
     /**
-     * 获取转发消息 todo
-     *
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {

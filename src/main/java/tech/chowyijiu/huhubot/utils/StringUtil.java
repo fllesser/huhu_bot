@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * @author elastic chow
  * @date 8/6/2023
  */
+@SuppressWarnings("unused")
 public class StringUtil {
 
     public static boolean hasLength(String str) {

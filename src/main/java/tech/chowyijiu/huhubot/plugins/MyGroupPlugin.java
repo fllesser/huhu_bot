@@ -38,7 +38,7 @@ public class MyGroupPlugin {
     @Async
     @Scheduled(cron = "0 0/2 * * * * ")
     public void dateGroupCard() {
-        String card = "失业第" + this.countdown("2023-06-16 10:00");
+        String card = "失业第" + this.countdown();
         log.info("Time group nicknames start to be updated card: {}", card);
         Huhubot.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
@@ -51,8 +51,8 @@ public class MyGroupPlugin {
         log.info("Time group nickname set up card: {}", card);
     }
 
-    private String countdown(String dateText) {
-        LocalDateTime fromTime = LocalDateTime.parse(dateText, formatter);
+    private String countdown() {
+        LocalDateTime fromTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
         Duration duration = Duration.between(fromTime, LocalDateTime.now());
         long days = duration.toDays();
         duration = duration.minusDays(days);
@@ -113,133 +113,4 @@ public class MyGroupPlugin {
         XiaoAIUtil.tts("群" + groupInfo.getGroupName() + "内"
                 + groupMember.getNickname() + "艾特你说, " + event.getMessage().getPlainText());
     }
-
-
-
-    //private final Map<String, Integer> verificationMap = new HashMap<>();
-    //private final List<Long> verificationGroups = List.of(754044548L, 208248400L);
-
-    //@NoticeHandler(name = "麦片哥验证1")
-    //public void verify1(Bot bot, GroupIncreaseNoticeEvent event) {
-    //    if (verificationGroups.stream().noneMatch(gid -> gid.equals(event.getGroupId()))) return;
-    //    int i = (int) (Math.random() * 10);
-    //    int j = (int) (Math.random() * 10);
-    //    verificationMap.put(event.getGroupId() + "_" + event.getUserId(), i + j);
-    //    Message message = new Message().append(MessageSegment.at(event.getUserId()))
-    //            .append(" 取汉化前请先完成入群验证:").append("\n" + i + " + " + j + " = ?")
-    //            .append("\n注意:回答无需@我, 只有一次机会, 回答错误, 将会被踢出群聊");
-    //    bot.sendMessage(event, message);
-    //}
-    //
-    //@MessageHandler(name = "麦片哥验证2")
-    //public void verify2(Bot bot, GroupMessageEvent event) {
-    //    String key = event.getGroupId() + "_" + event.getUserId();
-    //    if (!verificationMap.containsKey(key)) return;
-    //    int res = verificationMap.get(key);
-    //    verificationMap.remove(key);
-    //    if (res == Integer.parseInt(event.getRawMessage())) {
-    //        bot.sendMessage(event, MessageSegment.at(event.getUserId()) + " 回答正确!");
-    //    } else {
-    //        bot.deleteMsg(event.getMessageId());
-    //        bot.setGroupKick(event.getGroupId(), event.getUserId(), false);
-    //    }
-    //}
-
-    //@NoticeHandler(name = "清代肝")
-    //public void cleanDaiGan(Bot bot, GroupIncreaseNoticeEvent event) {
-    //    GroupMember groupMember = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
-    //    String nickname = groupMember.getNickname();
-    //    if (StringUtil.hasLength(nickname) && nickname.contains("代肝"))
-    //        bot.sendMessage(event, new Message()
-    //                .append(MessageSegment.at(groupMember.getUserId()))
-    //                .append("本群禁止代肝, 请修改群昵称, 否则5分钟后将踢出"));
-    //    new Thread(() -> {
-    //        try {
-    //            Thread.sleep(300000L);
-    //        } catch (InterruptedException e) {
-    //            e.printStackTrace();
-    //        }
-    //        GroupMember gm = bot.getGroupMember(event.getGroupId(), event.getUserId(), true);
-    //        String nickname_ = gm.getNickname();
-    //        if (StringUtil.hasLength(nickname_) && nickname_.contains("代肝"))
-    //                bot.setGroupKick(event.getGroupId(), event.getUserId(), true);
-    //    }).start();
-    //}
-
-
-    //RuleCheck giveAdminRule = (bot, event) -> RuleReference.selfOwner(bot, event)
-    //        && "message_sent".equals(event.getPostType());
-    //
-    ///**
-    // * 是答辩
-    // * command setadmin@... false / true
-    // */
-    //@MessageHandler(name = "授予管理员", commands = "setadmin")
-    //public void giveAdmin(Bot bot, GroupMessageEvent event) {
-    //    Message message = event.getMessage();
-    //    List<MessageSegment> segments = message.getSegmentByType("at");
-    //    segments.forEach(segment -> {
-    //        long qq = segment.getLong("qq");
-    //        GroupMember groupMember = bot.getGroupMember(event.getGroupId(), qq, true);
-    //        boolean isAdmin = "admin".equals(groupMember.getRole());
-    //        bot.setGroupAdmin(event.getGroupId(), qq, !isAdmin);
-    //    });
-    //
-    //}
-
-    //@NoticeHandler(name = "清除不活跃成员")
-    //public void kickNotActiveMembers(Bot bot, GroupIncreaseNoticeEvent event) {
-    //    GroupInfo groupInfo = bot.getGroupInfo(event.getGroupId(), true);
-    //    if (!groupInfo.getMemberCount().equals(groupInfo.getMaxMemberCount())) {
-    //        //群没满
-    //        return;
-    //    }
-    //    List<GroupMember> groupMembers = bot.getGroupMembers(event.getGroupId(), true);
-    //    long curTime = System.currentTimeMillis();
-    //    groupMembers.stream()
-    //            .filter(gm -> !StringUtil.hasLength(gm.getTitle())  //没有群头衔
-    //                && Integer.parseInt(gm.getLevel()) <= 1         //
-    //                && curTime - gm.getLastSentTime() > 7777777)    //三个月未发言
-    //            .limit(10).forEach(gm -> bot.setGroupKick(event.getGroupId(), gm.getUserId(), false));
-    //}
-
-
-    //@MessageHandler(name = "禁言", commands = {"ban", "禁"}, rule = RuleEnum.admin)
-    //public void ban(Bot bot, GroupMessageEvent event) {
-    //    List<MessageSegment> segments = event.getMsg().getSegmentByType("at");
-    //    final int duration;
-    //    if (StringUtil.isDigit(event.getCommandArgs())) {
-    //        duration = Integer.parseInt(event.getCommandArgs());
-    //    } else duration = 600; //默认禁 10 min
-    //    segments.forEach(segment -> {
-    //        long qq = Long.parseLong(segment.get("qq"));
-    //        bot.setGroupBan(event.getGroupId(), qq, duration);
-    //    });
-    //    //if (segments.size() == 1 && "all".equals(segments.get(0).get("qq"))) {
-    //    //    bot.setGroupWholeBan(event.getGroupId(), true);
-    //    //} else {
-    //    //    final int duration;
-    //    //    if (StringUtil.isDigit(event.getCommandArgs())) {
-    //    //         duration = Integer.parseInt(event.getCommandArgs());
-    //    //    } else duration = 600; //默认禁 10 min
-    //    //    segments.forEach(segment -> {
-    //    //        //这里qq必为数字, 无需判断
-    //    //        long qq = Long.parseLong(segment.get("qq"));
-    //    //        bot.setGroupBan(event.getGroupId(), qq, duration);
-    //    //    });
-    //    //}
-    //}
-    //
-    //@MessageHandler(name = "踢人", commands = {"kick", "踢"}, rule = RuleEnum.admin)
-    //public void kick(Bot bot, GroupMessageEvent event) {
-    //    List<MessageSegment> segments = event.getMsg().getSegmentByType("at");
-    //    if (segments.size() == 1 && "all".equals(segments.get(0).get("qq"))) {
-    //        event.finish("你是要把所有人都踢了吗?");
-    //    }
-    //    segments.forEach(segment -> {
-    //        //这里qq必为数字, 无需判断
-    //        long qq = Long.parseLong(segment.get("qq"));
-    //        bot.setGroupKick(event.getGroupId(), qq, true);
-    //    });
-    //}
 }
