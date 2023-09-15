@@ -81,9 +81,4 @@ public class Message extends ArrayList<MessageSegment> {
         return null;
     }
 
-    //@Override
-    //public String toString() {
-    //    //return this.plainText;
-    //    return JSONObject.toJSONString(this);
-    //}
 }

@@ -18,7 +18,7 @@ public class ChatGptPlugin {
     @MessageHandler(name = "chatgpt", commands = {"gpt"})
     public void defaultChatGpt(MessageEvent event) {
         String resp = GptReq.chat(event.getCommandArgs());
-        event.getBot().sendMessage(event, resp);
+        event.sendMessage(resp);
     }
 
 }

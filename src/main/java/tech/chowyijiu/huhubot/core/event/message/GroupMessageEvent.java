@@ -44,4 +44,9 @@ public class GroupMessageEvent extends MessageEvent {
                 ", raw_message=" + super.getRawMessage() +
                 "}";
     }
+
+    @Override
+    public void sendMessage(Object message) {
+        getBot().sendGroupMessage(this.getGroupId(), message);
+    }
 }

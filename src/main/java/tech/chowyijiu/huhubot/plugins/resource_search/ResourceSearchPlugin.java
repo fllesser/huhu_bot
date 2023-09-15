@@ -3,20 +3,19 @@ package tech.chowyijiu.huhubot.plugins.resource_search;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
-import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.core.rule.RuleEnum;
+import tech.chowyijiu.huhubot.core.ws.Huhubot;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceUtil;
 import tech.chowyijiu.huhubot.plugins.resource_search.gitcafe.GitCafeReq;
 import tech.chowyijiu.huhubot.plugins.resource_search.hdhive.HdhiveReq;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
-import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.Huhubot;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,20 +50,20 @@ public class ResourceSearchPlugin {
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
-        event.getBot().sendMessage(event, result);
+        event.sendMessage(result);
         XiaoAIUtil.tts(result);
     }
 
     @MessageHandler(name = "阿里云盘资源搜索(GITCAFE)", commands = {".s"})
     public void search1(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), GitCafeReq::get);
-        event.getBot().sendMessage(event, ResourceUtil.buildString(dataList));
+        event.sendMessage(ResourceUtil.buildString(dataList));
     }
 
     @MessageHandler(name = "阿里云盘资源搜索(HDHIVE)", commands = {".ds"})
     public void search2(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), HdhiveReq::get1);
-        event.getBot().sendMessage(event, ResourceUtil.buildString(dataList));
+        event.sendMessage(ResourceUtil.buildString(dataList));
     }
 
     /**
@@ -74,9 +73,8 @@ public class ResourceSearchPlugin {
     @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, block = true)
     public void save(MessageEvent event) {
         String no = event.getCommandArgs();
-        Bot bot = event.getBot();
         if (!StringUtil.isDigit(no)) {
-            bot.sendMessage(event, "参数应为数字");
+            event.sendMessage("参数应为数字");
             return;
         }
         int index = Integer.parseInt(no);
@@ -94,7 +92,7 @@ public class ResourceSearchPlugin {
             } else {
                 willSend += "失败, 分享者取消分享, 或被风控";
             }
-            bot.sendMessage(event, willSend);
+            event.sendMessage(willSend);
         }
 
     }
@@ -105,6 +103,6 @@ public class ResourceSearchPlugin {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
-        event.getBot().sendMessage(event, willSend);
+        event.sendMessage(willSend);
     }
 }

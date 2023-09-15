@@ -35,4 +35,9 @@ public class PrivateMessageEvent extends MessageEvent {
                 ", subType=" + subType +
                 "}";
     }
+
+    @Override
+    public void sendMessage(Object message) {
+        getBot().sendPrivateMessage(this.getUserId(), message);
+    }
 }

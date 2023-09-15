@@ -3,6 +3,7 @@ package tech.chowyijiu.huhubot.plugins.api_;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.core.entity.response.MessageInfo;
@@ -36,10 +37,14 @@ public class ApiPlugin {
         if (trans != null && trans.size() > 0) {
             StringBuilder sb = new StringBuilder(StringUtil.manMachine(word + ": "));
             trans.forEach(str -> sb.append(" ").append(str));
-            event.getBot().sendMessage(event, sb.toString());
+            event.sendMessage(sb.toString());
         }
     }
 
-
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
+    public void moyu(MessageEvent event) {
+        event.sendMessage(MessageSegment.image(HandFish.imgUrl()));
+    }
 
 }
