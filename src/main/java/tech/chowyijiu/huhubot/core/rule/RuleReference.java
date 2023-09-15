@@ -19,6 +19,11 @@ public class RuleReference {
         return false;
     }
 
+    public static boolean toAll(Event event) {
+        if (event instanceof GroupMessageEvent gme) return gme.isToMe();
+        return false;
+    }
+
     public static boolean superuser(Event event) {
         if (event instanceof MessageEvent me) return BotConfig.isSuperUser(me.getUserId());
         else return false;
@@ -62,5 +67,6 @@ public class RuleReference {
         }
         return false;
     }
+
 
 }

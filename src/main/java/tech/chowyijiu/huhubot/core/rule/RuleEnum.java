@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum RuleEnum {
 
     tome("@机器人", RuleReference::tome),
+    to_all("@全体", RuleReference::toAll),
     superuser("使用者为超级用户", RuleReference::superuser),
     owner("使用者为群主", RuleReference::owner),
     admin("使用者为 管理 or 群主 or 超级用户", RuleReference::admin),

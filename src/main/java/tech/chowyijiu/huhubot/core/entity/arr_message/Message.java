@@ -20,7 +20,7 @@ public class Message extends ArrayList<MessageSegment> {
         for (MessageSegment segment : this) {
             if ("at".equals(segment.getType())) {
                 String qq = segment.getString("qq");
-                return "all".equals(qq) || Long.parseLong(qq) == selfId;
+                if ("all".equals(qq) || Long.parseLong(qq) == selfId) return true;
             }
         }
         return false;
