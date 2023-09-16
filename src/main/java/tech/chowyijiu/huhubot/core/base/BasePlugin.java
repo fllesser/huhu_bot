@@ -7,6 +7,7 @@ import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.utils.IocUtil;
+import tech.chowyijiu.huhubot.utils.StringUtil;
 
 /**
  * @author flless
@@ -29,7 +30,9 @@ public class BasePlugin {
     public void close(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
         String arg = event.getCommandArgs();
-        event.getBot().sendMessage(event, "关闭" + arg + (core.logicClose(arg) ? "成功" : "失败"));
+        if (!StringUtil.isDigit(arg)) return;
+        int no = Integer.parseInt(arg);
+        event.getBot().sendMessage(event, "关闭" + arg + (core.logicClose(no) ? "成功" : "失败"));
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
@@ -37,14 +40,16 @@ public class BasePlugin {
     public void open(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
         String arg = event.getCommandArgs();
-        event.getBot().sendMessage(event, "开启" + arg + (core.logicOpen(arg) ? "成功" : "失败"));
+        if (!StringUtil.isDigit(arg)) return;
+        int no = Integer.parseInt(arg);
+        event.getBot().sendMessage(event, "开启" + arg + (core.logicOpen(no) ? "成功" : "失败"));
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "功能集", commands = "list")
     public void list(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
-        String handlerNames = core.getHandlerNames();
+        String handlerNames = core.getHandlerNameList();
         event.getBot().sendMessage(event, handlerNames);
     }
 

@@ -10,20 +10,18 @@ import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
-import tech.chowyijiu.huhubot.core.rule.Rule;
 import tech.chowyijiu.huhubot.core.constant.ANSI;
 import tech.chowyijiu.huhubot.core.event.Event;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
 import tech.chowyijiu.huhubot.core.exception.ActionFailed;
 import tech.chowyijiu.huhubot.core.exception.FinishedException;
+import tech.chowyijiu.huhubot.core.rule.Rule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 
@@ -87,6 +85,7 @@ public class DispatcherCore {
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
         NOTICE_HANDLER_CONTAINER = List.copyOf(noticeHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
+        initHandlerNameMap();
         log.info("{}running huhubot...{}", ANSI.YELLOW, ANSI.RESET);
     }
 
@@ -221,10 +220,13 @@ public class DispatcherCore {
     }
 
 
+    private final Map<Integer, String> handlerNameMap = new HashMap<>();
+
     /**
      * 逻辑关闭
      */
-    public boolean logicClose(String handlerName) {
+    public boolean logicClose(int no) {
+        String handlerName = handlerNameMap.get(no);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             if (handlerName.equals(handler.name)) {
                 handler.status = false;
@@ -243,7 +245,8 @@ public class DispatcherCore {
     /**
      * 逻辑开启
      */
-    public boolean logicOpen(String handlerName) {
+    public boolean logicOpen(int no) {
+        String handlerName = handlerNameMap.get(no);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
             if (handlerName.equals(handler.name)) {
                 handler.status = true;
@@ -260,10 +263,17 @@ public class DispatcherCore {
     }
 
 
-    public String getHandlerNames() {
-        StringBuilder sb = new StringBuilder();
+    private void initHandlerNameMap() {
+        AtomicInteger i = new AtomicInteger(1);
         Stream.concat(MESSAGE_HANDLER_CONTAINER.stream(), NOTICE_HANDLER_CONTAINER.stream())
-                .forEach(handler -> sb.append(handler.name).append(" "));
+                .forEach(handler -> handlerNameMap.put(i.getAndIncrement(), handler.name));
+    }
+
+    public String getHandlerNameList() {
+        StringBuilder sb = new StringBuilder();
+        for (Integer integer : handlerNameMap.keySet()) {
+            sb.append(integer).append(". ").append(handlerNameMap.get(integer)).append("\n");
+        }
         return sb.toString();
     }
 
