@@ -1,6 +1,5 @@
 package tech.chowyijiu.huhubot.core.entity.arr_message;
 
-import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 public class ForwardMessage {
     private final String type = "node";
 
-    @JSONField(name = "data")
     private Node data;
 
     private ForwardMessage() {

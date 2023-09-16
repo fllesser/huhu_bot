@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 13/5/2023
  */
 @Slf4j
-public class Huhubot extends TextWebSocketHandler {
+public class OneBotV11Adapter extends TextWebSocketHandler {
 
     private static final Map<Long, Bot> BOT_MAP = new HashMap<>(1);
 
@@ -63,7 +63,7 @@ public class Huhubot extends TextWebSocketHandler {
                 if (metaEvent.heartbeat()) return;//心跳忽略
                 else if (metaEvent.connect()) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
-                    Huhubot.addBot(event.getSelfId(), session);
+                    OneBotV11Adapter.addBot(event.getSelfId(), session);
                     log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
                     return;

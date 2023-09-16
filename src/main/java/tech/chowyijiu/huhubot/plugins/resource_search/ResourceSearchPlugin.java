@@ -9,7 +9,7 @@ import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.ws.Huhubot;
+import tech.chowyijiu.huhubot.core.ws.OneBotV11Adapter;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceUtil;
 import tech.chowyijiu.huhubot.plugins.resource_search.gitcafe.GitCafeReq;
@@ -34,7 +34,7 @@ public class ResourceSearchPlugin {
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApiWrapper.signInList();
-        Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
+        Objects.requireNonNull(OneBotV11Adapter.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
         //清除搜索缓存

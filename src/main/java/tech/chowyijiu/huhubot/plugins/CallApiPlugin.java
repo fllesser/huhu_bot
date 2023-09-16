@@ -62,7 +62,7 @@ public class CallApiPlugin {
             messages.add(costTime);
             messages.add(MessageSegment.image("https://pic2.zhimg.com/80/v2-d9a3bd17467c3b51e35c95cbbfe6a755_1440w.webp"));
             messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
-            List<ForwardMessage> nodes = ForwardMessage.quickBuild("Huhubot", event.getUserId(), messages);
+            List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Adapter", event.getUserId(), messages);
             bot.sendForwardMsg(event, nodes);
         }
     }
