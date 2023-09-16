@@ -2,12 +2,12 @@ package tech.chowyijiu.huhubot.core.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import tech.chowyijiu.huhubot.core.DispatcherCore;
-import tech.chowyijiu.huhubot.core.event.Event;
-import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.core.event.notice.NoticeEvent;
-import tech.chowyijiu.huhubot.core.event.request.RequestEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.Event;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.request.RequestEvent;
 import tech.chowyijiu.huhubot.utils.IocUtil;
-import tech.chowyijiu.huhubot.utils.ThreadPoolUtil;
+import tech.chowyijiu.huhubot.core.utils.ThreadPoolUtil;
 
 import java.util.concurrent.ThreadPoolExecutor;
 

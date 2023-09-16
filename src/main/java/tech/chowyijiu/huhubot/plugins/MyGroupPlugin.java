@@ -3,19 +3,19 @@ package tech.chowyijiu.huhubot.plugins;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.OneBotV11Handler;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.NoticeHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.core.constant.SubTypeEnum;
-import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.core.entity.response.GroupInfo;
-import tech.chowyijiu.huhubot.core.entity.response.GroupMember;
-import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.core.event.notice.NotifyNoticeEvent;
-import tech.chowyijiu.huhubot.core.ws.Bot;
-import tech.chowyijiu.huhubot.core.ws.OneBotV11Adapter;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.GroupInfo;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.GroupMember;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.Bot;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
 import java.time.Duration;
@@ -40,7 +40,7 @@ public class MyGroupPlugin {
     public void dateGroupCard() {
         String card = "失业第" + this.countdown();
         log.info("Time group nicknames start to be updated card: {}", card);
-        OneBotV11Adapter.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+        OneBotV11Handler.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
                 .stream().map(GroupInfo::getGroupId).forEach(groupId -> {
                     bot.setGroupCard(groupId, bot.getSelfId(), card);
                     try {
@@ -67,7 +67,7 @@ public class MyGroupPlugin {
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");
-        for (Bot bot : OneBotV11Adapter.getBots()) {
+        for (Bot bot : OneBotV11Handler.getBots()) {
             for (Long clockGroup : clockGroups) {
                 bot.sendGroupSign(clockGroup);
                 try {

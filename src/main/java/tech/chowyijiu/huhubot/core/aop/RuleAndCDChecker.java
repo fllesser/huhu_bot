@@ -10,7 +10,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.event.Event;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.Event;
 import tech.chowyijiu.huhubot.core.utils.CoolDownLimiter;
 
 import java.lang.reflect.Method;

@@ -3,11 +3,11 @@ package tech.chowyijiu.huhubot.plugins.api_;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
-import tech.chowyijiu.huhubot.core.entity.response.MessageInfo;
-import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.GuessPost;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 

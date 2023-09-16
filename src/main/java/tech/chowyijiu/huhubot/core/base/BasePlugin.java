@@ -5,7 +5,7 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.utils.IocUtil;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 

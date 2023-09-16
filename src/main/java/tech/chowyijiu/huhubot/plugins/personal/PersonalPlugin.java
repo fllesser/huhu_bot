@@ -6,11 +6,11 @@ import tech.chowyijiu.huhubot.core.annotation.CoolDown;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.core.entity.arr_message.Message;
-import tech.chowyijiu.huhubot.core.entity.arr_message.MessageSegment;
-import tech.chowyijiu.huhubot.core.event.message.GroupMessageEvent;
-import tech.chowyijiu.huhubot.core.event.message.MessageEvent;
-import tech.chowyijiu.huhubot.core.event.message.PrivateMessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
 
 /**
  * @author elastic chow
