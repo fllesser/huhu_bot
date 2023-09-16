@@ -15,7 +15,7 @@ import java.util.Map;
  * @author elastic chow
  * @date 19/7/2023
  */
-public class AliYunApi {
+public class AliYunApiWrapper {
 
     private static String ACCESS_TOKEN;
     private static LocalDateTime EXPIRE_TIME;

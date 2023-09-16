@@ -33,7 +33,7 @@ public class ResourceSearchPlugin {
     @Async
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
-        String result = AliYunApi.signInList();
+        String result = AliYunApiWrapper.signInList();
         Objects.requireNonNull(Huhubot.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
@@ -46,7 +46,7 @@ public class ResourceSearchPlugin {
     public void aliSignIn(MessageEvent event) {
         String result;
         try {
-            result = AliYunApi.signInList();
+            result = AliYunApiWrapper.signInList();
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
@@ -83,7 +83,7 @@ public class ResourceSearchPlugin {
             boolean success = false;
             String willSend = "转存[" + index + "]" + data.getName();
             try {
-                success = AliYunApi.fileCopy(data.getShareId());
+                success = AliYunApiWrapper.fileCopy(data.getShareId());
             } catch (Exception e) {
                 willSend = "refresh token expired, " + willSend;
             }

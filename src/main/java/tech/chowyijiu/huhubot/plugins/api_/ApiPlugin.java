@@ -44,7 +44,7 @@ public class ApiPlugin {
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
-        event.sendMessage(MessageSegment.image(HandFish.imgUrl()));
+        event.sendMessage(MessageSegment.image("https://api.vvhan.com/api/moyu"));
     }
 
 }
