@@ -3,12 +3,12 @@ package tech.chowyijiu.huhubot.plugins.resource_search;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.OneBotV11Handler;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.BotContainer;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceUtil;
@@ -34,7 +34,7 @@ public class ResourceSearchPlugin {
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
         String result = AliYunApiWrapper.signInList();
-        Objects.requireNonNull(OneBotV11Handler.getBot(BotConfig.superUsers.get(0)))
+        Objects.requireNonNull(BotContainer.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
         //清除搜索缓存

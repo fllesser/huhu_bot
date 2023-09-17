@@ -3,9 +3,9 @@ package tech.chowyijiu.huhubot.controller;
 import jakarta.annotation.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.OneBotV11Handler;
-import tech.chowyijiu.huhubot.core.constant.GocqAction;
 import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.Bot;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.BotContainer;
+import tech.chowyijiu.huhubot.core.constant.GocqAction;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class GocqController {
         if (Arrays.stream(GocqAction.values()).noneMatch(a -> a.name().equals(action))) {
             return ResponseEntity.ok("gocq未支持该api: " + action);
         }
-        Bot bot = OneBotV11Handler.getBot(qq);
+        Bot bot = BotContainer.getBot(qq);
         if (bot == null) return ResponseEntity.ok("没有连接对应的bot, id:" + qq);
         GocqAction gocqAction = GocqAction.valueOf(action);
         String res;
