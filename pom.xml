@@ -67,6 +67,13 @@
             <artifactId>hutool-http</artifactId>
             <version>5.8.16</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.lianjiatech/retrofit-spring-boot-starter -->
+        <dependency>
+            <groupId>com.github.lianjiatech</groupId>
+            <artifactId>retrofit-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.unfbx</groupId>
             <artifactId>chatgpt-java</artifactId>

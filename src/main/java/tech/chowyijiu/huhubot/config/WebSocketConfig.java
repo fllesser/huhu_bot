@@ -20,7 +20,6 @@ import tech.chowyijiu.huhubot.adapters.onebot.v11.bot.OneBotV11Handler;
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer, ServletContextInitializer {
 
-
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new OneBotV11Handler(),"/onebot/v11/ws").setAllowedOrigins("*");

@@ -1,14 +1,16 @@
 package tech.chowyijiu.huhubot.plugins.api_;
 
+import jakarta.annotation.Resource;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.Message;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.Message;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.GuessPost;
+import tech.chowyijiu.huhubot.plugins.api_.vvhan.VvhanApi;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 @BotPlugin("huhubot-plugin-api")
 public class ApiPlugin {
+    @Resource
+    private VvhanApi vvhanApi;
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
@@ -44,7 +48,7 @@ public class ApiPlugin {
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
-        event.sendMessage(MessageSegment.image(HandFish.imgUrl()));
+        event.sendMessage(MessageSegment.image(vvhanApi.moyu().getUrl()));
     }
 
 }

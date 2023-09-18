@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @BotPlugin(name = "huhubot-plugin-gocqapi")
 public class CallApiPlugin {
 
-
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "callApi", commands = "api")
     public void apiTest(MessageEvent event) {

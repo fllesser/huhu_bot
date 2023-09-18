@@ -14,7 +14,6 @@ import java.util.List;
  */
 public class GptReq {
 
-
     private static final OpenAiClient client = OpenAiClient.builder()
             .apiKey(BotConfig.chatGptKey)
             .keyStrategy(new MyKeyStrategy()).build();

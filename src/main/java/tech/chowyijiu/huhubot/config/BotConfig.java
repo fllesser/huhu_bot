@@ -52,7 +52,6 @@ public class BotConfig {
             if ("Logger".equals(f.getType().getSimpleName())) continue;
             sb.append(" ").append(f.getName()).append(": ").append(f.get(this));
         }
-
         log.info("{}[BotConfig]{}{}", ANSI.YELLOW, sb, ANSI.RESET);
     }
 
