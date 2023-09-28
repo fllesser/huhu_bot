@@ -9,15 +9,11 @@ import retrofit2.http.Query;
  * @date 17/9/2023
  */
 @RetrofitClient(baseUrl = "https://api.vvhan.com/api")
-public interface VvhanApi {
+public interface VvhanClient {
 
     @GET("moyu?type=json")
     MoyuResult moyu();
 
     @GET("qiang")
     QiangResult qiang(@Query("url") String url);
-
-    default QiangResult defaultQiang() {
-        return qiang("youtube.com");
-    }
 }

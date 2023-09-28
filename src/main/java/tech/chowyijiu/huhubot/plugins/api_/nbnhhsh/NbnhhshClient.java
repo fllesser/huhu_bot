@@ -13,7 +13,7 @@ import java.util.Map;
  * @date 26/7/2023
  */
 @RetrofitClient(baseUrl = "https://lab.magiconch.com/api/nbnhhsh/")
-public interface NbnhhshApi {
+public interface NbnhhshClient {
 
     Map<String, String> headers = Map.of(
             "origin", "https://lab.magiconch.com",

@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.config.BotConfig;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 
@@ -15,14 +16,15 @@ import java.util.Map;
  * @author elastic chow
  * @date 19/7/2023
  */
-public class AliYunApiWrapper {
-
-    private static String ACCESS_TOKEN;
-    private static LocalDateTime EXPIRE_TIME;
-    //2023-07-22T15:35:40Z
+@Component
+public class AliYunDriverClient {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    private static String getAccessToken() {
+    private String ACCESS_TOKEN;
+    private LocalDateTime EXPIRE_TIME;
+    //2023-07-22T15:35:40Z
+
+    private String getAccessToken() {
         if (EXPIRE_TIME != null && EXPIRE_TIME.isAfter(LocalDateTime.now())) return ACCESS_TOKEN;
         Map<String, String> bodyMap = Map.of(
                 "grant_type", "refresh_token",
@@ -45,7 +47,7 @@ public class AliYunApiWrapper {
     /**
      * 获取签到列表, 并签到
      */
-    public static String signInList() {
+    public String signInList() {
         String accessToken = getAccessToken();
         if (!StringUtil.hasLength(accessToken)) return "阿里云盘今日签到失败, error: access token is null";
         Map<String, Object> bodyMap = Map.of("isReward", true, "_rx-s", "mobile");
@@ -63,7 +65,7 @@ public class AliYunApiWrapper {
     /**
      * 签到并领取奖励
      */
-    private static String signInReward(int signInCount) {
+    private String signInReward(int signInCount) {
         Map<String, Object> bodyMap = Map.of("signInDay", signInCount, "_rx-s", "mobile");
         HttpResponse response = HttpRequest.post("https://member.aliyundrive.com/v1/activity/sign_in_reward")
                 .header("Content-Type", "application/json")
@@ -79,7 +81,7 @@ public class AliYunApiWrapper {
                 + ", " + result.getString("notice");
     }
 
-    public static boolean fileCopy(String shareId) {
+    public boolean fileCopy(String shareId) {
         String accessToken = getAccessToken();
         if (!StringUtil.hasLength(accessToken)) return false;
         String shareToken = getShareToken(shareId);
@@ -104,7 +106,7 @@ public class AliYunApiWrapper {
         return StringUtil.hasLength(jsonObject.getString("drive_id"));
     }
 
-    public static String getShareToken(String shareId) {
+    public String getShareToken(String shareId) {
         Map<String, String> bodyMap = Map.of("share_id", shareId);
         HttpResponse response = HttpRequest.post("https://api.aliyundrive.com/v2/share_link/get_share_token")
                 .header("Content-Type", "application/json")
@@ -116,7 +118,7 @@ public class AliYunApiWrapper {
     /**
      * 如果有多个文件夹,会有多个,先不考虑
      */
-    public static String getShareFileId(String shareId) {
+    public String getShareFileId(String shareId) {
         Map<String, String> bodyMap = Map.of("share_id", shareId);
         HttpResponse response = HttpRequest.post("https://api.aliyundrive.com/adrive/v3/share_link/get_share_by_anonymous")
                 .header("Content-Type", "application/json")

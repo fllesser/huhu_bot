@@ -57,9 +57,9 @@ public class Bot {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
-            log.info("{}sessionSend error, session[{}], message[{}], exception[{}]{}",
-                    ANSI.RED, this.session.getId(), text, e.getMessage(), ANSI.RESET);
+            log.info("{}-ws-onebotv11-X->[{}]{}, exception[{}]{}", ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
         }
+        log.info("-ws-onebotv11->[{}]{}", selfId, text);
     }
 
     public void callApi(GocqAction action, Map<String, Object> paramsMap) {
@@ -124,7 +124,9 @@ public class Bot {
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
             this.sessionSend(requestBox);
-            return echoData.waitAndGet();
+            String res = echoData.waitAndGet();
+            log.info("<-ws-onebotv11-[{}]{}", this.selfId, res);
+            return res;
         }
     }
 
@@ -343,11 +345,11 @@ public class Bot {
     }
 
     public void sendForwardMsg(MessageEvent event, List<ForwardMessage> nodes) {
-       if (event instanceof GroupMessageEvent gme) {
-           this.sendGroupForwardMsg(gme.getGroupId(), nodes);
-       } else {
-           this.sendPrivateForwardMsg(event.getUserId(), nodes);
-       }
+        if (event instanceof GroupMessageEvent gme) {
+            this.sendGroupForwardMsg(gme.getGroupId(), nodes);
+        } else {
+            this.sendPrivateForwardMsg(event.getUserId(), nodes);
+        }
     }
 
 

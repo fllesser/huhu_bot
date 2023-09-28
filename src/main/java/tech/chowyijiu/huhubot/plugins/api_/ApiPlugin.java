@@ -9,8 +9,8 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
-import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.NbnhhshApi;
-import tech.chowyijiu.huhubot.plugins.api_.vvhan.VvhanApi;
+import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.NbnhhshClient;
+import tech.chowyijiu.huhubot.plugins.api_.vvhan.VvhanClient;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 
 import java.util.List;
@@ -23,10 +23,10 @@ import java.util.List;
 @BotPlugin("huhubot-plugin-api")
 public class ApiPlugin {
     @Resource
-    private VvhanApi vvhanApi;
+    private VvhanClient vvhanClient;
 
     @Resource
-    private NbnhhshApi nbnhhshApi;
+    private NbnhhshClient nbnhhshClient;
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
@@ -40,7 +40,7 @@ public class ApiPlugin {
                 word = StringUtil.getFirstLAN(message.getPlainText());
             }
         }
-        List<String> trans = StringUtil.hasLength(word, nbnhhshApi::defaultGuess);
+        List<String> trans = StringUtil.hasLength(word, nbnhhshClient::defaultGuess);
         if (trans != null && trans.size() > 0) {
             StringBuilder sb = new StringBuilder(StringUtil.manMachine(word + ": "));
             trans.forEach(str -> sb.append(" ").append(str));
@@ -51,7 +51,7 @@ public class ApiPlugin {
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
-        event.sendMessage(MessageSegment.image(vvhanApi.moyu().getUrl()));
+        event.sendMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
     }
 
 }

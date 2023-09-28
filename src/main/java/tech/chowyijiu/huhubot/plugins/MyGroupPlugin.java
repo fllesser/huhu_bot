@@ -36,7 +36,7 @@ public class MyGroupPlugin {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     @Async
-    @Scheduled(cron = "0 0/2 * * * * ")
+    @Scheduled(cron = "0 0/3 * * * * ")
     public void dateGroupCard() {
         String card = "失业第" + this.countdown();
         log.info("Time group nicknames start to be updated card: {}", card);
@@ -64,6 +64,7 @@ public class MyGroupPlugin {
 
     private final List<Long> clockGroups = List.of(768887710L, 754044548L, 208248400L, 643396867L);
 
+    @Async
     @Scheduled(cron = "0 0 0 * * *")
     public void dailyClockIn() {
         log.info("开始群打卡");

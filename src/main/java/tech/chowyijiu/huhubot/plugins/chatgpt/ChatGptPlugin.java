@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhubot.plugins.chatgpt;
 
+import jakarta.annotation.Resource;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
@@ -14,10 +15,12 @@ import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 @BotPlugin("huhubot-plugin-chatgpt")
 public class ChatGptPlugin {
 
+    @Resource
+    private GptClient gptClient;
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "chatgpt", commands = {"gpt"})
     public void defaultChatGpt(MessageEvent event) {
-        String resp = GptReq.chat(event.getCommandArgs());
+        String resp = gptClient.chat(event.getCommandArgs());
         event.sendMessage(resp);
     }
 

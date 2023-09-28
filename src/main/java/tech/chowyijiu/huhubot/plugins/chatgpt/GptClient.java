@@ -4,6 +4,7 @@ import com.unfbx.chatgpt.OpenAiClient;
 import com.unfbx.chatgpt.entity.chat.ChatCompletion;
 import com.unfbx.chatgpt.entity.chat.ChatCompletionResponse;
 import com.unfbx.chatgpt.entity.chat.Message;
+import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.config.BotConfig;
 
 import java.util.List;
@@ -12,13 +13,17 @@ import java.util.List;
  * @author elastic chow
  * @date 20/7/2023
  */
-public class GptReq {
+@Component
+public class GptClient {
 
-    private static final OpenAiClient client = OpenAiClient.builder()
-            .apiKey(BotConfig.chatGptKey)
-            .keyStrategy(new MyKeyStrategy()).build();
+    private static final OpenAiClient client;
 
-    public static String chat(String question) {
+    static {
+        client = OpenAiClient.builder().apiKey(BotConfig.chatGptKey)
+                .keyStrategy(new MyKeyStrategy()).build();
+    }
+
+    public String chat(String question) {
         Message message = Message.builder().role(Message.Role.USER).content(question).build();
         ChatCompletion chatCompletion = ChatCompletion.builder().messages(List.of(message)).build();
         StringBuilder sb = new StringBuilder();

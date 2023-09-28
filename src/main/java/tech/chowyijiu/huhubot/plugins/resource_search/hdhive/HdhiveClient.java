@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import org.springframework.stereotype.Component;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 
 import java.util.ArrayList;
@@ -14,7 +15,8 @@ import java.util.Map;
  * @author elastic chow
  * @date 19/7/2023
  */
-public class HdhiveReq {
+@Component
+public class HdhiveClient {
 
     private static final String auth = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4OTY2NTAxMywianRpIjoiNDA3ODBkYjUtMjRjOS00ZjE5LTgyOTMtMGFhZGUxYWEzMjY5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6NTE5NiwibmJmIjoxNjg5NjY1MDEzLCJleHAiOjE2OTIyNTcwMTN9.uCBvHlfROMm6yrqN5CVKTV4s1w8GOeAj51fiDg7VlAo";
     private static final String url1 = "https://www.hdhive.org/api/v1/public/tmdb/search/multi";
@@ -24,7 +26,7 @@ public class HdhiveReq {
     /**
      * 搜索 by page
      */
-    public static List<ResourceData> get1(String keyword) {
+    public List<ResourceData> get(String keyword) {
         Map<String, Object> map = Map.of("query", keyword, "page", 1);
         String respJson = HttpUtil.get(url1, map);
         JSONObject jsonObject = JSONObject.parseObject(respJson);
@@ -49,7 +51,7 @@ public class HdhiveReq {
     /**
      * 进入详细页面
      */
-    private static ResourceData get2(String type, Integer tmdbId) {
+    private ResourceData get2(String type, Integer tmdbId) {
         String respJson = HttpUtil.get(url2 + type, Map.of("tmdb_id", tmdbId));
         JSONObject jsonObject = JSONObject.parseObject(respJson);
         JSONArray dataArr = jsonObject.getJSONArray("data");
@@ -79,7 +81,7 @@ public class HdhiveReq {
     /**
      * 获得分享链接
      */
-    private static ResourceData get3(String idType, Integer id) {
+    private ResourceData get3(String idType, Integer id) {
         Map<String, Object> map = Map.of(idType, id,
                 "sort_by", "is_admin", "sort_order", "descend", "per_page", 100);
         String respJson = HttpRequest.get(url3)

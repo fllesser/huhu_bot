@@ -1,5 +1,6 @@
 package tech.chowyijiu.huhubot.plugins.resource_search;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,8 +13,8 @@ import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceData;
 import tech.chowyijiu.huhubot.plugins.resource_search.cache_.ResourceUtil;
-import tech.chowyijiu.huhubot.plugins.resource_search.gitcafe.GitCafeReq;
-import tech.chowyijiu.huhubot.plugins.resource_search.hdhive.HdhiveReq;
+import tech.chowyijiu.huhubot.plugins.resource_search.gitcafe.GitCafeClient;
+import tech.chowyijiu.huhubot.plugins.resource_search.hdhive.HdhiveClient;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 import tech.chowyijiu.huhubot.utils.xiaoai.XiaoAIUtil;
 
@@ -30,10 +31,20 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public class ResourceSearchPlugin {
 
+    @Resource
+    private GitCafeClient gitCafeClient;
+    @Resource
+    private HdhiveClient hdhiveClient;
+    @Resource
+    private OpenwrtClient openwrtClient;
+
+    @Resource
+    private AliYunDriverClient aliYunDriverClient;
+
     @Async
     @Scheduled(cron = "0 30 10 * * *")
     public void scheduledCheck() {
-        String result = AliYunApiWrapper.signInList();
+        String result = aliYunDriverClient.signInList();
         Objects.requireNonNull(BotContainer.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
         XiaoAIUtil.tts(result);
@@ -46,7 +57,7 @@ public class ResourceSearchPlugin {
     public void aliSignIn(MessageEvent event) {
         String result;
         try {
-            result = AliYunApiWrapper.signInList();
+            result = aliYunDriverClient.signInList();
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
@@ -56,15 +67,19 @@ public class ResourceSearchPlugin {
 
     @MessageHandler(name = "阿里云盘资源搜索(GITCAFE)", commands = {".s"})
     public void search1(MessageEvent event) {
-        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), GitCafeReq::get);
+        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), gitCafeClient::get);
         event.sendMessage(ResourceUtil.buildString(dataList));
     }
 
+
+
     @MessageHandler(name = "阿里云盘资源搜索(HDHIVE)", commands = {".ds"})
     public void search2(MessageEvent event) {
-        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), HdhiveReq::get1);
+        List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), hdhiveClient::get);
         event.sendMessage(ResourceUtil.buildString(dataList));
     }
+
+
 
     /**
      * .save/保存 搜索时的关键词 序号
@@ -83,12 +98,12 @@ public class ResourceSearchPlugin {
             boolean success = false;
             String willSend = "转存[" + index + "]" + data.getName();
             try {
-                success = AliYunApiWrapper.fileCopy(data.getShareId());
+                success = aliYunDriverClient.fileCopy(data.getShareId());
             } catch (Exception e) {
                 willSend = "refresh token expired, " + willSend;
             }
             if (success) {
-                willSend += "成功\n删除Openwrt阿里云盘缓存" + (OpenwrtReq.invalidateCache() ? "成功" : "失败");
+                willSend += "成功\n删除Openwrt阿里云盘缓存" + (openwrtClient.invalidateCache() ? "成功" : "失败");
             } else {
                 willSend += "失败, 分享者取消分享, 或被风控";
             }

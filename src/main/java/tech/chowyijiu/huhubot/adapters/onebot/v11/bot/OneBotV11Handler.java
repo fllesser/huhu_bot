@@ -43,7 +43,9 @@ public class OneBotV11Handler extends TextWebSocketHandler {
             }
             //测试
             //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
-            event.setBot(BotContainer.getBot(event.getSelfId()));
+            Bot bot = BotContainer.getBot(event.getSelfId());
+            log.info("<-ws-onebotv11-[{}]{}", bot.getSelfId(), event);
+            event.setBot(bot);
             ProcessEventTask.execute(event);
         } catch (Exception e) {
             log.error("handleTextMessage exception", e);
