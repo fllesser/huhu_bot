@@ -16,4 +16,8 @@ public interface VvhanApi {
 
     @GET("qiang")
     QiangResult qiang(@Query("url") String url);
+
+    default QiangResult defaultQiang() {
+        return qiang("youtube.com");
+    }
 }

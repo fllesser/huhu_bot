@@ -1,12 +1,9 @@
 package tech.chowyijiu.huhubot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.test.context.SpringBootTest;
 
-//@SpringBootTest
 @SuppressWarnings("all")
 @Slf4j
-@SpringBootTest
 public class HuhuBotApplicationTests {
 
 
@@ -29,5 +26,6 @@ public class HuhuBotApplicationTests {
     //    }).toArray(BufferedImage[]::new);
     //    ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     //}
+
 
 }
