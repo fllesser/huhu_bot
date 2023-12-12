@@ -1,10 +1,10 @@
 package tech.chowyijiu.huhubot.plugins.chatgpt;
 
 import jakarta.annotation.Resource;
+import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
-import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 
 /**

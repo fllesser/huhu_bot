@@ -65,16 +65,15 @@ public class ResourceSearchPlugin {
         XiaoAIUtil.tts(result);
     }
 
-    @MessageHandler(name = "阿里云盘资源搜索(GITCAFE)", commands = {".s"})
-    public void search1(MessageEvent event) {
+    @MessageHandler(name = "GITCAFE", commands = {".s"})
+    public void gitCafeSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), gitCafeClient::get);
         event.sendMessage(ResourceUtil.buildString(dataList));
     }
 
 
-
-    @MessageHandler(name = "阿里云盘资源搜索(HDHIVE)", commands = {".ds"})
-    public void search2(MessageEvent event) {
+    @MessageHandler(name = "HDHIVE", commands = {".ds"})
+    public void hdhiveSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), hdhiveClient::get);
         event.sendMessage(ResourceUtil.buildString(dataList));
     }

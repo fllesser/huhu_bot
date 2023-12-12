@@ -13,17 +13,16 @@ import java.util.List;
  * @author elastic chow
  * @date 20/7/2023
  */
+
 @Component
 public class GptClient {
 
-    private static final OpenAiClient client;
-
-    static {
-        client = OpenAiClient.builder().apiKey(BotConfig.chatGptKey)
-                .keyStrategy(new MyKeyStrategy()).build();
-    }
+    private OpenAiClient client;
 
     public String chat(String question) {
+        if (client == null) {
+            client = OpenAiClient.builder().apiKey(BotConfig.chatGptKey).keyStrategy(new MyKeyStrategy()).build();
+        }
         Message message = Message.builder().role(Message.Role.USER).content(question).build();
         ChatCompletion chatCompletion = ChatCompletion.builder().messages(List.of(message)).build();
         StringBuilder sb = new StringBuilder();
@@ -36,7 +35,6 @@ public class GptClient {
             client.getApiKey().remove(MyKeyStrategy.curKey);
             return "error: api key invoked";
         }
-
     }
 }
 

@@ -59,7 +59,9 @@ public class Bot {
         } catch (IOException e) {
             log.info("{}-ws-onebotv11-X->[{}]{}, exception[{}]{}", ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
         }
-        log.info("-ws-onebotv11->[{}]{}", selfId, text);
+        if (!requestBox.getAction().equals("set_group_card")) {
+            log.info("-ws-onebotv11->[{}]{}", selfId, text);
+        }
     }
 
     public void callApi(GocqAction action, Map<String, Object> paramsMap) {
@@ -182,6 +184,8 @@ public class Bot {
 
     public List<GroupInfo> getGroupList() {
         this.groups = this.getGroupList(false);
+        //去除不需要修改群名的群号
+        this.groups.removeIf(group -> group.getGroupId().equals(908253603L));
         return this.groups;
     }
 
