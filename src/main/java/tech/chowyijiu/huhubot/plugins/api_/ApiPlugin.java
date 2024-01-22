@@ -5,16 +5,20 @@ import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.Message;
 import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
 import tech.chowyijiu.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import tech.chowyijiu.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.chowyijiu.huhubot.config.ApiSpaceConfig;
 import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
 import tech.chowyijiu.huhubot.plugins.api_.api_sapce.ApiSpaceClient;
+import tech.chowyijiu.huhubot.plugins.api_.api_sapce.ApiSpaceResult;
 import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.NbnhhshClient;
 import tech.chowyijiu.huhubot.plugins.api_.vvhan.VvhanClient;
 import tech.chowyijiu.huhubot.utils.StringUtil;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author elastic chow
@@ -58,10 +62,20 @@ public class ApiPlugin {
         event.sendMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
     }
 
-    @RuleCheck(rule = RuleEnum.superuser)
+    //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "周公解梦", commands = "zgjm")
     public void zgjm(MessageEvent event) {
-        event.sendMessage(apiSpaceClient.zgjm(event.getCommandArgs()));
+        if (!StringUtil.hasLength(event.getCommandArgs())) return;
+        ApiSpaceResult result = apiSpaceClient.zgjm(ApiSpaceConfig.token, event.getCommandArgs());
+        String content = result.getResult()[0].get("content");
+        String pattern = "<p>(.*?)</p>";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(content);
+        StringBuilder sb = new StringBuilder();
+        while (m.find()) {
+            sb.append("\n").append(m.group(1));
+        }
+        event.sendMessage("解梦结果: " + sb);
     }
 
 }
