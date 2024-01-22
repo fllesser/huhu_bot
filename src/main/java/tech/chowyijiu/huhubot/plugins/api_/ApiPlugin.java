@@ -9,6 +9,7 @@ import tech.chowyijiu.huhubot.core.annotation.BotPlugin;
 import tech.chowyijiu.huhubot.core.annotation.MessageHandler;
 import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
 import tech.chowyijiu.huhubot.core.rule.RuleEnum;
+import tech.chowyijiu.huhubot.plugins.api_.api_sapce.ApiSpaceClient;
 import tech.chowyijiu.huhubot.plugins.api_.nbnhhsh.NbnhhshClient;
 import tech.chowyijiu.huhubot.plugins.api_.vvhan.VvhanClient;
 import tech.chowyijiu.huhubot.utils.StringUtil;
@@ -27,6 +28,9 @@ public class ApiPlugin {
 
     @Resource
     private NbnhhshClient nbnhhshClient;
+
+    @Resource
+    private ApiSpaceClient apiSpaceClient;
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
@@ -52,6 +56,12 @@ public class ApiPlugin {
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
         event.sendMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
+    }
+
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "周公解梦", commands = "zgjm")
+    public void zgjm(MessageEvent event) {
+        event.sendMessage(apiSpaceClient.zgjm(event.getCommandArgs()));
     }
 
 }

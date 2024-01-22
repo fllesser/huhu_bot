@@ -30,8 +30,9 @@ public class PersonalPlugin {
         event.getBot().sendGroupMessage(event.getSender().getGroupId(), message);
     }
 
-    @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
+    //@RuleCheck(rule = RuleEnum.superuser)
+    //@MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
+    @Deprecated
     public void tts(GroupMessageEvent event) {
         event.sendMessage(MessageSegment.tts(event.getCommandArgs()));
     }
@@ -40,7 +41,8 @@ public class PersonalPlugin {
     @CoolDown(seconds = 120)
     @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
     public void yaoYaoLingXian(MessageEvent event) {
-        event.sendMessage(MessageSegment.record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));
+        event.sendMessage(MessageSegment
+                .record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));
     }
 
 }

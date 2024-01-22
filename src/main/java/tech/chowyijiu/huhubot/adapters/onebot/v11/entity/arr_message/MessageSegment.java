@@ -83,6 +83,8 @@ public class MessageSegment {
         return build("at", Map.of("qq", "all"));
     }
 
+    //gocq已不支持
+    @Deprecated
     public static MessageSegment tts(String text) {
         return build("tts", Map.of("text", text));
     }
