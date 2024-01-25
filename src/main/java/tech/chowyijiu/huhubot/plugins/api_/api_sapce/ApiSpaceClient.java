@@ -17,4 +17,8 @@ public interface ApiSpaceClient {
     @POST("zgjm/common/dream/searchDreamDetail")
     @FormUrlEncoded
     ApiSpaceResult zgjm(@Header ("X-APISpace-Token") String token, @Field("keyword") String keyword);
+
+    @POST("pic2sketch/api/v1/forward/pic2sketch")
+    @FormUrlEncoded
+    ApiSpaceResult sketch(@Header ("X-APISpace-Token") String token, @Field("image_url") String url);
 }

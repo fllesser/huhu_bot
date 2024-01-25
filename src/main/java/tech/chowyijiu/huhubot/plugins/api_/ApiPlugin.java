@@ -68,14 +68,18 @@ public class ApiPlugin {
         if (!StringUtil.hasLength(event.getCommandArgs())) return;
         ApiSpaceResult result = apiSpaceClient.zgjm(ApiSpaceConfig.token, event.getCommandArgs());
         String content = result.getResult()[0].get("content");
-        String pattern = "<p>(.*?)</p>";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(content);
-        StringBuilder sb = new StringBuilder();
-        while (m.find()) {
-            sb.append("\n").append(m.group(1));
+        String message = "解梦失败";
+        if (StringUtil.hasLength(content)) {
+            String pattern = "<p>(.*?)</p>";
+            Pattern r = Pattern.compile(pattern);
+            Matcher m = r.matcher(content);
+            StringBuilder sb = new StringBuilder();
+            while (m.find()) {
+                sb.append("\n").append(m.group(1));
+            }
+            message = "解梦结果: " + sb;
         }
-        event.sendMessage("解梦结果: " + sb);
+        event.sendMessage(message);
     }
 
 }
