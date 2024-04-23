@@ -8,7 +8,7 @@
         <version>3.0.8</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>tech.chowyijiu</groupId>
+    <groupId>tech.flless</groupId>
     <artifactId>huhubot</artifactId>
     <version>1.0.0</version>
     <name>huhubot</name>
