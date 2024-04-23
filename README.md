@@ -24,7 +24,7 @@ nonebot2, 但是jvav
 ## 示例插件
 
 ```Java
-import tech.chowyijiu.huhubot.core.annotation.RuleCheck;
+import annotation.core.tech.flless.huhubot.RuleCheck;
 
 @Slf4j
 @BotPlugin("demo")
