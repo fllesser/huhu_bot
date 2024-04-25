@@ -25,11 +25,11 @@ public class MetaEvent extends Event {
     private String subType;
 
 
-    public boolean connect() {
+    public boolean isConnected() {
         return "lifecycle".equals(this.getMetaEventType()) && "connect".equals(this.getSubType());
     }
 
-    public boolean heartbeat() {
+    public boolean isHeartbeat() {
         return "heartbeat".equals(this.getMetaEventType());
     }
 

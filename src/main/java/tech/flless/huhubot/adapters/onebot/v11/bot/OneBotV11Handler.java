@@ -32,11 +32,11 @@ public class OneBotV11Handler extends TextWebSocketHandler {
             final Event event = Event.build(JSONObject.parseObject(json));
             if (event == null) return;
             if (event instanceof MetaEvent metaEvent) {
-                if (metaEvent.heartbeat()) return;//心跳忽略
-                else if (metaEvent.connect()) {
+                if (metaEvent.isHeartbeat()) return;//心跳忽略
+                else if (metaEvent.isConnected()) {
                     //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
                     BotContainer.addBot(event.getSelfId(), session);
-                    log.info("{}RECEIVED GOCQ CLIENT[{}] CONNECTION SUCCESS MESSAGE{}", ANSI.YELLOW,
+                    log.info("{}Received gocq client[{}] connection success message{}", ANSI.YELLOW,
                             metaEvent.getSelfId(), ANSI.RESET);
                     return;
                 }
@@ -55,14 +55,14 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.info("{}connect exception sessionId[{}], exception[{}]{}",
+        log.info("{}Connection happened exception sessionId[{}], exception[{}]{}",
                 ANSI.YELLOW, session.getId(), exception.getMessage(), ANSI.RESET);
         BotContainer.removeBot(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        log.info("{}connect close, sessionId:{},{}{}", ANSI.YELLOW,
+        log.info("{}Connection closed, sessionId:{},{}{}", ANSI.YELLOW,
                 session.getId(), closeStatus.toString(), ANSI.RESET);
         BotContainer.removeBot(session);
     }

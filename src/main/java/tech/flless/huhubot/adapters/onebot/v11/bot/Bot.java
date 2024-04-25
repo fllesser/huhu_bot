@@ -24,9 +24,9 @@ import tech.flless.huhubot.core.exception.IllegalMessageTypeException;
 import tech.flless.huhubot.utils.MistIdGenerator;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author elastic chow
@@ -57,7 +57,8 @@ public class Bot {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
-            log.info("{}-ws-onebotv11-X->[{}]{}, exception[{}]{}", ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
+            log.info("{}-ws-onebotv11-X->[{}]{}, exception[{}]{}",
+                    ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
         }
         if (!requestBox.getAction().equals("set_group_card")) {
             log.info("-ws-onebotv11->[{}]{}", selfId, text);
@@ -69,7 +70,7 @@ public class Bot {
         this.sessionSend(requestBox);
     }
 
-    private static final Map<Long, EchoData> ECHO_DATA_MAP = new HashMap<>();
+    private static final Map<Long, EchoData> ECHO_DATA_MAP = new ConcurrentHashMap<>();
 
     private static EchoData buildEchoDataToMap(long echo) {
         EchoData echoData = new EchoData(echo);

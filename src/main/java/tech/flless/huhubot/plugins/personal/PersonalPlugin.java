@@ -39,7 +39,7 @@ public class PersonalPlugin {
 
 
     @CoolDown(seconds = 120)
-    @MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
+    //@MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
     public void yaoYaoLingXian(MessageEvent event) {
         event.sendMessage(MessageSegment
                 .record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));

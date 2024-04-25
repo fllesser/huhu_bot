@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 @Slf4j
 @Component
 @Aspect
-public class RuleAndCDChecker {
+public class RuleAndCDAspect {
 
     @Pointcut("@annotation(tech.flless.huhubot.core.annotation.RuleCheck) || @annotation(tech.flless.huhubot.core.annotation.CoolDown)")
     public void pointcut() {

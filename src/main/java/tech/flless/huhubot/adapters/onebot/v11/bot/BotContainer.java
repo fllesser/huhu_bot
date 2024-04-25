@@ -2,9 +2,9 @@ package tech.flless.huhubot.adapters.onebot.v11.bot;
 
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author FLLess7
@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public class BotContainer {
 
-    private static final Map<Long, Bot> BOT_MAP = new HashMap<>(1);
+    private static final Map<Long, Bot> BOT_MAP = new ConcurrentHashMap<>(1);
 
     protected static void addBot(Long userId, WebSocketSession session) {
         BOT_MAP.put(userId, new Bot(userId, session));
