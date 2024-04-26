@@ -142,8 +142,7 @@ public class DispatcherCore {
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
-                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).status(true)
-                    .build();
+                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).status(true).build();
             handler.initEventType();
             return handler;
         }
@@ -151,8 +150,7 @@ public class DispatcherCore {
         public static Handler buildNoticeHandler(Object plugin, Method method) {
             NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
             Handler handler = Handler.builder().plugin(plugin).method(method).name(nh.name())
-                    .priority(nh.priority()).status(true)
-                    .build();
+                    .priority(nh.priority()).status(true).build();
             handler.initEventType();
             return handler;
         }

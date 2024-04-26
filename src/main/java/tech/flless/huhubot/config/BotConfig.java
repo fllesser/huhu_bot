@@ -23,7 +23,6 @@ public class BotConfig {
     public static Long testGroup;
 
     public static String aliRefreshToken;
-    public static List<String> chatGptKey;
 
     public void setSuperUsers(ArrayList<Long> superUsers) {
         BotConfig.superUsers = superUsers;
@@ -40,10 +39,7 @@ public class BotConfig {
     public void setAliRefreshToken(String aliRefreshToken) {
         BotConfig.aliRefreshToken = aliRefreshToken;
     }
-
-    public void setChatGptKey(ArrayList<String> chatGptKey) {
-        BotConfig.chatGptKey = chatGptKey;
-    }
+    
 
     @PostConstruct
     public void postLog() throws IllegalAccessException {

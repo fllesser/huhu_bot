@@ -28,7 +28,6 @@ public record ProcessEventTask(Event event) implements Runnable {
 
     @Override
     public void run() {
-        //log.info("{} starts to match handler", event);
         if (event instanceof MessageEvent messageEvent) {
             DISPATCHER_CORE.onMessage(messageEvent);
         } else if (event instanceof NoticeEvent noticeEvent) {
@@ -36,7 +35,6 @@ public record ProcessEventTask(Event event) implements Runnable {
         } else if (event instanceof RequestEvent requestEvent) {
             log.info("{}", requestEvent);
         }
-        //log.info("{} matches handler end", event);
     }
 
     public static void execute(final Event event) {

@@ -10,9 +10,7 @@ import java.util.Map;
  * @date 6/9/2023
  */
 public class CoolDownLimiter {
-
     private static final Map<String, Long> map = new HashMap<>();
-
     public static boolean check(String key, int seconds) {
         long now = System.currentTimeMillis();
         Long last = map.getOrDefault(key, 0L);

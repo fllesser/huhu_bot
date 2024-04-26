@@ -13,7 +13,6 @@ import retrofit2.http.POST;
 @RetrofitClient(baseUrl = "https://eolink.o.apispace.com")
 public interface ApiSpaceClient {
 
-
     @POST("zgjm/common/dream/searchDreamDetail")
     @FormUrlEncoded
     ApiSpaceResult zgjm(@Header ("X-APISpace-Token") String token, @Field("keyword") String keyword);

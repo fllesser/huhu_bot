@@ -21,7 +21,7 @@ public class ThreadPoolUtil {
     private final static ThreadPoolExecutor eventExecutor;
 
     static {
-        int corePoolSize = Runtime.getRuntime().availableProcessors() + 1;
+        final int corePoolSize = Runtime.getRuntime().availableProcessors() + 1;
         assert corePoolSize > 0;
         eventExecutor = new ProcessEventThreadPoolExecutor(corePoolSize, corePoolSize * 2,
                 1, TimeUnit.HOURS,

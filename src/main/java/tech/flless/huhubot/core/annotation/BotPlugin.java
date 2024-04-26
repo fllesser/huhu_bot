@@ -9,7 +9,6 @@ import java.lang.annotation.*;
  * @author elastic chow
  * @date 14/5/2023
  */
-
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

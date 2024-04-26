@@ -21,35 +21,29 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) {
-        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}", ANSI.YELLOW,
-                session.getRemoteAddress(), BotContainer.getConnections() + 1, ANSI.RESET);
+        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}",
+                ANSI.YELLOW, session.getRemoteAddress(), BotContainer.getConnections() + 1, ANSI.RESET);
     }
 
     @Override
-    public void handleTextMessage(final @NotNull WebSocketSession session, final TextMessage message) {
-        final String json = message.getPayload();
-        try {
-            final Event event = Event.build(JSONObject.parseObject(json));
-            if (event == null) return;
-            if (event instanceof MetaEvent metaEvent) {
-                if (metaEvent.isHeartbeat()) return;//心跳忽略
-                else if (metaEvent.isConnected()) {
-                    //刚连接成功时，gocq会发一条消息给bot, 添加bot对象到bots中
-                    BotContainer.addBot(event.getSelfId(), session);
-                    log.info("{}Received gocq client[{}] connection success message{}", ANSI.YELLOW,
-                            metaEvent.getSelfId(), ANSI.RESET);
-                    return;
-                }
+    public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) {
+        String json = message.getPayload();
+        Event event = Event.build(JSONObject.parseObject(json));
+        if (event == null) return;
+        if (event instanceof MetaEvent metaEvent) {
+            if (metaEvent.isHeartbeat()) return;//心跳忽略
+            else if (metaEvent.isConnected()) {
+                //刚连接成功时，gocq会发一条消息给bot, 添加bot到map中
+                BotContainer.addBot(event.getSelfId(), session);
+                log.info("{}Received gocq client[{}] connection success message{}", ANSI.YELLOW,
+                        metaEvent.getSelfId(), ANSI.RESET);
+                return;
             }
-            //测试
-            //if (bots.isEmpty() && event.getSelfId() == 888888L) addBot(event.getSelfId(), session);
-            Bot bot = BotContainer.getBot(event.getSelfId());
-            log.info("<-ws-onebotv11-[{}]{}", bot.getSelfId(), event);
-            event.setBot(bot);
-            ProcessEventTask.execute(event);
-        } catch (Exception e) {
-            log.error("handleTextMessage exception", e);
         }
+        Bot bot = BotContainer.getBot(event.getSelfId());
+        log.info("<-ws-onebotv11-[{}]{}", bot.getSelfId(), event);
+        event.setBot(bot);
+        ProcessEventTask.execute(event);
     }
 
 
@@ -62,8 +56,8 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        log.info("{}Connection closed, sessionId:{},{}{}", ANSI.YELLOW,
-                session.getId(), closeStatus.toString(), ANSI.RESET);
+        log.info("{}Connection closed, sessionId:{},{}{}",
+                ANSI.YELLOW, session.getId(), closeStatus.toString(), ANSI.RESET);
         BotContainer.removeBot(session);
     }
 

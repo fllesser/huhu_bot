@@ -5,7 +5,6 @@ package tech.flless.huhubot.core.exception;
  * @date 18/5/2023
  */
 public class NetworkError extends RuntimeException {
-
     public NetworkError(String message, Throwable cause) {
         super(message, cause);
     }

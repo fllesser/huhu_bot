@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.8</version>
+        <version>3.1.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>tech.flless</groupId>
@@ -65,22 +65,26 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-http</artifactId>
-            <version>5.8.16</version>
+            <version>5.8.26</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.github.lianjiatech/retrofit-spring-boot-starter -->
         <dependency>
             <groupId>com.github.lianjiatech</groupId>
             <artifactId>retrofit-spring-boot-starter</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.unfbx</groupId>
-            <artifactId>chatgpt-java</artifactId>
-            <version>1.0.14</version>
+            <version>3.0.3</version>
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio-jvm</artifactId>
+                <version>3.4.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

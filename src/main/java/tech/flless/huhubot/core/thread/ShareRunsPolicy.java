@@ -16,7 +16,6 @@ public class ShareRunsPolicy implements RejectedExecutionHandler {
     public ShareRunsPolicy(String poolName){
         this.poolName = poolName;
     }
-
     @Override
     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 

@@ -13,7 +13,7 @@ import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
  * @author elastic chow
  * @date 27/6/2023
  */
-public class RuleReference {
+public class RuleRef {
 
     public static boolean tome(Event event) {
         if (event instanceof GroupMessageEvent gme) return gme.isToMe();
@@ -38,7 +38,8 @@ public class RuleReference {
     }
 
     public static boolean owner(Event event) {
-        if (event instanceof GroupMessageEvent gme) return "owner".equals(gme.getSender().getRole());
+        if (event instanceof GroupMessageEvent gme)
+            return "owner".equals(gme.getSender().getRole());
         else return false;
     }
 

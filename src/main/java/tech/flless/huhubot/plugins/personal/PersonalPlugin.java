@@ -20,7 +20,6 @@ import tech.flless.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent
 @BotPlugin(name = "huhubot-plugin-seveneight")
 @SuppressWarnings("unused")
 public class PersonalPlugin {
-    
 
     @RuleCheck(rule = RuleEnum.temp_session)
     @MessageHandler(name = "回复jy群的临时会话", keywords = {"汉化", "英文", "中文"})
@@ -36,7 +35,6 @@ public class PersonalPlugin {
     public void tts(GroupMessageEvent event) {
         event.sendMessage(MessageSegment.tts(event.getCommandArgs()));
     }
-
 
     @CoolDown(seconds = 120)
     //@MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
