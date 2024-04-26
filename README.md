@@ -1,48 +1,58 @@
 # Huhubot
-nonebot2, 但是jvav
+nonebot2, but jvav
 
 ## 介绍
-1. java(springboot), 基于go-cqhttp, websocket反向连接的qq机器人;
-2. 支持被多个go-cqhttp连接;
+1. java17(springboot3), 基于go-cqhttp反向websocket连接的qq机器人
+2. 支持被多个go-cqhttp连接
 3. 类似于nonebot2的插件编写方式
 
-## 使用要点
-1. go-cqhttp 反向ws地址配置如 ws://127.0.0.1:8888(配置文件自定义, 默认8888)/onebot/v11/ws
-2. java -jar huhubot-1.x.jar
-
+## 快速开始
+1. go-cqhttp 配置文件修改项(必需)
+    ```yaml
+    message:
+      # 上报数据类型
+      post-format: array
+      # 是否上报自身消息
+      report-self-message: true
+    
+    servers:
+      # 反向 Websocket, 端口, 默认8888, 如需修改, 请在application.yml中设置
+      - ws-reverse:
+          universal: ws://127.0.0.1:8888/onebot/v11/ws
+    
+    ```
+2. [下载Releases里的最新jar包](https://github.com/fllessntt/huhu_bot/releases/download/springboot3.16/huhubot-1.0.0.jar)
+3. 在jar包目录下创建application.yml文件
+    ```yaml
+    bot:
+      super-users: [1942422015]
+      command-prefixes: []
+      test_group: 12334567
+      ali-refresh-token: 0sdf95fa1sdfsdfasa5a38fb7adfe1d8f86
+    
+    logging:
+      file:
+        name: log/huhubot.log  # 日志文件相对路径及名称
+      level:
+        root: info
+    ```
+4. java -jar huhubot.jar 
 
 ## TODO
 1. 连续对话
 2. 适配频道
 3. 跨平台
 
+
 ## 插件编写方式
 1. 新建一个类加上`@BotPlugin("指定名称,用于加载时打印日志")` 和 `@SuppressWarnings("unused")`
 2. 编写响应的方法, 参数必须为(Bot bot, Event event), 其中event指定其子类, 响应对应的事件
 3. 然后在方法上加上@MessageHandler(可指定命令匹配或者关键词匹配) 或者 @NoticeHandler
-4. 在这个类中添加类型为tech.chowyijiu.huhu_bot.rule.Rule, 名称为响应方法加"Rule"的成员变量, 使用返回布尔值lambda表达式作为对应方法响应的前置条件
-
-## 配置文件示例
-```yaml
-bot:
-  super-users: [1942422015]
-  command-prefixes: []
-  test_group: 12334567
-  ali-refresh-token: 0sdf95fa1sdfsdfasa5a38fb7adfe1d8f86
-
-logging:
-  file:
-    name: log/huhubot.log  # 日志文件相对路径及名称
-  level:
-    root: info
-```
-
+4. 在这个类中添加类型为tech.flless.huhu_bot.rule.Rule, 名称为响应方法加"Rule"的成员变量, 使用返回布尔值lambda表达式作为对应方法响应的前置条件
 
 ## 示例插件
 
 ```Java
-import annotation.core.tech.flless.huhubot.RuleCheck;
-
 @Slf4j
 @BotPlugin("demo")
 @SuppressWarnings("unused")
