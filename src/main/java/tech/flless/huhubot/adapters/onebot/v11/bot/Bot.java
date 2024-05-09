@@ -206,7 +206,7 @@ public class Bot {
         String data = this.callApiWaitResp(GocqAction.get_msg, Map.of("message_id", messageId));
         JSONObject jsonObject = JSONObject.parseObject(data);
         return jsonObject.toJavaObject(MessageInfo.class);
-        //return JSONObject.parseObject(data, MessageInfo.class);//
+        //return JSONObject.parseObject(data, MessageInfo.class);//莫名其妙报错
     }
 
     /**
@@ -278,12 +278,11 @@ public class Bot {
      *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendGroupMessage(Long groupId, Object message) {
-        Map<String, Object> map;
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        map = Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape);
-        this.callApi(GocqAction.send_group_msg, map);
+        this.callApi(GocqAction.send_group_msg,
+                Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
     }
 
 
@@ -295,12 +294,11 @@ public class Bot {
      *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
     public void sendPrivateMessage(Long userId, Object message) {
-        Map<String, Object> map;
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        map = Map.of("user_id", userId, "message", message, "auto_escape", autoEscape);
-        this.callApi(GocqAction.send_private_msg, map);
+        this.callApi(GocqAction.send_private_msg,
+                Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
     }
 
 

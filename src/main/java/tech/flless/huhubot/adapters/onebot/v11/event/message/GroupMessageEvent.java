@@ -46,7 +46,7 @@ public class GroupMessageEvent extends MessageEvent {
     }
 
     @Override
-    public void sendMessage(Object message) {
+    public void replyMessage(Object message) {
         getBot().sendGroupMessage(this.getGroupId(), message);
     }
 }

@@ -61,21 +61,21 @@ public class ResourceSearchPlugin {
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
-        event.sendMessage(result);
+        event.replyMessage(result);
         XiaoAIUtil.tts(result);
     }
 
     @MessageHandler(name = "GITCAFE", commands = {".s"})
     public void gitCafeSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), gitCafeClient::get);
-        event.sendMessage(ResourceUtil.buildString(dataList));
+        event.replyMessage(ResourceUtil.buildString(dataList));
     }
 
 
     @MessageHandler(name = "HDHIVE", commands = {".ds"})
     public void hdhiveSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), hdhiveClient::get);
-        event.sendMessage(ResourceUtil.buildString(dataList));
+        event.replyMessage(ResourceUtil.buildString(dataList));
     }
 
 
@@ -88,7 +88,7 @@ public class ResourceSearchPlugin {
     public void save(MessageEvent event) {
         String no = event.getCommandArgs();
         if (!StringUtil.isDigit(no)) {
-            event.sendMessage("参数应为数字");
+            event.replyMessage("参数应为数字");
             return;
         }
         int index = Integer.parseInt(no);
@@ -106,7 +106,7 @@ public class ResourceSearchPlugin {
             } else {
                 willSend += "失败, 分享者取消分享, 或被风控";
             }
-            event.sendMessage(willSend);
+            event.replyMessage(willSend);
         }
 
     }
@@ -117,6 +117,6 @@ public class ResourceSearchPlugin {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
-        event.sendMessage(willSend);
+        event.replyMessage(willSend);
     }
 }

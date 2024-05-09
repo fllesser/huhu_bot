@@ -52,14 +52,14 @@ public class ApiPlugin {
         if (trans != null && trans.size() > 0) {
             StringBuilder sb = new StringBuilder(StringUtil.manMachine(word + ": "));
             trans.forEach(str -> sb.append(" ").append(str));
-            event.sendMessage(sb.toString());
+            event.replyMessage(sb.toString());
         }
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
-        event.sendMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
+        event.replyMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
     }
 
     //@RuleCheck(rule = RuleEnum.superuser)
@@ -67,6 +67,10 @@ public class ApiPlugin {
     public void zgjm(MessageEvent event) {
         if (!StringUtil.hasLength(event.getCommandArgs())) return;
         ApiSpaceResult result = apiSpaceClient.zgjm(ApiSpaceConfig.token, event.getCommandArgs());
+        if (result.getResult() == null) {
+            event.replyMessage("解梦失败");
+            return;
+        }
         String content = result.getResult()[0].get("content");
         String message = "解梦失败";
         if (StringUtil.hasLength(content)) {
@@ -79,7 +83,7 @@ public class ApiPlugin {
             }
             message = "解梦结果: " + sb;
         }
-        event.sendMessage(message);
+        event.replyMessage(message);
     }
 
 }
