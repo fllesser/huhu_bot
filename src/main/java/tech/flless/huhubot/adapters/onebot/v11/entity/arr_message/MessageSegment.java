@@ -180,7 +180,7 @@ public class MessageSegment {
 
     /**
      * 语音
-     * https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3
+     * <a href="https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3">...</a>
      * @param file 语音网络路径
      * @param magic 发送时可选, 默认 0, 设置为 1 表示变声
      * @param cache 只在通过网络 URL 发送时有效, 表示是否使用已缓存的文件, 默认 1
