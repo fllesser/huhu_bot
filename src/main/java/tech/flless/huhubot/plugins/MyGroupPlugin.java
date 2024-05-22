@@ -41,9 +41,9 @@ public class MyGroupPlugin {
         //String card = "失业第" + this.countdown();
         String card = "FLLess "  + LocalDateTime.now().format(formatter);
         log.info("Time group nicknames start to be updated card: {}", card);
-        BotContainer.getBots().forEach(bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
-                .stream()
-                .map(GroupInfo::getGroupId)
+        BotContainer.getBots().forEach(
+                bot -> Optional.ofNullable(bot.getGroups()).orElseGet(bot::getGroupList)
+                .stream().map(GroupInfo::getGroupId)
                 .forEach(groupId -> {
                     bot.setGroupCard(groupId, bot.getSelfId(), card);
                     try {

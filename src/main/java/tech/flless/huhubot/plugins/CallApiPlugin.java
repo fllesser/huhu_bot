@@ -2,15 +2,14 @@ package tech.flless.huhubot.plugins;
 
 import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
+import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
+import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.ForwardMessage;
+import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
-import tech.flless.huhubot.core.rule.RuleEnum;
 import tech.flless.huhubot.core.constant.GocqAction;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.ForwardMessage;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
-import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
+import tech.flless.huhubot.core.rule.RuleEnum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +58,6 @@ public class CallApiPlugin {
         } else if (resp.startsWith("[")) {
             List<Object> messages = new ArrayList<>();
             messages.add(costTime);
-            messages.add(MessageSegment.image("https://pic2.zhimg.com/80/v2-d9a3bd17467c3b51e35c95cbbfe6a755_1440w.webp"));
             messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
             List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
             bot.sendForwardMsg(event, nodes);

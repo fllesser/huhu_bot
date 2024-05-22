@@ -62,6 +62,8 @@ public class DispatcherCore {
                 //所以需要使用AopUtils.getTargetClass()获取原始类
                 for (Method method : AopUtils.getTargetClass(plugin).getDeclaredMethods()) {
                     Handler handler;
+                    //取消检查
+                    method.setAccessible(true);
                     if (method.isAnnotationPresent(MessageHandler.class)) {
                         handler = Handler.buildMessageHandler(plugin, method);
                         messageHandlers.add(handler);
