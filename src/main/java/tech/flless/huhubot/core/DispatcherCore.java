@@ -51,13 +51,12 @@ public class DispatcherCore {
         if (!botPluginMap.isEmpty()) {
             log.info("{}huhubot starts to load plugins...{}", ANSI.YELLOW, ANSI.RESET);
             int count = 1;
-            StringBuilder sb;
+            StringBuilder pluginFuctionNames;
             //容器中的插件Bean
             Object plugin;
             for (String pluginName : botPluginMap.keySet()) {
                 plugin = botPluginMap.get(pluginName);
-                //插件功能名, 用于打印日志
-                sb = new StringBuilder();
+                pluginFuctionNames = new StringBuilder();
                 //开启aop后, 使用aop增强的Bean会变成代理类对象, 代理类不包含原始类的注解
                 //所以需要使用AopUtils.getTargetClass()获取原始类
                 for (Method method : AopUtils.getTargetClass(plugin).getDeclaredMethods()) {
@@ -71,10 +70,10 @@ public class DispatcherCore {
                         handler = Handler.buildNoticeHandler(plugin, method);
                         noticeHandlers.add(handler);
                     } else continue;
-                    sb.append(handler.name).append(" ");
+                    pluginFuctionNames.append(handler.name).append(" ");
                 }
                 log.info("{}huhubot succeeded to load plugin {}, progress:{}/{}, function:{}{}",
-                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(), sb, ANSI.RESET);
+                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(), pluginFuctionNames, ANSI.RESET);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
