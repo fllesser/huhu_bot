@@ -1,11 +1,10 @@
 package tech.flless.huhubot.core.base;
 
+import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.core.DispatcherCore;
-import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
 import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.utils.IocUtil;
 import tech.flless.huhubot.utils.StringUtil;
 
@@ -13,7 +12,8 @@ import tech.flless.huhubot.utils.StringUtil;
  * @author flless
  * @date 13/9/2023
  */
-@BotPlugin("huhubot-plugin-base")
+//@BotPlugin("huhubot-plugin-base")
+@Deprecated
 @SuppressWarnings("unused")
 public class BasePlugin {
 
