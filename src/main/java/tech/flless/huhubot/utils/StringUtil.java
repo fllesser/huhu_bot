@@ -54,6 +54,11 @@ public class StringUtil {
 
     private static final Pattern letterAndNumberPattern = Pattern.compile("[a-zA-Z0-9]+");
 
+    /**
+     * 截取字符串中第一个英文(数字)组合
+     * @param str source string
+     * @return string
+     */
     public static String getFirstLAN(String str) {
         Matcher matcher = letterAndNumberPattern.matcher(str);
         if (matcher.find()) return matcher.group(0);
