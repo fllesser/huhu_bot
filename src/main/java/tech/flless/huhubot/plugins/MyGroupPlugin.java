@@ -38,7 +38,6 @@ public class MyGroupPlugin {
     @Async
     @Scheduled(cron = "0 0/3 * * * * ")
     public void dateGroupCard() {
-        //String card = "失业第" + this.countdown();
         String card = "FLLess "  + LocalDateTime.now().format(formatter);
         log.info("Time group nicknames start to be updated card: {}", card);
         BotContainer.getBots().forEach(

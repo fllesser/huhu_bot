@@ -1,0 +1,11 @@
+bot:
+  super-users: [1942422015] #超级用户
+  command-prefixes: []
+  test_group: 12334567
+  ali-refresh-token:
+
+logging:
+  file:
+    name: log/huhubot.log  # 日志文件相对路径及名称
+  level:
+    root: info

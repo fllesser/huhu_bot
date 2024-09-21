@@ -47,13 +47,14 @@ public class ResourceSearchPlugin {
         String result = aliYunDriverClient.signInList();
         Objects.requireNonNull(BotContainer.getBot(BotConfig.superUsers.get(0)))
                 .sendGroupMessage(BotConfig.testGroup, result);
-        XiaoAIUtil.tts(result);
+        //XiaoAIUtil.tts(result);
         //清除搜索缓存
         ResourceUtil.clear();
     }
 
-    @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "阿里云盘手动签到", commands = "alisign")
+    //@RuleCheck(rule = RuleEnum.superuser)
+    //@MessageHandler(name = "阿里云盘手动签到", commands = "alisign")
+    @Deprecated
     public void aliSignIn(MessageEvent event) {
         String result;
         try {

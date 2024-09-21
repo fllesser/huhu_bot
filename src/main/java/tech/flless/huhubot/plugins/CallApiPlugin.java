@@ -10,6 +10,7 @@ import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
 import tech.flless.huhubot.core.constant.GocqAction;
 import tech.flless.huhubot.core.rule.RuleEnum;
+import tech.flless.huhubot.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,15 +54,20 @@ public class CallApiPlugin {
         String resp = bot.callApiWaitResp(action, map);
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
-        if (resp.startsWith("{")) {
-            bot.sendMessage(event, resp + "\n" + costTime);
-        } else if (resp.startsWith("[")) {
-            List<Object> messages = new ArrayList<>();
-            messages.add(costTime);
-            messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
-            List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
-            bot.sendForwardMsg(event, nodes);
+        if (StringUtil.hasLength(resp)) {
+            if (resp.startsWith("{")) {
+                bot.sendMessage(event, resp + "\n" + costTime);
+            } else if (resp.startsWith("[")) {
+                List<Object> messages = new ArrayList<>();
+                messages.add(costTime);
+                messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
+                List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
+                bot.sendForwardMsg(event, nodes);
+            }
+        } else {
+            bot.sendMessage(event, "onebotv11实现端可能未支持该api");
         }
+
     }
 
 }
