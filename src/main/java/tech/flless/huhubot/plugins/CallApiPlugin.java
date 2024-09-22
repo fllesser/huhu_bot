@@ -1,6 +1,7 @@
 package tech.flless.huhubot.plugins;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
 import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.ForwardMessage;
@@ -27,6 +28,11 @@ import java.util.stream.Collectors;
 @BotPlugin(name = "huhubot-plugin-gocqapi")
 public class CallApiPlugin {
 
+
+    /**
+     * ai get_group_info group_id:12312321 k:v ...
+     * @param event
+     */
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "callApi", commands = "api")
     public void apiTest(MessageEvent event) {
@@ -56,11 +62,20 @@ public class CallApiPlugin {
         String costTime = "time-consuming: " + (end - start) + "ms";
         if (StringUtil.hasLength(resp)) {
             if (resp.startsWith("{")) {
-                bot.sendMessage(event, resp + "\n" + costTime);
+                StringBuilder willSend = new StringBuilder();
+                JSONObject jsonObject = JSONObject.parse(resp);
+                jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                bot.sendMessage(event, willSend + "\n" + costTime);
             } else if (resp.startsWith("[")) {
                 List<Object> messages = new ArrayList<>();
                 messages.add(costTime);
-                messages.addAll(JSONArray.parseArray(resp, String.class).stream().limit(98).toList());
+                messages.addAll(JSONArray.parseArray(resp, String.class)
+                        .stream().limit(98).map(json -> {
+                            StringBuilder willSend = new StringBuilder();
+                            JSONObject jsonObject = JSONObject.parse(json);
+                            jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                            return willSend.toString();
+                        }).toList());
                 List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
                 bot.sendForwardMsg(event, nodes);
             }

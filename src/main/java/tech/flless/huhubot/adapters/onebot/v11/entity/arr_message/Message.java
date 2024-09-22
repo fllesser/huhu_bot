@@ -16,6 +16,15 @@ public class Message extends ArrayList<MessageSegment> {
     @JsonIgnore
     private String plainText;
 
+    public static Message reply(Long messageId) {
+        Message message = new Message();
+        return message.append(MessageSegment.reply(messageId));
+    }
+
+    public static Message text(String text) {
+        return new Message().append(text);
+    }
+
     public boolean checkToMe(Long selfId) {
         for (MessageSegment segment : this) {
             if ("at".equals(segment.getType())) {
@@ -50,9 +59,7 @@ public class Message extends ArrayList<MessageSegment> {
         return this;
     }
 
-    public static Message text(String text) {
-        return new Message().append(text);
-    }
+
 
     /**
      * 初始化所有text信息, 去除所有cq码

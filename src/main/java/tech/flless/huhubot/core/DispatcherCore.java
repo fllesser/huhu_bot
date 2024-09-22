@@ -207,7 +207,7 @@ public class DispatcherCore {
                 } else if (targetException instanceof ActionFailed) {
                     log.info("{}ActionFailed: {}{}", ANSI.RED, targetException.getMessage(), ANSI.RESET);
                 } else {
-                    targetException.printStackTrace();
+                    log.error(targetException.getMessage());
                 }
             }
         }
@@ -221,9 +221,24 @@ public class DispatcherCore {
 
     private final Map<Integer, String> handlerNameMap = new HashMap<>();
 
+    private void initHandlerNameMap() {
+        AtomicInteger i = new AtomicInteger(1);
+        Stream.concat(MESSAGE_HANDLER_CONTAINER.stream(), NOTICE_HANDLER_CONTAINER.stream())
+                .forEach(handler -> handlerNameMap.put(i.getAndIncrement(), handler.name));
+    }
+
+    public String getHandlerNameList() {
+        StringBuilder sb = new StringBuilder();
+        for (Integer integer : handlerNameMap.keySet()) {
+            sb.append(integer).append(". ").append(handlerNameMap.get(integer)).append("\n");
+        }
+        return sb.toString();
+    }
+
     /**
      * 逻辑关闭
      */
+    @Deprecated
     public boolean logicClose(int no) {
         String handlerName = handlerNameMap.get(no);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
@@ -244,6 +259,7 @@ public class DispatcherCore {
     /**
      * 逻辑开启
      */
+    @Deprecated
     public boolean logicOpen(int no) {
         String handlerName = handlerNameMap.get(no);
         for (Handler handler : MESSAGE_HANDLER_CONTAINER) {
@@ -260,20 +276,4 @@ public class DispatcherCore {
         }
         return false;
     }
-
-
-    private void initHandlerNameMap() {
-        AtomicInteger i = new AtomicInteger(1);
-        Stream.concat(MESSAGE_HANDLER_CONTAINER.stream(), NOTICE_HANDLER_CONTAINER.stream())
-                .forEach(handler -> handlerNameMap.put(i.getAndIncrement(), handler.name));
-    }
-
-    public String getHandlerNameList() {
-        StringBuilder sb = new StringBuilder();
-        for (Integer integer : handlerNameMap.keySet()) {
-            sb.append(integer).append(". ").append(handlerNameMap.get(integer)).append("\n");
-        }
-        return sb.toString();
-    }
-
 }
