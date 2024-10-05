@@ -52,7 +52,7 @@ public class MainPlugin {
                     content.set(event.getCommandArgs());
                 }
         );
-        log.info(content.get());
+        //log.info(content.get());
         //AccessToken = ernieClient.getToken(WxConfig.ak, WxConfig.sk).getAccess_token();
         CompletionRes completion = getCompletion(content.get());
         bot.sendMessage(event, completion.getResult());
