@@ -128,7 +128,7 @@ public class Bot {
         synchronized (echoData) {
             this.sessionSend(requestBox);
             String res = echoData.waitAndGet();
-            log.info("<-ws-onebotv11-[{}]{}", this.selfId, res);
+            log.info("[hb]<-ws-[ob][{}]{}", this.selfId, res);
             return res;
         }
     }
