@@ -35,13 +35,13 @@ public class OneBotV11Handler extends TextWebSocketHandler {
             else if (metaEvent.isConnected()) {
                 //刚连接成功时，gocq会发一条消息给bot, 添加bot到map中
                 BotContainer.addBot(event.getSelfId(), session);
-                log.info("{}Received gocq client[{}] connection success message{}", ANSI.YELLOW,
+                log.info("{}Received onebotv11 client[{}] connection success message{}", ANSI.YELLOW,
                         metaEvent.getSelfId(), ANSI.RESET);
                 return;
             }
         }
         Bot bot = BotContainer.getBot(event.getSelfId());
-        log.info("<-ws-onebotv11-[{}]{}", bot.getSelfId(), event);
+        log.info("[hb]<-ws-[ob11][{}]{}", bot.getSelfId(), event);
         event.setBot(bot);
         ProcessEventTask.execute(event);
     }
