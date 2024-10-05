@@ -4,6 +4,16 @@ bot:
   test_group: 12334567
   ali-refresh-token:
 
+wx:
+
+
+retrofit:
+  global-timeout:
+    connect-timeout-ms: 10000
+    read-timeout-ms: 60000
+    write-timeout-ms: 60000
+
+
 logging:
   file:
     name: log/huhubot.log  # 日志文件相对路径及名称

@@ -2,6 +2,8 @@ package tech.flless.huhubot.plugins.ai;
 
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
+import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
@@ -24,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @BotPlugin("AI")
+@Slf4j
 public class MainPlugin {
 
     @Resource
@@ -43,12 +46,13 @@ public class MainPlugin {
                     MessageInfo msg = bot.getMsg(seg.getInteger("id"));
                     Message replied = msg.getMessage();
                     replied.plainText();
-                    content.set(message.getPlainText() + ", " + replied.getPlainText());
+                    content.set(event.getCommandArgs() + ", " + replied.getPlainText());
                 },
                 () -> {
-                    content.set(message.getPlainText());
+                    content.set(event.getCommandArgs());
                 }
         );
+        log.info(content.get());
         AccessToken = ernieClient.getToken(WxConfig.ak, WxConfig.sk).getAccess_token();
         CompletionRes completion = getCompletion(content.get());
         bot.sendMessage(event, completion.getResult());

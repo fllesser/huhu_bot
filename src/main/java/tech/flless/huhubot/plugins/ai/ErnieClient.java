@@ -21,14 +21,6 @@ import java.util.concurrent.TimeUnit;
 @RetrofitClient(baseUrl = "https://aip.baidubce.com")
 public interface ErnieClient {
 
-    static OkHttpClient.Builder okhttpClientBuilder() {
-        return new OkHttpClient.Builder()
-                .connectTimeout(5, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS);
-
-    }
-
 
     @POST("/oauth/2.0/token?grant_type=client_credentials")
     @Headers({"Content-Type:application/json", "Accept:application/json"})
