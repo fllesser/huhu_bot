@@ -1,5 +1,6 @@
 package tech.flless.huhubot.adapters.onebot.v11.event.notice;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,8 +19,12 @@ public class GroupIncreaseNoticeEvent extends NoticeEvent {
 
     //事件子类型
     //approve分别表示管理员已同意入群  invite 管理员邀请入群
+    @JsonProperty("sub_type")
     private String subType;
+    @JsonProperty("user_id")
     private Long userId;
+    @JsonProperty("group_id")
     private Long groupId;
+    @JsonProperty("operator_id")
     private Long operatorId;
 }

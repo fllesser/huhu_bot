@@ -1,5 +1,6 @@
 package tech.flless.huhubot.adapters.onebot.v11.event.notice;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -17,5 +18,6 @@ public class FriendAddNoticeEvent extends NoticeEvent {
 
     private final String noticeType = NoticeTypeEnum.friend_add.name();
 
+    @JsonProperty("user_id")
     private Long userId;
 }
