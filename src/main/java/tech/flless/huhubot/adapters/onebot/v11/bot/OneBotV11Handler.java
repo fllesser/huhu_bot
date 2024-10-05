@@ -21,7 +21,7 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) {
-        log.info("{}GOCQ CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}",
+        log.info("{}OB11 CLIENT CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}",
                 ANSI.YELLOW, session.getRemoteAddress(), BotContainer.getConnections() + 1, ANSI.RESET);
     }
 
