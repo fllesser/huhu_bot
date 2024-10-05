@@ -57,11 +57,11 @@ public class Bot {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
-            log.info("{}[huhubot]-ws->[onebotv11] [{}]{}, exception[{}]{}",
+            log.info("{}[hb]-ws->[ob][{}]{}, exception[{}]{}",
                     ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
         }
         if (!requestBox.getAction().equals("set_group_card")) {
-            log.info("[huhubot]-ws->[onebotv11] [{}]{}", selfId, text);
+            log.info("[hb]-ws->[ob][{}]{}", selfId, text);
         }
     }
 
