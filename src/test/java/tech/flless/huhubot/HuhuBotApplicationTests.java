@@ -9,7 +9,6 @@ import tech.flless.huhubot.plugins.ai.entity.CompletionRes;
 
 @SuppressWarnings("all")
 @Slf4j
-@SpringBootTest
 public class HuhuBotApplicationTests {
 
 
@@ -32,17 +31,6 @@ public class HuhuBotApplicationTests {
     //    }).toArray(BufferedImage[]::new);
     //    ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     //}
-
-
-    @Resource
-    private MainPlugin mainPlugin;
-
-    @Test
-    public void contextLoads() {
-        CompletionRes completion = mainPlugin.getCompletion("测试");
-        System.out.println(completion);
-    }
-
 
 
 }
