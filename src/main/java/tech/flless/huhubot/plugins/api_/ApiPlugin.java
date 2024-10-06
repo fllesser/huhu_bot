@@ -36,7 +36,7 @@ public class ApiPlugin {
     @Resource
     private ApiSpaceClient apiSpaceClient;
 
-    @RuleCheck(rule = RuleEnum.superuser)
+    //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
     public void sx(MessageEvent event) {
         String word = event.getCommandArgs();
@@ -56,13 +56,13 @@ public class ApiPlugin {
         }
     }
 
-    @RuleCheck(rule = RuleEnum.superuser)
+    //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "摸鱼人日历", commands = "摸鱼")
     public void moyu(MessageEvent event) {
         event.replyMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
     }
 
-    @RuleCheck(rule = RuleEnum.superuser)
+    //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "周公解梦", commands = "zgjm")
     public void zgjm(MessageEvent event) {
         if (!StringUtil.hasLength(event.getCommandArgs())) return;
