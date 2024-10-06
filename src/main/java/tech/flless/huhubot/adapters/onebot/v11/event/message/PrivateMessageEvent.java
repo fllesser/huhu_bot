@@ -30,9 +30,9 @@ public class PrivateMessageEvent extends MessageEvent {
     @Override
     public String toString() {
         return "PrivateMessageEvent{" +
-                "uid:" + super.getUserId() +
-                ", raw_msg:" + super.getRawMessage() +
-                ", sub_type=:" + subType +
+                "uid=" + super.getUserId() +
+                ", raw_msg=" + super.getRawMessage() +
+                ", sub_type=" + subType +
                 "}";
     }
 
