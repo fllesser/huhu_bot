@@ -1,11 +1,6 @@
 package tech.flless.huhubot;
 
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import tech.flless.huhubot.plugins.ai.MainPlugin;
-import tech.flless.huhubot.plugins.ai.entity.CompletionRes;
 
 @SuppressWarnings("all")
 @Slf4j
