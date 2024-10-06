@@ -8,14 +8,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "wx")
 public class WxConfig {
 
-    public static String ak;
-    public static String sk;
+    public static String clientId;
+    public static String clientSecret;
 
-    public void setAk(String ak) {
-        WxConfig.ak = ak;
+    public void setClientId(String clientId) {
+        WxConfig.clientId = clientId;
     }
 
-    public void setSk(String sk) {
-        WxConfig.sk = sk;
+    public void setClientSecret(String clientSecret) {
+        WxConfig.clientSecret = clientSecret;
     }
 }

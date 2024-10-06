@@ -44,7 +44,8 @@ public class ResourceUtil {
     public static String buildString(List<ResourceData> dataList) {
         if (dataList == null || dataList.size() == 0) return "未搜索到此关键词资源, 试试别的";
         int start = resourceDataList.size();
-        addAll(dataList);
+        //暂时取消缓存
+        //addAll(dataList);
         StringBuilder sb = new StringBuilder();
         sb.append("共搜索到").append(dataList.size()).append("个资源");
         for (int i = 0; i < dataList.size(); i++) {

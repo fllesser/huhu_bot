@@ -22,7 +22,7 @@ public class BotConfig {
     public static List<Character> commandPrefixes = new ArrayList<>(1);
     public static Long testGroup;
 
-    public static String aliRefreshToken;
+    //public static String aliRefreshToken;
 
     public void setSuperUsers(ArrayList<Long> superUsers) {
         BotConfig.superUsers = superUsers;
@@ -36,9 +36,9 @@ public class BotConfig {
         BotConfig.testGroup = testGroup;
     }
 
-    public void setAliRefreshToken(String aliRefreshToken) {
-        BotConfig.aliRefreshToken = aliRefreshToken;
-    }
+//    public void setAliRefreshToken(String aliRefreshToken) {
+//        BotConfig.aliRefreshToken = aliRefreshToken;
+//    }
     
 
     @PostConstruct

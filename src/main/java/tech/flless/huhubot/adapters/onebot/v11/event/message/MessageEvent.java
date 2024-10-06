@@ -60,8 +60,8 @@ public class MessageEvent extends Event {
     }
 
     public MessageInfo getReply() {
-        MessageSegment segment = this.message.get(0);
-        if (!"reply".equals(segment.getType())) return null;
+        MessageSegment segment = this.message.get("reply", 0);
+        if (segment == null) return null;
         return this.getBot().getMsg(segment.getInteger("id"));
     }
 

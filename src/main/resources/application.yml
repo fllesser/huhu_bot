@@ -5,13 +5,16 @@ bot:
   ali-refresh-token:
 
 wx:
-
+  client-id:
+  client-secret:
 
 retrofit:
   global-timeout:
     connect-timeout-ms: 10000
-    read-timeout-ms: 60000
-    write-timeout-ms: 60000
+    read-timeout-ms: 30000
+    write-timeout-ms: 30000
+  global-log:
+    enable: false
 
 
 logging:

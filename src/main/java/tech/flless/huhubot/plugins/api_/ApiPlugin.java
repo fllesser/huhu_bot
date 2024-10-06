@@ -62,7 +62,7 @@ public class ApiPlugin {
         event.replyMessage(MessageSegment.image(vvhanClient.moyu().getUrl()));
     }
 
-    //@RuleCheck(rule = RuleEnum.superuser)
+    @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "周公解梦", commands = "zgjm")
     public void zgjm(MessageEvent event) {
         if (!StringUtil.hasLength(event.getCommandArgs())) return;

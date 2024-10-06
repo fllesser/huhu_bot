@@ -1,6 +1,7 @@
 package tech.flless.huhubot.plugins.ai.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,11 +11,16 @@ import lombok.ToString;
 @ToString
 public class TokenRes {
 
-    private String refresh_token;
-    private long expires_in;
-    private String session_key;
-    private String access_token;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+    @JsonProperty("expiresIn")
+    private long expiresIn;
+    @JsonProperty("sessionKey")
+    private String sessionKey;
+    @JsonProperty("access_token")
+    private String accessToken;
     private String scope;
-    private String session_secret;
+    @JsonProperty("sessionSecret")
+    private String sessionSecret;
 
 }

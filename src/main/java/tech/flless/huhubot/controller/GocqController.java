@@ -25,7 +25,7 @@ public class GocqController {
             @RequestParam @Nullable Map<String, Object> params)
     {
         if (Arrays.stream(GocqAction.values()).noneMatch(a -> a.name().equals(action))) {
-            return ResponseEntity.ok("gocq未支持该api: " + action);
+            return ResponseEntity.ok("onebot实现未支持该api: " + action);
         }
         Bot bot = BotContainer.getBot(qq);
         if (bot == null) return ResponseEntity.ok("没有连接对应的bot, id:" + qq);

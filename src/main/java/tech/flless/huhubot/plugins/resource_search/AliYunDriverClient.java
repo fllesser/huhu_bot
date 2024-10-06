@@ -28,7 +28,7 @@ public class AliYunDriverClient {
         if (EXPIRE_TIME != null && EXPIRE_TIME.isAfter(LocalDateTime.now())) return ACCESS_TOKEN;
         Map<String, String> bodyMap = Map.of(
                 "grant_type", "refresh_token",
-                "refresh_token", BotConfig.aliRefreshToken
+                "refresh_token", "Botconfig.refreshToken"
         );
         HttpResponse response = HttpRequest.post("https://auth.aliyundrive.com/v2/account/token")
                 .header("Content-Type", "application/json")

@@ -29,18 +29,5 @@ public class PersonalPlugin {
         event.getBot().sendGroupMessage(event.getSender().getGroupId(), message);
     }
 
-    //@RuleCheck(rule = RuleEnum.superuser)
-    //@MessageHandler(name = "文字转语音", commands = {"tts", "文字转语音"})
-    @Deprecated
-    public void tts(GroupMessageEvent event) {
-        event.replyMessage(MessageSegment.tts(event.getCommandArgs()));
-    }
-
-    @CoolDown(seconds = 120)
-    //@MessageHandler(name = "遥遥领先", keywords = {"遥遥领先", "yylx"})
-    public void yaoYaoLingXian(MessageEvent event) {
-        event.replyMessage(MessageSegment
-                .record("file:///home/chow/oswald/huhubot/record/yaoyaolingxian.mp3", 0));
-    }
 
 }

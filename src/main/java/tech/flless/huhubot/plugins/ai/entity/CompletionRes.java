@@ -1,6 +1,7 @@
 package tech.flless.huhubot.plugins.ai.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -10,7 +11,9 @@ public class CompletionRes {
     private String object;
     private long created;
     private String result;
-    private boolean is_truncated;
-    private boolean need_clear_history;
+    @JsonProperty("is_truncated")
+    private boolean isTruncated;
+    @JsonProperty("need_clear_history")
+    private boolean needClearHistory;
 
 }

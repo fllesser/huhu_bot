@@ -35,22 +35,22 @@ public class ResourceSearchPlugin {
     private GitCafeClient gitCafeClient;
     @Resource
     private HdhiveClient hdhiveClient;
-    @Resource
-    private OpenwrtClient openwrtClient;
+//    @Resource
+//    private OpenwrtClient openwrtClient;
 
     @Resource
     private AliYunDriverClient aliYunDriverClient;
 
-    @Async
-    @Scheduled(cron = "0 30 10 * * *")
-    public void scheduledCheck() {
-        String result = aliYunDriverClient.signInList();
-        Objects.requireNonNull(BotContainer.getBot(BotConfig.superUsers.get(0)))
-                .sendGroupMessage(BotConfig.testGroup, result);
-        //XiaoAIUtil.tts(result);
-        //清除搜索缓存
-        ResourceUtil.clear();
-    }
+//    @Async
+//    @Scheduled(cron = "0 30 10 * * *")
+//    public void scheduledCheck() {
+//        String result = aliYunDriverClient.signInList();
+//        Objects.requireNonNull(BotContainer.getBot(BotConfig.superUsers.get(0)))
+//                .sendGroupMessage(BotConfig.testGroup, result);
+//        //XiaoAIUtil.tts(result);
+//        //清除搜索缓存
+//        ResourceUtil.clear();
+//    }
 
     //@RuleCheck(rule = RuleEnum.superuser)
     //@MessageHandler(name = "阿里云盘手动签到", commands = "alisign")
@@ -84,33 +84,33 @@ public class ResourceSearchPlugin {
     /**
      * .save/保存 搜索时的关键词 序号
      */
-    @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, block = true)
-    public void save(MessageEvent event) {
-        String no = event.getCommandArgs();
-        if (!StringUtil.isDigit(no)) {
-            event.replyMessage("参数应为数字");
-            return;
-        }
-        int index = Integer.parseInt(no);
-        ResourceData data = ResourceUtil.get(index);
-        if (data != null) {
-            boolean success = false;
-            String willSend = "转存[" + index + "]" + data.getName();
-            try {
-                success = aliYunDriverClient.fileCopy(data.getShareId());
-            } catch (Exception e) {
-                willSend = "refresh token expired, " + willSend;
-            }
-            if (success) {
-                willSend += "成功\n删除Openwrt阿里云盘缓存" + (openwrtClient.invalidateCache() ? "成功" : "失败");
-            } else {
-                willSend += "失败, 分享者取消分享, 或被风控";
-            }
-            event.replyMessage(willSend);
-        }
-
-    }
+//    @RuleCheck(rule = RuleEnum.superuser)
+//    @MessageHandler(name = "转存到阿里云盘", commands = {".save"}, priority = 1, block = true)
+//    public void save(MessageEvent event) {
+//        String no = event.getCommandArgs();
+//        if (!StringUtil.isDigit(no)) {
+//            event.replyMessage("参数应为数字");
+//            return;
+//        }
+//        int index = Integer.parseInt(no);
+//        ResourceData data = ResourceUtil.get(index);
+//        if (data != null) {
+//            boolean success = false;
+//            String willSend = "转存[" + index + "]" + data.getName();
+//            try {
+//                success = aliYunDriverClient.fileCopy(data.getShareId());
+//            } catch (Exception e) {
+//                willSend = "refresh token expired, " + willSend;
+//            }
+//            if (success) {
+//                willSend += "成功\n删除Openwrt阿里云盘缓存" + (openwrtClient.invalidateCache() ? "成功" : "失败");
+//            } else {
+//                willSend += "失败, 分享者取消分享, 或被风控";
+//            }
+//            event.replyMessage(willSend);
+//        }
+//
+//    }
 
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "search in cache", commands = {".cache"})
