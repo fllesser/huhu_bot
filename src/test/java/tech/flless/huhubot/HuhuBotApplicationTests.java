@@ -15,7 +15,6 @@ import static tech.flless.huhubot.plugins.api_.reecho.VoiceIdEnum.LeiJun;
 
 @SuppressWarnings("all")
 @Slf4j
-@SpringBootTest
 public class HuhuBotApplicationTests {
 
 
@@ -39,12 +38,5 @@ public class HuhuBotApplicationTests {
     //    ImageUtil.mergeImage("/Users/yijiuchow/Desktop/1.png", imgs);
     //}
 
-    @Resource
-    private ReechoClient reechoClient;
-
-    @Test
-    public void test() throws InterruptedException, ExecutionException {
-        System.out.println(reechoClient.generate("测试测试测试测试"));
-    }
 
 }
