@@ -96,17 +96,17 @@ public class MyGroupPlugin {
 //        event.getBot().setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
 //    }
 
-//    @NoticeHandler(name = "群内回戳", priority = 0)
-//    public void replyPoke(NotifyNoticeEvent event) {
-//        Bot bot = event.getBot();
-//        if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
-//                || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
-//                || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
-//        ) return;
-//        if (event.getGroupId() != null) {
-//            event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
-//        }
-//    }
+    @NoticeHandler(name = "群内回戳", priority = 0)
+    public void replyPoke(NotifyNoticeEvent event) {
+        Bot bot = event.getBot();
+        if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
+                || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
+                || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
+        ) return;
+        if (event.getGroupId() != null) {
+            event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
+        }
+    }
 
     //@RuleCheck(rule = RuleEnum.tome)
     //@MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, priority = 9)
