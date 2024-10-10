@@ -37,8 +37,8 @@ public interface ReechoClient {
 
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
-    default String generate(String text) throws InterruptedException {
-        GenResp resp = generate(ReechoConfig.webToken, new GenReqBody(LeiJun.getVoiceId(), text));
+    default String generate(VoiceIdEnum voice, String text) throws InterruptedException {
+        GenResp resp = generate(ReechoConfig.webToken, new GenReqBody(voice.getVoiceId(), text));
         //Action action = new Action(this, resp);
         //return executor.schedule(action, 0, TimeUnit.SECONDS).get();
         String audioUrl;
