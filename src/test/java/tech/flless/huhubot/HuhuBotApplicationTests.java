@@ -9,7 +9,9 @@ import tech.flless.huhubot.plugins.api_.reecho.ReechoClient;
 import tech.flless.huhubot.plugins.api_.reecho.entity.GenReqBody;
 import tech.flless.huhubot.plugins.api_.reecho.entity.GenResp;
 
-import static tech.flless.huhubot.plugins.api_.reecho.VoidIdEnum.LeiJun;
+import java.util.concurrent.ExecutionException;
+
+import static tech.flless.huhubot.plugins.api_.reecho.VoiceIdEnum.LeiJun;
 
 @SuppressWarnings("all")
 @Slf4j
@@ -41,9 +43,8 @@ public class HuhuBotApplicationTests {
     private ReechoClient reechoClient;
 
     @Test
-    public void test(){
-        String resp = reechoClient.generate(ReechoConfig.webToken, new GenReqBody(LeiJun.getVoiceId(), "你好呀"));
-        log.info(resp);
+    public void test() throws InterruptedException, ExecutionException {
+        System.out.println(reechoClient.generate("测试测试测试测试"));
     }
 
 }

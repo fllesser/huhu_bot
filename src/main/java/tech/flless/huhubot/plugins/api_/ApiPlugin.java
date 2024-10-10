@@ -13,10 +13,12 @@ import tech.flless.huhubot.core.rule.RuleEnum;
 import tech.flless.huhubot.plugins.api_.api_sapce.ApiSpaceClient;
 import tech.flless.huhubot.plugins.api_.api_sapce.ApiSpaceResult;
 import tech.flless.huhubot.plugins.api_.nbnhhsh.NbnhhshClient;
+import tech.flless.huhubot.plugins.api_.reecho.ReechoClient;
 import tech.flless.huhubot.plugins.api_.vvhan.VvhanClient;
 import tech.flless.huhubot.utils.StringUtil;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +37,9 @@ public class ApiPlugin {
 
     @Resource
     private ApiSpaceClient apiSpaceClient;
+
+    @Resource
+    private ReechoClient reechoClient;
 
     //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
@@ -84,6 +89,12 @@ public class ApiPlugin {
             message = "解梦结果: " + sb;
         }
         event.replyMessage(message);
+    }
+
+    @MessageHandler(name = "文字转语音", commands = "雷军说")
+    public void tts(MessageEvent event) throws InterruptedException {
+        String url = reechoClient.generate(event.getCommandArgs());
+        event.replyMessage(MessageSegment.record(url));
     }
 
 }

@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum VoidIdEnum {
+public enum VoiceIdEnum {
 
     LeiJun("market:6e2463c6-ccff-4d12-b6bf-d5ab9ec65573");
 

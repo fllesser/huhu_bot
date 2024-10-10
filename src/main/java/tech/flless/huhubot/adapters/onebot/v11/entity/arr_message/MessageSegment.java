@@ -161,6 +161,13 @@ public class MessageSegment {
         return build("share", Map.of("url", url, "title", title, "content", content, "image", imageUrl));
     }
 
+
+    public static MessageSegment record(String file) {
+        if (!file.startsWith("http") && !file.startsWith("file://") && !file.startsWith("base64://"))
+            throw new IllegalArgumentException("file string must start with 'http' or 'file://' or 'base64://'");
+        return build("record", Map.of("file", file));
+    }
+
     /**
      * 语音
      * https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3

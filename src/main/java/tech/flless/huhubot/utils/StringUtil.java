@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class StringUtil {
 
     public static boolean hasLength(String str) {
-        return str != null && str.length() != 0;
+        return str != null && !str.isEmpty();
     }
 
     public static void hasLength(String str, Consumer<String> consumer) {
