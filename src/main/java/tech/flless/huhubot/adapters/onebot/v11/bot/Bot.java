@@ -47,7 +47,7 @@ public class Bot {
     //群列表
     private List<GroupInfo> groups;
 
-    public static final Map<Integer, String> EmojiMap;
+    private static final Map<Integer, String> EmojiMap;
 
     static  {
         EmojiMap = new HashMap<>();
@@ -413,6 +413,8 @@ public class Bot {
     }
 
     public void setMsgEmojiLike(Integer messageId, Integer emojiId) {
-        this.callApi(GocqAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
+        if (EmojiMap.containsKey(emojiId)) {
+            this.callApi(GocqAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
+        }
     }
 }

@@ -1,7 +1,7 @@
 bot:
   super-users: [1942422015] #超级用户
   command-prefixes: []
-  test_group: 12334567
+  test_group:
   ali-refresh-token:
 
 wx:
