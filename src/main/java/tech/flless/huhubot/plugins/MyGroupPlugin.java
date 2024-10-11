@@ -106,6 +106,11 @@ public class MyGroupPlugin {
             Integer id = seg.getInteger("id");
             if (Bot.EmojiMap.containsKey(id)) {
                 bot.setMsgEmojiLike(event.getMessageId(), id);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
