@@ -9,6 +9,7 @@ import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.GroupInfo;
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.GroupMember;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
+import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
@@ -33,7 +34,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public class MyGroupPlugin {
 
-    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    //private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 //    @Async
 //    @Scheduled(cron = "0 0/3 * * * * ")
@@ -53,17 +54,17 @@ public class MyGroupPlugin {
 //        log.info("Time group nickname set up card: {}", card);
 //    }
 
-    @Deprecated
-    private String countdown() {
-        LocalDateTime fromTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
-        Duration duration = Duration.between(fromTime, LocalDateTime.now());
-        long days = duration.toDays();
-        duration = duration.minusDays(days);
-        long hours = duration.toHours();
-        duration = duration.minusHours(hours);
-        long minutes = duration.toMinutes();
-        return days + "天" + hours + "时" + minutes + "分";
-    }
+//    @Deprecated
+//    private String countdown() {
+//        LocalDateTime fromTime = LocalDateTime.parse("2023-06-16 10:00", formatter);
+//        Duration duration = Duration.between(fromTime, LocalDateTime.now());
+//        long days = duration.toDays();
+//        duration = duration.minusDays(days);
+//        long hours = duration.toHours();
+//        duration = duration.minusHours(hours);
+//        long minutes = duration.toMinutes();
+//        return days + "天" + hours + "时" + minutes + "分";
+//    }
 
     //private final List<Long> clockGroups = List.of(768887710L, 754044548L, 208248400L, 643396867L);
 
@@ -95,6 +96,19 @@ public class MyGroupPlugin {
 //        }
 //        event.getBot().setGroupSpecialTitle(event.getGroupId(), event.getUserId(), title);
 //    }
+
+
+    @MessageHandler(name = "回应带表情的消息", keywords = "")
+    public void replyEmoji(MessageEvent event) {
+        Bot bot = event.getBot();
+        List<MessageSegment> faces = event.getMessage().get("face");
+        faces.forEach(seg -> {
+            Integer id = seg.getInteger("id");
+            if (Bot.EmojiMap.containsKey(id)) {
+                bot.setMsgEmojiLike(event.getMessageId(), id);
+            }
+        });
+    }
 
     @NoticeHandler(name = "群内回戳", priority = 0)
     public void replyPoke(NotifyNoticeEvent event) {

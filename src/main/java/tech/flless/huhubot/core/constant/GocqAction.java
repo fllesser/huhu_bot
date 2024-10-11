@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * @author elastic chow
- * @date 13/5/2023
+ * &#064;date  13/5/2023
  */
 @Getter
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public enum GocqAction {
     set_group_ban("群单人禁言", false),
     set_group_whole_ban("全体禁言",false),
     set_qq_profile("设置登录号信息", false),
-    set_group_emoji_like("表情回应", false),
+    set_msg_emoji_like("表情回应", false),
     //_set_model_show("设置在线机型", false),
 
     get_group_member_info("获取群成员信息", true),
