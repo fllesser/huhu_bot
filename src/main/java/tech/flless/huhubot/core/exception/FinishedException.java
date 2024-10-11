@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FinishedException extends RuntimeException {
     private String msg;
-    public FinishedException(String msg) {}
+    public FinishedException(String msg) {
+         this.msg = msg;
+}
 }
