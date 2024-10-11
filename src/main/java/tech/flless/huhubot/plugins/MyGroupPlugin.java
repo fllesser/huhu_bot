@@ -30,7 +30,7 @@ import java.util.Optional;
  * @date 18/5/2023
  */
 @Slf4j
-//@BotPlugin("huhubot-plugin-mygroup")
+@BotPlugin("huhubot-plugin-mygroup")
 @SuppressWarnings("unused")
 public class MyGroupPlugin {
 
@@ -102,15 +102,12 @@ public class MyGroupPlugin {
     public void replyEmoji(MessageEvent event) {
         Bot bot = event.getBot();
         List<MessageSegment> faces = event.getMessage().get("face");
-        faces.forEach(seg -> {
-            Integer id = seg.getInteger("id");
-            if (Bot.EmojiMap.containsKey(id)) {
-                bot.setMsgEmojiLike(event.getMessageId(), id);
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        faces.stream().map(seg -> seg.getInteger("id")).distinct().forEach(id -> {
+            bot.setMsgEmojiLike(event.getMessageId(), id);
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         });
     }
