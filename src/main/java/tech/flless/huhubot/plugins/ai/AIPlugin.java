@@ -64,6 +64,10 @@ public class AIPlugin {
         Message message = event.getMessage();
         MessageInfo reply = event.getReply();
         String[] nameAndText = message.getPlainText().split("说", 2);
+        String roleName = nameAndText[0].trim();
+        if (!StringUtil.hasLength(roleName) || roleName.length() > 8) {
+            return;
+        }
         String text;
         if (reply != null) {
             Message replied = reply.getMessage();
@@ -71,9 +75,10 @@ public class AIPlugin {
         } else {
             text = nameAndText[1].trim();
         }
+
         String res;
         if (StringUtil.hasLength(text) && text.length() <= 100) {
-            res = reechoClient.generate(nameAndText[0], text);
+            res = reechoClient.generate(roleName, text);
         } else {
             res = "api额度有限，so字符长度须少于100";
         }
