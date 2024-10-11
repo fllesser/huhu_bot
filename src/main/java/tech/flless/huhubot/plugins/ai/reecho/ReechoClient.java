@@ -5,6 +5,7 @@ import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
 
 import retrofit2.http.*;
 import tech.flless.huhubot.config.ReechoConfig;
+import tech.flless.huhubot.core.exception.FinishedException;
 import tech.flless.huhubot.core.utils.ThreadPoolUtil;
 import tech.flless.huhubot.plugins.ai.reecho.entity.GenReqBody;
 import tech.flless.huhubot.plugins.ai.reecho.entity.GenResp;
@@ -44,9 +45,9 @@ public interface ReechoClient {
             RoleList roleList = getVoiceList(ReechoConfig.apiKey);
             roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
         }
-        if (!NameIdMap.containsKey(name)) return "未支持角色[" + name + "]" + "\n请发送[角色列表]查看支持的角色";
+        if (!NameIdMap.containsKey(name)) throw new FinishedException("未支持角色[" + name + "]" + "\n请发送[角色列表]查看支持的角色");
         GenResp resp = generate(ReechoConfig.webToken, new GenReqBody("market:" + NameIdMap.get(name), text));
-        if (resp.getData() == null) return "今日点数已用尽，明天再来吧";
+        if (resp.getData() == null) throw new FinishedException("今日点数已用尽，明天再来吧");
         try {
             return ThreadPoolUtil.getScheduledExecutor().schedule(() -> {
                 String audioUrl;

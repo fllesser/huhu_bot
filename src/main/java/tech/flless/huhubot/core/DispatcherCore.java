@@ -201,13 +201,14 @@ public class DispatcherCore {
             } catch (IllegalAccessException e) {
                 log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
             } catch (InvocationTargetException e) {
-                Throwable targetException = e.getTargetException();
-                if (targetException instanceof FinishedException) {
-                    log.info("{} FinishedException ignored", event);
-                } else if (targetException instanceof ActionFailed) {
-                    log.info("{}ActionFailed: {}{}", ANSI.RED, targetException.getMessage(), ANSI.RESET);
+                Throwable targetE = e.getTargetException();
+                if (targetE instanceof FinishedException fe) {
+                    log.info("[{}] | {} Finished, msg:{}, event:{}", plugin.getClass().getSimpleName(), name, fe.getMsg(), event);
+                    if (event instanceof MessageEvent messageEvent) messageEvent.replyMessage(fe.getMsg());
+                } else if (targetE instanceof ActionFailed) {
+                    log.info("{}ActionFailed: {}{}", ANSI.RED, targetE.getMessage(), ANSI.RESET);
                 } else {
-                    log.error(targetException.getMessage());
+                    log.error(targetE.getMessage());
                 }
             }
         }

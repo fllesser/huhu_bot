@@ -11,6 +11,7 @@ import tech.flless.huhubot.config.ReechoConfig;
 import tech.flless.huhubot.config.WxConfig;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
+import tech.flless.huhubot.core.exception.FinishedException;
 import tech.flless.huhubot.plugins.ai.errie.entity.CompletionRes;
 import tech.flless.huhubot.plugins.ai.errie.ErnieClient;
 import tech.flless.huhubot.plugins.ai.errie.entity.WxMessages;
@@ -65,30 +66,12 @@ public class AIPlugin {
         MessageInfo reply = event.getReply();
         String[] nameAndText = message.getPlainText().split("说", 2);
         String roleName = nameAndText[0].trim();
-        if (!StringUtil.hasLength(roleName) || roleName.length() > 8) {
-            return;
-        }
-        String text;
-        if (reply != null) {
-            Message replied = reply.getMessage();
-            text = replied.plainText();
-        } else {
-            text = nameAndText[1].trim();
-        }
-
-        String res;
+        if (!StringUtil.hasLength(roleName) || roleName.length() > 8) return; //意外触发 ignore
+        String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (StringUtil.hasLength(text) && text.length() <= 100) {
-            res = reechoClient.generate(roleName, text);
+            event.replyMessage(MessageSegment.record(reechoClient.generate(roleName, text)));
         } else {
-            res = "api额度有限，so字符长度须少于100";
-        }
-
-        if (StringUtil.hasLength(res)) {
-            if (res.startsWith("http")) {
-                event.replyMessage(MessageSegment.record(res));
-            } else {
-                event.replyMessage(res);
-            }
+            throw new FinishedException("api额度有限，so字符长度须少于100");
         }
 
     }
