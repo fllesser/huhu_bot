@@ -46,7 +46,7 @@ public interface ReechoClient {
         }
         if (!NameIdMap.containsKey(name)) return "未支持角色[" + name + "]" + "\n请发送[角色列表]查看支持的角色";
         GenResp resp = generate(ReechoConfig.webToken, new GenReqBody("market:" + NameIdMap.get(name), text));
-
+        if (resp.getData() == null) return "今日点数已用尽，明天再来吧";
         try {
             return ThreadPoolUtil.getScheduledExecutor().schedule(() -> {
                 String audioUrl;
