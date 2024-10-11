@@ -68,12 +68,9 @@ public class AIPlugin {
         String roleName = nameAndText[0].trim();
         if (!StringUtil.hasLength(roleName) || roleName.length() > 8) return; //意外触发 ignore
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
-        if (StringUtil.hasLength(text) && text.length() <= 100) {
-            event.replyMessage(MessageSegment.record(reechoClient.generate(roleName, text)));
-        } else {
-            throw new FinishedException("api额度有限，so字符长度须少于100");
-        }
-
+        if (!StringUtil.hasLength(text)) return;
+        if (text.length() >= 102) throw new FinishedException("api额度有限，so字符长度须少于100");
+        event.replyMessage(MessageSegment.record(reechoClient.generate(roleName, text)));
     }
 
     @MessageHandler(name = "睿声角色列表", keywords = "角色列表")
