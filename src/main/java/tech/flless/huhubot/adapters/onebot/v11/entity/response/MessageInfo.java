@@ -2,7 +2,7 @@ package tech.flless.huhubot.adapters.onebot.v11.entity.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.Message;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
 
 /**
  * @author flless

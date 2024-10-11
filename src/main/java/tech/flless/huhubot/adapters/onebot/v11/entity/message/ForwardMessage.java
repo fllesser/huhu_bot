@@ -1,4 +1,4 @@
-package tech.flless.huhubot.adapters.onebot.v11.entity.arr_message;
+package tech.flless.huhubot.adapters.onebot.v11.entity.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

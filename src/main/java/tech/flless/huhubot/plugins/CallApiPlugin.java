@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.ForwardMessage;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;

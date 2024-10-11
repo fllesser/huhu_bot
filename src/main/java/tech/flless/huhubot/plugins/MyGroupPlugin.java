@@ -1,29 +1,16 @@
 package tech.flless.huhubot.plugins;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
-import tech.flless.huhubot.adapters.onebot.v11.bot.BotContainer;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
-import tech.flless.huhubot.adapters.onebot.v11.entity.response.GroupInfo;
-import tech.flless.huhubot.adapters.onebot.v11.entity.response.GroupMember;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.NoticeHandler;
-import tech.flless.huhubot.core.annotation.RuleCheck;
 import tech.flless.huhubot.core.constant.SubTypeEnum;
-import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.utils.xiaoai.XiaoAIUtil;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author elastic chow

@@ -1,7 +1,7 @@
 package tech.flless.huhubot.core.rule;
 
 import tech.flless.huhubot.config.BotConfig;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.GroupMember;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;

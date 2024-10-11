@@ -1,8 +1,8 @@
 package tech.flless.huhubot.plugins.api;
 
 import jakarta.annotation.Resource;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.Message;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.config.ApiSpaceConfig;

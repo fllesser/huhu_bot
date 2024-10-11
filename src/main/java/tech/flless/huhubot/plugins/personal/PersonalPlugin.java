@@ -2,14 +2,11 @@ package tech.flless.huhubot.plugins.personal;
 
 import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.core.annotation.BotPlugin;
-import tech.flless.huhubot.core.annotation.CoolDown;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
 import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.Message;
-import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
 
 /**

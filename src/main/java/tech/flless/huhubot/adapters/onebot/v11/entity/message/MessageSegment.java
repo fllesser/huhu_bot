@@ -1,4 +1,4 @@
-package tech.flless.huhubot.adapters.onebot.v11.entity.arr_message;
+package tech.flless.huhubot.adapters.onebot.v11.entity.message;
 
 import lombok.*;
 import tech.flless.huhubot.core.exception.IllegalDataException;
