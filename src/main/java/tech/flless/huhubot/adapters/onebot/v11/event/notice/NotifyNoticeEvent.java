@@ -19,7 +19,7 @@ public class NotifyNoticeEvent extends NoticeEvent {
     private final String noticeType = NoticeTypeEnum.notify.name();
     @JsonProperty("sub_type")
     private String subType;
-    @JsonProperty
+    @JsonProperty("user_id")
     private Long userId;
 
     @JsonProperty("group_id")

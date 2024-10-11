@@ -409,4 +409,8 @@ public class Bot {
     public void setGroupWholeBan(Long groupId, boolean enable) {
         this.callApi(GocqAction.set_group_whole_ban, Map.of("group_id", groupId, "enable", enable));
     }
+
+    public void setGroupEmojiLike(Long messageId, Integer faceId) {
+        this.callApi(GocqAction);
+    }
 }

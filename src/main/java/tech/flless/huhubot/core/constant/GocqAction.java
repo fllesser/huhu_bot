@@ -28,6 +28,7 @@ public enum GocqAction {
     set_group_ban("群单人禁言", false),
     set_group_whole_ban("全体禁言",false),
     set_qq_profile("设置登录号信息", false),
+    set_group_emoji_like("表情回应", false),
     //_set_model_show("设置在线机型", false),
 
     get_group_member_info("获取群成员信息", true),

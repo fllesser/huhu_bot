@@ -44,8 +44,9 @@ public interface ReechoClient {
             RoleList roleList = getVoiceList(ReechoConfig.apiKey);
             roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
         }
-        if (!NameIdMap.containsKey(name)) return "未支持角色[" + name + "]" + ", 请发送[角色列表]查看支持的角色";
+        if (!NameIdMap.containsKey(name)) return "未支持角色[" + name + "]" + "\n请发送[角色列表]查看支持的角色";
         GenResp resp = generate(ReechoConfig.webToken, new GenReqBody("market:" + NameIdMap.get(name), text));
+
         try {
             return ThreadPoolUtil.getScheduledExecutor().schedule(() -> {
                 String audioUrl;
@@ -55,7 +56,7 @@ public interface ReechoClient {
                     Thread.sleep(1000);
                 } while (!StringUtil.hasLength(audioUrl));
                 return audioUrl;
-            }, 500, TimeUnit.MILLISECONDS).get();
+            }, 200 + text.length() * 100 , TimeUnit.MILLISECONDS).get();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {

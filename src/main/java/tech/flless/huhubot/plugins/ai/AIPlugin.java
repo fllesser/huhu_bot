@@ -22,6 +22,8 @@ import tech.flless.huhubot.utils.StringUtil;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static tech.flless.huhubot.plugins.ai.reecho.ReechoClient.NameIdMap;
+
 @BotPlugin("AI")
 @Slf4j
 @SuppressWarnings("unused")
@@ -89,8 +91,9 @@ public class AIPlugin {
     @MessageHandler(name = "睿声角色列表", keywords = "角色列表")
     public void list(MessageEvent event) {
         RoleList roleList = reechoClient.getVoiceList(ReechoConfig.apiKey);
+        roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
         StringBuilder sb = new StringBuilder();
-        roleList.getData().forEach(d -> sb.append(d.getName()).append(" "));
+        roleList.getData().forEach(d -> sb.append(d.getName()).append(" | "));
         event.replyMessage(sb.toString());
     }
 
