@@ -35,7 +35,7 @@ public interface ReechoClient {
     @GET("/api/tts/voice?show=full")
     String getVoiceList(@Header("Authorization") String key);
 
-    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    //ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
     default String generate(VoiceIdEnum voice, String text) throws InterruptedException {
         GenResp resp = generate(ReechoConfig.webToken, new GenReqBody(voice.getVoiceId(), text));
