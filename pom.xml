@@ -72,13 +72,7 @@
             <groupId>com.github.lianjiatech</groupId>
             <artifactId>retrofit-spring-boot-starter</artifactId>
             <version>3.0.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-        </dependency>
-
+        </dependency> 
     </dependencies>
 
     <dependencyManagement>
