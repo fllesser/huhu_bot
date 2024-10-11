@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.api_.api_sapce;
+package tech.flless.huhubot.plugins.api.api_sapce;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * @author FLLess7
- * @date 22/1/2024
+ * &#064;date  22/1/2024
  */
 @Data
 public class ApiSpaceResult {

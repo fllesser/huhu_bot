@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.api_.reecho.entity;
+package tech.flless.huhubot.plugins.ai.reecho.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

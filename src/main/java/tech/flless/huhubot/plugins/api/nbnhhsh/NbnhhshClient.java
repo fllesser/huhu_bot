@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.api_.nbnhhsh;
+package tech.flless.huhubot.plugins.api.nbnhhsh;
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
 import retrofit2.http.Body;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * @author elastic chow
- * @date 26/7/2023
+ * &#064;date  26/7/2023
  */
 @RetrofitClient(baseUrl = "https://lab.magiconch.com/api/nbnhhsh/")
 public interface NbnhhshClient {

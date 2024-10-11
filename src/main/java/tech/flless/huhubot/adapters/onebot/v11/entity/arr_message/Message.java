@@ -8,9 +8,10 @@ import java.util.List;
 
 /**
  * @author elastic chow
- * @date 25/7/2023
+ * &#064;date  25/7/2023
  */
 @Getter
+@SuppressWarnings("unused")
 public class Message extends ArrayList<MessageSegment> {
 
     @JsonIgnore
@@ -65,10 +66,11 @@ public class Message extends ArrayList<MessageSegment> {
      * 初始化所有text信息, 去除所有cq码
      * 即合并所有[CQ:text,text=?]中的?
      */
-    public void plainText() {
+    public String plainText() {
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this) sb.append(segment.text());
         this.plainText = sb.toString().trim();
+        return this.plainText;
     }
 
     /**

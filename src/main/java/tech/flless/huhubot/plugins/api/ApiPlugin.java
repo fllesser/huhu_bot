@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.api_;
+package tech.flless.huhubot.plugins.api;
 
 import jakarta.annotation.Resource;
 import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.Message;
@@ -8,24 +8,19 @@ import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.config.ApiSpaceConfig;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
-import tech.flless.huhubot.core.annotation.RuleCheck;
-import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.plugins.api_.api_sapce.ApiSpaceClient;
-import tech.flless.huhubot.plugins.api_.api_sapce.ApiSpaceResult;
-import tech.flless.huhubot.plugins.api_.nbnhhsh.NbnhhshClient;
-import tech.flless.huhubot.plugins.api_.reecho.ReechoClient;
-import tech.flless.huhubot.plugins.api_.reecho.VoiceIdEnum;
-import tech.flless.huhubot.plugins.api_.vvhan.VvhanClient;
+import tech.flless.huhubot.plugins.api.api_sapce.ApiSpaceClient;
+import tech.flless.huhubot.plugins.api.api_sapce.ApiSpaceResult;
+import tech.flless.huhubot.plugins.api.nbnhhsh.NbnhhshClient;
+import tech.flless.huhubot.plugins.api.vvhan.VvhanClient;
 import tech.flless.huhubot.utils.StringUtil;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author elastic chow
- * @date 26/7/2023
+ * &#064;date  26/7/2023
  */
 @SuppressWarnings("unused")
 @BotPlugin("huhubot-plugin-api")
@@ -39,8 +34,6 @@ public class ApiPlugin {
     @Resource
     private ApiSpaceClient apiSpaceClient;
 
-    @Resource
-    private ReechoClient reechoClient;
 
     //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "缩写查询", commands = {"sx", "缩写"})
@@ -55,7 +48,7 @@ public class ApiPlugin {
             }
         }
         List<String> trans = StringUtil.hasLength(word, nbnhhshClient::defaultGuess);
-        if (trans != null && trans.size() > 0) {
+        if (trans != null && !trans.isEmpty()) {
             StringBuilder sb = new StringBuilder(StringUtil.manMachine(word + ": "));
             trans.forEach(str -> sb.append(" ").append(str));
             event.replyMessage(sb.toString());
@@ -91,34 +84,4 @@ public class ApiPlugin {
         }
         event.replyMessage(message);
     }
-
-    @MessageHandler(name = "雷军说", commands = "雷军说")
-    public void leijun(MessageEvent event) throws InterruptedException {
-        String url = reechoClient.generate(VoiceIdEnum.LeiJun, event.getCommandArgs());
-        event.replyMessage(MessageSegment.record(url));
-    }
-
-    @MessageHandler(name = "麦克阿瑟说", commands = "麦克阿瑟说")
-    public void mkas(MessageEvent event) throws InterruptedException {
-        String url = reechoClient.generate(VoiceIdEnum.MaiKeASe, event.getCommandArgs());
-        event.replyMessage(MessageSegment.record(url));
-    }
-
-    @MessageHandler(name = "郭德纲说", commands = "郭德纲说")
-    public void gdg(MessageEvent event) throws InterruptedException {
-        String url = reechoClient.generate(VoiceIdEnum.GuoDeGang, event.getCommandArgs());
-        event.replyMessage(MessageSegment.record(url));
-    }
-
-    @MessageHandler(name = "卢本伟说", commands = "卢本伟说")
-    public void lbw(MessageEvent event) throws InterruptedException {
-        String url = reechoClient.generate(VoiceIdEnum.LuBenWei, event.getCommandArgs());
-        event.replyMessage(MessageSegment.record(url));
-    }
-    @MessageHandler(name = "老爹说", commands = "老爹说")
-    public void ld(MessageEvent event) throws InterruptedException {
-        String url = reechoClient.generate(VoiceIdEnum.LaoDie, event.getCommandArgs());
-        event.replyMessage(MessageSegment.record(url));
-    }
-
 }

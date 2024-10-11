@@ -1,17 +1,8 @@
 package tech.flless.huhubot;
 
-import jakarta.annotation.Resource;
+
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import tech.flless.huhubot.config.ReechoConfig;
-import tech.flless.huhubot.plugins.api_.reecho.ReechoClient;
-import tech.flless.huhubot.plugins.api_.reecho.entity.GenReqBody;
-import tech.flless.huhubot.plugins.api_.reecho.entity.GenResp;
 
-import java.util.concurrent.ExecutionException;
-
-import static tech.flless.huhubot.plugins.api_.reecho.VoiceIdEnum.LeiJun;
 
 @SuppressWarnings("all")
 @Slf4j

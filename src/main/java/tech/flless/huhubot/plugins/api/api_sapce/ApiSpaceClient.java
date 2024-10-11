@@ -1,16 +1,16 @@
-package tech.flless.huhubot.plugins.api_.api_sapce;
+package tech.flless.huhubot.plugins.api.api_sapce;
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
-import tech.flless.huhubot.config.BotConfig;
 
 /**
  * @author FLLess7
- * @date 22/1/2024
+ * &#064;date  22/1/2024
  */
+@SuppressWarnings("unused")
 @RetrofitClient(baseUrl = "https://eolink.o.apispace.com")
 public interface ApiSpaceClient {
 

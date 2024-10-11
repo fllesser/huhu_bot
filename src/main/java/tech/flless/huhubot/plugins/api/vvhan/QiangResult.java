@@ -1,10 +1,10 @@
-package tech.flless.huhubot.plugins.api_.vvhan;
+package tech.flless.huhubot.plugins.api.vvhan;
 
 import lombok.Data;
 
 /**
  * @author FLLess7
- * @date 18/9/2023
+ * &#064;date  18/9/2023
  */
 @Data
 public class QiangResult {

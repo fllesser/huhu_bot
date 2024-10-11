@@ -7,15 +7,15 @@ import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.Message;
 import tech.flless.huhubot.adapters.onebot.v11.entity.arr_message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.flless.huhubot.config.ReechoConfig;
 import tech.flless.huhubot.config.WxConfig;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
-import tech.flless.huhubot.core.annotation.RuleCheck;
-import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.plugins.ai.entity.CompletionRes;
-import tech.flless.huhubot.plugins.ai.entity.TokenRes;
-import tech.flless.huhubot.plugins.ai.entity.WxMessage;
-import tech.flless.huhubot.plugins.ai.entity.WxMessages;
+import tech.flless.huhubot.plugins.ai.errie.entity.CompletionRes;
+import tech.flless.huhubot.plugins.ai.errie.ErnieClient;
+import tech.flless.huhubot.plugins.ai.errie.entity.WxMessages;
+import tech.flless.huhubot.plugins.ai.reecho.ReechoClient;
+import tech.flless.huhubot.plugins.ai.reecho.entity.RoleList;
 import tech.flless.huhubot.utils.StringUtil;
 
 
@@ -24,10 +24,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @BotPlugin("AI")
 @Slf4j
+@SuppressWarnings("unused")
 public class AIPlugin {
 
     @Resource
     private ErnieClient ernieClient;
+
+    @Resource
+    private ReechoClient reechoClient;
 
     private String AccessToken;
 
@@ -43,9 +47,7 @@ public class AIPlugin {
                     replied.plainText();
                     content.set(event.getCommandArgs() + ", " + replied.getPlainText());
                 },
-                () -> {
-                    content.set(event.getCommandArgs());
-                }
+                () -> content.set(event.getCommandArgs())
         );
         if (!StringUtil.hasLength(AccessToken)) {
             AccessToken = ernieClient.getToken(WxConfig.clientId, WxConfig.clientSecret).getAccessToken();
@@ -54,5 +56,43 @@ public class AIPlugin {
         bot.sendMessage(event, completion.getResult());
 
     }
+
+    @MessageHandler(name = "睿声语音生成", keywords = "说")
+    public void aiVoice(MessageEvent event) {
+        Message message = event.getMessage();
+        MessageInfo reply = event.getReply();
+        String[] nameAndText = message.getPlainText().split("说", 2);
+        String text;
+        if (reply != null) {
+            Message replied = reply.getMessage();
+            text = replied.plainText();
+        } else {
+            text = nameAndText[1].trim();
+        }
+        String res;
+        if (StringUtil.hasLength(text) && text.length() <= 100) {
+            res = reechoClient.generate(nameAndText[0], text);
+        } else {
+            res = "api额度有限，so字符长度须少于100";
+        }
+
+        if (StringUtil.hasLength(res)) {
+            if (res.startsWith("http")) {
+                event.replyMessage(MessageSegment.record(res));
+            } else {
+                event.replyMessage(res);
+            }
+        }
+
+    }
+
+    @MessageHandler(name = "睿声角色列表", keywords = "角色列表")
+    public void list(MessageEvent event) {
+        RoleList roleList = reechoClient.getVoiceList(ReechoConfig.apiKey);
+        StringBuilder sb = new StringBuilder();
+        roleList.getData().forEach(d -> sb.append(d.getName()).append(" "));
+        event.replyMessage(sb.toString());
+    }
+
 
 }

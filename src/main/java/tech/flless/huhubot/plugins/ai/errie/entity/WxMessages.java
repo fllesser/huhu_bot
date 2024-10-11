@@ -1,8 +1,7 @@
-package tech.flless.huhubot.plugins.ai.entity;
+package tech.flless.huhubot.plugins.ai.errie.entity;
 
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

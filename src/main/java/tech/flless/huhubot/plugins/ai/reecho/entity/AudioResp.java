@@ -1,11 +1,11 @@
-package tech.flless.huhubot.plugins.api_.reecho.entity;
+package tech.flless.huhubot.plugins.ai.reecho.entity;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class VoiceResp {
+public class AudioResp {
 
     private int status;
     private String message;
@@ -45,15 +45,15 @@ public class VoiceResp {
 
     @Data
     public static class Content {
+        private String audio;
 //        private String voiceId;
 //        private String text;
-        private String audio;
 //        private double duration;
 //        private Date generatedAt;
     }
 
-    public static class Voice {
-
+//    public static class Voice {
+//
 //        private String id;
 //        private String status;
 //        private String type;
@@ -72,6 +72,6 @@ public class VoiceResp {
 //        private String avatar;
 //        private String version;
 //        private String from;
-
-    }
+//
+//    }
 }

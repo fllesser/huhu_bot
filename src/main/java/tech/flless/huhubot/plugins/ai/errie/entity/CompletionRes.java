@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.ai.entity;
+package tech.flless.huhubot.plugins.ai.errie.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

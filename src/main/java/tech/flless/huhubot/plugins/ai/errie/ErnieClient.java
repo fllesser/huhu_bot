@@ -1,15 +1,11 @@
-package tech.flless.huhubot.plugins.ai;
+package tech.flless.huhubot.plugins.ai.errie;
 
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
 import retrofit2.http.*;
-import tech.flless.huhubot.plugins.ai.entity.CompletionRes;
-import tech.flless.huhubot.plugins.ai.entity.TokenRes;
-import tech.flless.huhubot.plugins.ai.entity.WxMessage;
-import tech.flless.huhubot.plugins.ai.entity.WxMessages;
-
-import java.util.List;
-import java.util.Map;
+import tech.flless.huhubot.plugins.ai.errie.entity.CompletionRes;
+import tech.flless.huhubot.plugins.ai.errie.entity.TokenRes;
+import tech.flless.huhubot.plugins.ai.errie.entity.WxMessages;
 
 @RetrofitClient(baseUrl = "https://aip.baidubce.com")
 public interface ErnieClient {

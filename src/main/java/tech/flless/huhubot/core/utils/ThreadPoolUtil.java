@@ -1,5 +1,6 @@
 package tech.flless.huhubot.core.utils;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -11,21 +12,25 @@ import java.util.concurrent.*;
  * 线程池工厂
  *
  * @author elastic chow
- * @date 13/5/2023
+ * &#064;date  13/5/2023
  */
 @Slf4j
 public class ThreadPoolUtil {
     private ThreadPoolUtil() {
     }
 
+    @Getter
     private final static ThreadPoolExecutor eventExecutor;
+
+    @Getter
+    private final static ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(2);
 
     static {
         final int corePoolSize = Runtime.getRuntime().availableProcessors() + 1;
         assert corePoolSize > 0;
         eventExecutor = new ProcessEventThreadPoolExecutor(corePoolSize, corePoolSize * 2,
                 1, TimeUnit.HOURS,
-                new ArrayBlockingQueue<>(corePoolSize * 4),
+                new ArrayBlockingQueue<>(corePoolSize * 8),
                 new CustomizableThreadFactory("process-event-"),
                 new ShareRunsPolicy("EventExecutor"));
         log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}",
@@ -48,10 +53,6 @@ public class ThreadPoolUtil {
             super.execute(task);
         }
 
-    }
-
-    public static ThreadPoolExecutor getEventExecutor() {
-        return eventExecutor;
     }
 
 }

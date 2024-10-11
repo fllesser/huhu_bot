@@ -9,8 +9,8 @@ wx:
   client-secret:
 
 reecho:
-  api-key: Bearer sk-19ed04ac9a797dc9141c5a569bb1934b
-  web-token: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgxNmEwMDM4LTJmNzktNGNhNy1hNWFhLThlZWM5MDZkYmM4MyIsImVtYWlsIjoiKzg2MTkyMTY4MDEzNzNAbm9yZXBseS5waG9uZS51c2VyLnZvYy5pbmsiLCJyb2xlIjoidXNlciIsImlhdCI6MTcyODU1NjM3MSwiZXhwIjoxNzI5MTYxMTcxLCJpc3MiOiJ2MS5yZWVjaG8uY24vYXBpL2FjY291bnQvcmVnaXN0ZXIiLCJzdWIiOiJhY2Nlc3MiLCJqdGkiOiJzcWV1NzhyNW1qM2EifQ.QKomJGkmJUrAaJWSDKc5BR32qxQGYN6jIomBDqzXDYI
+  api-key:
+  web-token:
 
 retrofit:
   global-timeout:
