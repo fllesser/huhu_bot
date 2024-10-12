@@ -100,7 +100,7 @@ public class MyGroupPlugin {
         //if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
                 //|| !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
                // || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
-        ) return;
+        //) return;
         //event.reply(MessageSegment.poke(event.getUserId()));
     }
 
