@@ -101,9 +101,7 @@ public class MyGroupPlugin {
                 || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
-        if (event.getGroupId() != null) {
-            event.getBot().sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
-        }
+        event.reply(MessageSegment.poke(event.getUserId()));
     }
 
     //@RuleCheck(rule = RuleEnum.tome)
