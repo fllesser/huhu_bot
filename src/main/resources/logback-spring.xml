@@ -20,7 +20,7 @@ debug：当此属性设置为true时，将打印出logback内部日志信息，�
       %n是换行符
         -->
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [BOT] [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{18} - %msg%n</pattern>
 <!--            <springProfile name="dev">-->
 <!--                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} == 学习笔记 == [%thread] -&ndash;&gt; %-5level %logger{50} - %msg%n</pattern>-->
 <!--            </springProfile>-->
