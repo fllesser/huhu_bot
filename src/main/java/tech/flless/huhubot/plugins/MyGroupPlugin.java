@@ -3,7 +3,7 @@ package tech.flless.huhubot.plugins;
 import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
+import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
@@ -86,7 +86,7 @@ public class MyGroupPlugin {
 
 
     @MessageHandler(name = "回应带表情的消息", keywords = "")
-    public void replyEmoji(MessageEvent event) {
+    public void replyEmoji(GroupMessageEvent event) {
         Bot bot = event.getBot();
         List<MessageSegment> faces = event.getMessage().get("face");
         faces.stream().map(seg -> seg.getInteger("id")).distinct().forEach(id -> {
