@@ -1,16 +1,16 @@
 bot:
   super-users: [1942422015] #超级用户
-  command-prefixes: []
-  test_group:
-  ali-refresh-token:
 
 wx:
-  client-id:
+  client-id: 
   client-secret:
 
+apispace:
+  token: 
+
 reecho:
-  api-key:
-  web-token:
+  api-key: 
+  web-token: 
 
 retrofit:
   global-timeout:
@@ -18,4 +18,12 @@ retrofit:
     read-timeout-ms: 30000
     write-timeout-ms: 30000
   global-log:
-    enable: true
+    enable: false
+    
+logging:
+  file:
+    name: log/huhubot.log
+  level:
+    root: info 
+  pattern:
+    console: '%d{MM-dd HH:mm:ss} %clr([%level]){green} %clr(%thread){magenta} | %clr(%msg){cyan}%n'
