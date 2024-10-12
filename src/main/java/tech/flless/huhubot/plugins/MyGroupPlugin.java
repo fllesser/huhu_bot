@@ -102,7 +102,7 @@ public class MyGroupPlugin {
                // || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         //) return;
         //event.reply(MessageSegment.poke(event.getUserId()));
-    }
+    //}
 
     //@RuleCheck(rule = RuleEnum.tome)
     //@MessageHandler(name = "被@, 让小爱通知我", keywords = {""}, priority = 9)
