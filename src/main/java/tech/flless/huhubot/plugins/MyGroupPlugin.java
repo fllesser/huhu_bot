@@ -91,11 +91,6 @@ public class MyGroupPlugin {
         List<MessageSegment> faces = event.getMessage().get("face");
         faces.stream().map(seg -> seg.getInteger("id")).distinct().forEach(id -> {
             bot.setMsgEmojiLike(event.getMessageId(), id);
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         });
     }
 
