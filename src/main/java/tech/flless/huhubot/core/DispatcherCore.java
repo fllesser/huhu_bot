@@ -49,7 +49,7 @@ public class DispatcherCore {
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("{}huhubot starts to load plugins...{}", ANSI.YELLOW, ANSI.RESET);
+            log.info("huhubot starts to load plugins...");
             int count = 1;
             StringBuilder pluginFuctionNames;
             //容器中的插件Bean
@@ -72,8 +72,8 @@ public class DispatcherCore {
                     } else continue;
                     pluginFuctionNames.append(handler.name).append(" ");
                 }
-                log.info("{}huhubot succeeded to load plugin {}, progress:{}/{}, function:{}{}",
-                        ANSI.YELLOW, pluginName, count++, botPluginMap.size(), pluginFuctionNames, ANSI.RESET);
+                log.info("huhubot succeeded to load plugin {}, progress:{}/{}, function:{}",
+                        pluginName, count++, botPluginMap.size(), pluginFuctionNames);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
@@ -87,7 +87,7 @@ public class DispatcherCore {
         NOTICE_HANDLER_CONTAINER = List.copyOf(noticeHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
         initHandlerNameMap();
-        log.info("{}running huhubot...{}", ANSI.YELLOW, ANSI.RESET);
+        log.info("huhubot is running...");
     }
 
     public void onMessage(final MessageEvent event) {
