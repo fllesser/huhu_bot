@@ -19,10 +19,3 @@ retrofit:
     write-timeout-ms: 30000
   global-log:
     enable: true
-
-
-logging:
-  file:
-    name: log/huhubot.log  # 日志文件相对路径及名称
-  level:
-    root: info
