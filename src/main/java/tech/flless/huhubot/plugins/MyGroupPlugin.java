@@ -94,14 +94,14 @@ public class MyGroupPlugin {
         });
     }
 
-    @NoticeHandler(name = "群内回戳", priority = 0)
-    public void replyPoke(NotifyNoticeEvent event) {
-        Bot bot = event.getBot();
-        if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
+    //@NoticeHandler(name = "群内回戳", priority = 0)
+    //public void replyPoke(NotifyNoticeEvent event) {
+        //Bot bot = event.getBot();
+        //if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
                 || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
-        event.reply(MessageSegment.poke(event.getUserId()));
+        //event.reply(MessageSegment.poke(event.getUserId()));
     }
 
     //@RuleCheck(rule = RuleEnum.tome)
