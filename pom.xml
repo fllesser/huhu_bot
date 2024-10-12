@@ -10,7 +10,7 @@
     </parent>
     <groupId>tech.flless</groupId>
     <artifactId>huhubot</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2</version>
     <name>huhubot</name>
     <description>huhubot</description>
 
