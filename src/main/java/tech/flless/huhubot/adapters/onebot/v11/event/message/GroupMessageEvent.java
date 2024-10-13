@@ -41,11 +41,11 @@ public class GroupMessageEvent extends MessageEvent {
 
     @Override
     public String toString() {
-        return "group.message[" +
+        return "GroupMessageEvent{" +
                 "gid=" + groupId +
                 ", uid=" + super.getUserId() +
                 ", raw_msg=" + super.getRawMessage() +
-                "]";
+                "}";
     }
 
     @Override

@@ -27,5 +27,5 @@ public class NotifyNoticeEvent extends NoticeEvent {
     private Long senderId;
     @JsonProperty("target_id")
     private Long targetId;
-    //private String title;
+    private String title;
 }

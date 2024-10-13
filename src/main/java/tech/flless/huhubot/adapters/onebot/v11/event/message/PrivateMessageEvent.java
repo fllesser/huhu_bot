@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 
@@ -31,11 +32,11 @@ public class PrivateMessageEvent extends MessageEvent {
 
     @Override
     public String toString() {
-        return "message.private[" +
+        return "PrivateMessageEvent{" +
                 "uid=" + super.getUserId() +
                 ", raw_msg=" + super.getRawMessage() +
                 ", sub_type=" + subType +
-                "]";
+                "}";
     }
 
     @Override

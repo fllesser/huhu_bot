@@ -203,7 +203,7 @@ public class DispatcherCore {
             } catch (InvocationTargetException e) {
                 Throwable targetE = e.getTargetException();
                 if (targetE instanceof FinishedException fe) {
-                    log.info("[{}] | {} Finished, msg:{}, event:{}", plugin.getClass().getSimpleName(), name, fe.getMessage(), event);
+                    log.info("[{}] | {} Finished, Msg:{}, Event:{}", plugin.getClass().getSimpleName(), name, fe.getMessage(), event);
                     if (event instanceof MessageEvent me) me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else if (targetE instanceof ActionFailed) {
                     log.error("ActionFailed: {}", targetE.getMessage());
