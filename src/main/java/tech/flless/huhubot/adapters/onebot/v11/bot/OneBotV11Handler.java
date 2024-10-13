@@ -38,7 +38,7 @@ public class OneBotV11Handler extends TextWebSocketHandler {
             }
         }
         Bot bot = BotContainer.getBot(event.getSelfId());
-        log.info("[hb]<-ws-[ob-{}]{}", bot.getSelfId(), event);
+        log.info("[hb]<-ws-[ob-{}] {}", bot.getSelfId(), event);
         event.setBot(bot);
         ProcessEventTask.execute(event);
     }
