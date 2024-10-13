@@ -20,8 +20,6 @@ import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
 public class MessageEvent extends Event {
 
     @JsonProperty("post_type")
@@ -67,7 +65,7 @@ public class MessageEvent extends Event {
 
 
     public void reply(Object message) {
-        //getBot().sendMessage(this, message);
+
     }
 
 

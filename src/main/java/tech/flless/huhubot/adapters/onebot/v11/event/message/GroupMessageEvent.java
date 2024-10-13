@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 
