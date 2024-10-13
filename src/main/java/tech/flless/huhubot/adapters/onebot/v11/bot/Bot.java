@@ -65,10 +65,10 @@ public class Bot {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
-            log.error("[hb]-ws->[ob][{}]{}, exception[{}]", selfId, text, e.getMessage());
+            log.error("[hb]-ws->[ob-{}]{}, exception[{}]", selfId, text, e.getMessage());
         }
         if (!requestBox.getAction().equals("set_group_card")) {
-            log.info("[hb]-ws->[ob][{}]{}", selfId, text);
+            log.info("[hb]-ws->[ob-{}]{}", selfId, text);
         }
     }
 
@@ -135,7 +135,7 @@ public class Bot {
         synchronized (echoData) {
             this.sessionSend(requestBox);
             String res = echoData.waitAndGet();
-            log.info("[hb]<-ws-[ob][{}]{}", this.selfId, res);
+            log.info("[hb]<-ws-[ob-{}]{}", this.selfId, res);
             return res;
         }
     }
