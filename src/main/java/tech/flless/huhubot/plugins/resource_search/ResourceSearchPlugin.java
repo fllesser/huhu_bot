@@ -22,7 +22,7 @@ import java.util.List;
  * @date 17/7/2023
  */
 @Slf4j
-@BotPlugin("huhubot-plugin-resourcesearch")
+@BotPlugin("Resource Search")
 @SuppressWarnings("unused")
 public class ResourceSearchPlugin {
 
@@ -61,14 +61,14 @@ public class ResourceSearchPlugin {
         XiaoAIUtil.tts(result);
     }
 
-    @MessageHandler(name = "GITCAFE", commands = {".s"})
+    @MessageHandler(name = "GITCAFE API", commands = {".s"})
     public void gitCafeSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), gitCafeClient::get);
         event.reply(ResourceUtil.buildString(dataList));
     }
 
 
-    @MessageHandler(name = "HDHIVE", commands = {".ds"})
+    @MessageHandler(name = "HDHIVE API", commands = {".ds"})
     public void hdhiveSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), hdhiveClient::get);
         event.reply(ResourceUtil.buildString(dataList));
@@ -108,7 +108,7 @@ public class ResourceSearchPlugin {
 //    }
 
     @RuleCheck(rule = RuleEnum.superuser)
-    @MessageHandler(name = "search in cache", commands = {".cache"})
+    @MessageHandler(name = "搜索缓存", commands = {".cache"})
     public void searchInCache(MessageEvent event) {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);

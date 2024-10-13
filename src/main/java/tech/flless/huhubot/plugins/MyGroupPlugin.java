@@ -14,7 +14,7 @@ import java.util.List;
  * @date 18/5/2023
  */
 @Slf4j
-@BotPlugin("huhubot-plugin-mygroup")
+@BotPlugin("Group")
 @SuppressWarnings("unused")
 public class MyGroupPlugin {
 

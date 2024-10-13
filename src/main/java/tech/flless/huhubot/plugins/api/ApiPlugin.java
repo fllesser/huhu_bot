@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * &#064;date  26/7/2023
  */
 @SuppressWarnings("unused")
-@BotPlugin("huhubot-plugin-api")
+@BotPlugin("API")
 public class ApiPlugin {
     @Resource
     private VvhanClient vvhanClient;

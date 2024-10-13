@@ -10,7 +10,6 @@ import tech.flless.huhubot.plugins.ai.errie.entity.WxMessages;
 @RetrofitClient(baseUrl = "https://aip.baidubce.com")
 public interface ErnieClient {
 
-
     @POST("/oauth/2.0/token?grant_type=client_credentials")
     @Headers({"Content-Type:application/json", "Accept:application/json"})
     TokenRes getToken(@Query("client_id") String clientId, @Query("client_secret") String clientSecret);

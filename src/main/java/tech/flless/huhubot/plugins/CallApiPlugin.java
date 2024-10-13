@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 @Slf4j
-@BotPlugin(name = "huhubot-plugin-gocqapi")
+@BotPlugin(name = "CallApi")
 public class CallApiPlugin {
 
 
     /**
      * ai get_group_info group_id:12312321 k:v ...
      *
-     * @param event
+     * @param event MessageEvent
      */
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "callApi", commands = "api")
