@@ -1,4 +1,4 @@
-package tech.flless.huhubot.core.constant;
+package tech.flless.huhubot.adapters.onebot.v11.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum GocqAction {
+public enum OnebotAction {
 
     //https://docs.go-cqhttp.org/api 参考gocq api
 
@@ -29,6 +29,7 @@ public enum GocqAction {
     set_group_whole_ban("全体禁言",false),
     set_qq_profile("设置登录号信息", false),
     set_msg_emoji_like("表情回应", false),
+    group_poke("戳一戳", false),
     //_set_model_show("设置在线机型", false),
 
     get_group_member_info("获取群成员信息", true),

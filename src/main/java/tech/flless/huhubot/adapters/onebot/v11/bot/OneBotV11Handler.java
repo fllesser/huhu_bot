@@ -9,7 +9,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 import tech.flless.huhubot.adapters.onebot.v11.event.meta.MetaEvent;
-import tech.flless.huhubot.core.constant.ANSI;
 import tech.flless.huhubot.core.thread.ProcessEventTask;
 
 /**
@@ -21,8 +20,7 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) {
-        log.info("{}OB11 CLIENT CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]{}",
-                ANSI.YELLOW, session.getRemoteAddress(), BotContainer.getConnections() + 1, ANSI.RESET);
+        log.info("OB11 CLIENT CONNECT SUCCESS, REMOTE[{}], CLIENT_NUM[{}]", session.getRemoteAddress(), BotContainer.getConnections() + 1);
     }
 
     @Override
@@ -33,10 +31,9 @@ public class OneBotV11Handler extends TextWebSocketHandler {
         if (event instanceof MetaEvent metaEvent) {
             if (metaEvent.isHeartbeat()) return;//心跳忽略
             else if (metaEvent.isConnected()) {
-                //刚连接成功时，gocq会发一条消息给bot, 添加bot到map中
+                //刚连接成功时，onebot实现端会发一条消息给bot, 添加bot到map中
                 BotContainer.addBot(event.getSelfId(), session);
-                log.info("{}Received onebotv11 client[{}] connection success message{}", ANSI.YELLOW,
-                        metaEvent.getSelfId(), ANSI.RESET);
+                log.info("Received OnebotV11 Client[{}] Connection Success Message", metaEvent.getSelfId());
                 return;
             }
         }
@@ -49,15 +46,13 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.info("{}Connection happened exception sessionId[{}], exception[{}]{}",
-                ANSI.YELLOW, session.getId(), exception.getMessage(), ANSI.RESET);
+        log.error("Connection Happened Exception SessionId[{}], Exception[{}]", session.getId(), exception.getMessage());
         BotContainer.removeBot(session);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) {
-        log.info("{}Connection closed, sessionId:{},{}{}",
-                ANSI.YELLOW, session.getId(), closeStatus.toString(), ANSI.RESET);
+        log.error("Connection Closed, SessionId:{},{}", session.getId(), closeStatus.toString());
         BotContainer.removeBot(session);
     }
 

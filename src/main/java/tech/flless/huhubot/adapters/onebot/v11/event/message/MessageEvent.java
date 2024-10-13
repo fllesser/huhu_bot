@@ -65,8 +65,10 @@ public class MessageEvent extends Event {
         return this.getBot().getMsg(segment.getInteger("id"));
     }
 
-    public void replyMessage(Object message) {
-        getBot().sendMessage(this, message);
+
+    public void reply(Object message) {
+        //getBot().sendMessage(this, message);
     }
+
 
 }

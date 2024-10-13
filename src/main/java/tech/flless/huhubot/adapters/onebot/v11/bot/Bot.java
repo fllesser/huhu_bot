@@ -16,10 +16,8 @@ import tech.flless.huhubot.adapters.onebot.v11.entity.response.*;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
-import tech.flless.huhubot.core.constant.ANSI;
-import tech.flless.huhubot.core.constant.GocqAction;
+import tech.flless.huhubot.adapters.onebot.v11.constant.OnebotAction;
 import tech.flless.huhubot.core.exception.ActionFailed;
-import tech.flless.huhubot.core.exception.FinishedException;
 import tech.flless.huhubot.core.exception.IllegalMessageTypeException;
 import tech.flless.huhubot.utils.MistIdGenerator;
 
@@ -67,14 +65,14 @@ public class Bot {
         try {
             this.session.sendMessage(new TextMessage(text));
         } catch (IOException e) {
-            log.info("{}[hb]-ws->[ob][{}]{}, exception[{}]{}",    ANSI.RED, selfId, text, e.getMessage(), ANSI.RESET);
+            log.error("[hb]-ws->[ob][{}]{}, exception[{}]", selfId, text, e.getMessage());
         }
         if (!requestBox.getAction().equals("set_group_card")) {
             log.info("[hb]-ws->[ob][{}]{}", selfId, text);
         }
     }
 
-    public void callApi(GocqAction action, Map<String, Object> paramsMap) {
+    public void callApi(OnebotAction action, Map<String, Object> paramsMap) {
         RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).build();
         this.sessionSend(requestBox);
     }
@@ -129,7 +127,7 @@ public class Bot {
      * @return json 字符串数据
      */
     @SuppressWarnings("all")
-    public String callApiWaitResp(GocqAction action, Map<String, Object> paramsMap) {
+    public String callApiWaitResp(OnebotAction action, Map<String, Object> paramsMap) {
         long echo = MistIdGenerator.nextId();
         RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).echo(echo).build();
         EchoData echoData = buildEchoDataToMap(echo);
@@ -144,7 +142,7 @@ public class Bot {
 
 
     public void deleteFriend(Long userId) {
-        this.callApiWaitResp(GocqAction.delete_friend, Map.of("user_id", userId));
+        this.callApiWaitResp(OnebotAction.delete_friend, Map.of("user_id", userId));
     }
 
     /**
@@ -153,7 +151,7 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWaitResp(GocqAction.get_login_info, null);
+        String data = this.callApiWaitResp(OnebotAction.get_login_info, null);
         return JSONObject.parseObject(data, SelfInfo.class);
     }
 
@@ -163,7 +161,7 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWaitResp(GocqAction.get_friend_list, null);
+        String data = this.callApiWaitResp(OnebotAction.get_friend_list, null);
         return JSONArray.parseArray(data, FriendInfo.class);
     }
 
@@ -176,7 +174,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = this.callApiWaitResp(GocqAction.get_group_member_list,Map.of("group_id", groupId, "no_cache", noCache));
+        String data = this.callApiWaitResp(OnebotAction.get_group_member_list,Map.of("group_id", groupId, "no_cache", noCache));
         return JSONArray.parseArray(data, GroupMember.class);
     }
 
@@ -187,7 +185,7 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callApiWaitResp(GocqAction.get_group_list, Map.of("no_cache", noCache));
+        String data = this.callApiWaitResp(OnebotAction.get_group_list, Map.of("no_cache", noCache));
         return JSONArray.parseArray(data, GroupInfo.class);
     }
 
@@ -199,7 +197,7 @@ public class Bot {
     }
 
     public GroupInfo getGroupInfo(Long groupId, boolean noCache) {
-        String data = this.callApiWaitResp(GocqAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
+        String data = this.callApiWaitResp(OnebotAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupInfo.class);
     }
 
@@ -211,7 +209,7 @@ public class Bot {
      * @return MessageInfo
      */
     public MessageInfo getMsg(Integer messageId) {
-        String data = this.callApiWaitResp(GocqAction.get_msg, Map.of("message_id", messageId));
+        String data = this.callApiWaitResp(OnebotAction.get_msg, Map.of("message_id", messageId));
         JSONObject jsonObject = JSONObject.parseObject(data);
         return jsonObject.toJavaObject(MessageInfo.class);
         //return JSONObject.parseObject(data, MessageInfo.class);//莫名其妙报错
@@ -227,7 +225,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = this.callApiWaitResp(GocqAction.get_group_member_info,Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
+        String data = this.callApiWaitResp(OnebotAction.get_group_member_info,Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
         return JSONObject.parseObject(data, GroupMember.class);
     }
 
@@ -239,7 +237,7 @@ public class Bot {
      * @param specialTitle special_title
      */
     public void setGroupSpecialTitle(Long groupId, Long userId, String specialTitle) {
-        this.callApi(GocqAction.set_group_special_title,Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
+        this.callApi(OnebotAction.set_group_special_title,Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
     }
 
     /**
@@ -250,7 +248,7 @@ public class Bot {
      * @param card    card
      */
     public void setGroupCard(Long groupId, Long userId, String card) {
-        this.callApi(GocqAction.set_group_card,Map.of("group_id", groupId, "user_id", userId, "card", card));
+        this.callApi(OnebotAction.set_group_card,Map.of("group_id", groupId, "user_id", userId, "card", card));
     }
 
     /**
@@ -259,7 +257,7 @@ public class Bot {
      * @param groupId group_id
      */
     public void sendGroupSign(Long groupId) {
-        this.callApi(GocqAction.send_group_sign, Map.of("group_id", groupId));
+        this.callApi(OnebotAction.send_group_sign, Map.of("group_id", groupId));
     }
 
     /**
@@ -270,7 +268,7 @@ public class Bot {
      * @param enable  true 为设置, false 为取消
      */
     public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
-        this.callApi(GocqAction.set_group_admin,Map.of("group_id", groupId, "user_id", userId, "enable", enable));
+        this.callApi(OnebotAction.set_group_admin,Map.of("group_id", groupId, "user_id", userId, "enable", enable));
     }
 
 
@@ -285,7 +283,7 @@ public class Bot {
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        this.callApi(GocqAction.send_group_msg,Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
+        this.callApi(OnebotAction.send_group_msg,Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
     }
 
 
@@ -300,7 +298,7 @@ public class Bot {
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        this.callApi(GocqAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+        this.callApi(OnebotAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
     }
 
 
@@ -310,7 +308,7 @@ public class Bot {
      * @param messageId Integer
      */
     public void deleteMsg(Integer messageId) {
-        this.callApi(GocqAction.delete_msg, Map.of("message_id", messageId));
+        this.callApi(OnebotAction.delete_msg, Map.of("message_id", messageId));
     }
 
     /**
@@ -319,14 +317,14 @@ public class Bot {
      * @param messageId Integer
      */
     public void markMsgAsRead(Integer messageId) {
-        this.callApi(GocqAction.mark_msg_as_read, Map.of("message_id", messageId));
+        this.callApi(OnebotAction.mark_msg_as_read, Map.of("message_id", messageId));
     }
 
     /**
      * @param messageId Integer
      */
     public void getForwardMsg(Integer messageId) {
-        String data = this.callApiWaitResp(GocqAction.get_forward_msg, Map.of("message_id", messageId));
+        String data = this.callApiWaitResp(OnebotAction.get_forward_msg, Map.of("message_id", messageId));
     }
 
     /**
@@ -336,7 +334,7 @@ public class Bot {
      * @param nodes   nodes
      */
     public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
-        this.callApi(GocqAction.send_group_forward_msg, Map.of("group_id", groupId, "messages", nodes));
+        this.callApi(OnebotAction.send_group_forward_msg, Map.of("group_id", groupId, "messages", nodes));
     }
 
     /**
@@ -346,7 +344,7 @@ public class Bot {
      * @param nodes  nodes
      */
     public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
-        this.callApi(GocqAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
+        this.callApi(OnebotAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
     }
 
     public void sendForwardMsg(MessageEvent event, List<ForwardMessage> nodes) {
@@ -360,11 +358,12 @@ public class Bot {
 
     /**
      * 根据事件, 来发送对应的消息
-     *
+     * 建议使用event.reply(Object message)
      * @param event   event object
      * @param message 消息 Message | MessageSegment | String
      *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
      */
+    @Deprecated
     public void sendMessage(Event event, Object message) {
         JSONObject jsonObject = event.getEventJsonObject();
         Long groupId = jsonObject.getLong("group_id");
@@ -378,15 +377,8 @@ public class Bot {
         }
     }
 
-    @Deprecated
-    public void finish(Event event, String message) {
-        this.sendMessage(event, message);
-        throw new FinishedException();
-    }
-
-
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
-        this.callApi(GocqAction.set_group_kick,Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
+        this.callApi(OnebotAction.set_group_kick,Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
     }
 
 
@@ -398,7 +390,7 @@ public class Bot {
      * @param duration duration 单位秒 default 30 * 60 | 0 表示取消禁言
      */
     public void setGroupBan(Long groupId, Long userId, int duration) {
-        this.callApi(GocqAction.set_group_ban, Map.of("group_id", groupId, "user_id", userId, "duration", duration));
+        this.callApi(OnebotAction.set_group_ban, Map.of("group_id", groupId, "user_id", userId, "duration", duration));
     }
 
     /**
@@ -408,12 +400,16 @@ public class Bot {
      * @param enable  默认true 禁言
      */
     public void setGroupWholeBan(Long groupId, boolean enable) {
-        this.callApi(GocqAction.set_group_whole_ban, Map.of("group_id", groupId, "enable", enable));
+        this.callApi(OnebotAction.set_group_whole_ban, Map.of("group_id", groupId, "enable", enable));
     }
 
     public void setMsgEmojiLike(Integer messageId, Integer emojiId) {
         if (EmojiMap.containsKey(emojiId)) {
-            this.callApi(GocqAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
+            this.callApi(OnebotAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
         }
+    }
+
+    public void groupPoke(Long groupId, Long userId) {
+        this.callApi(OnebotAction.group_poke, Map.of("group_id", groupId, "user_id", userId));
     }
 }

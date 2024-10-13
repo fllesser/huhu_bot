@@ -21,7 +21,7 @@ public class BasePlugin {
     @RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "echo", commands = "echo")
     public void echo(MessageEvent event) {
-        event.getBot().sendMessage(event, event.getCommandArgs());
+        event.reply(event.getCommandArgs());
     }
 
 
@@ -32,7 +32,7 @@ public class BasePlugin {
         String arg = event.getCommandArgs();
         if (!StringUtil.isDigit(arg)) return;
         int no = Integer.parseInt(arg);
-        event.getBot().sendMessage(event, "关闭" + arg + (core.logicClose(no) ? "成功" : "失败"));
+        event.reply("关闭" + arg + (core.logicClose(no) ? "成功" : "失败"));
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
@@ -42,7 +42,7 @@ public class BasePlugin {
         String arg = event.getCommandArgs();
         if (!StringUtil.isDigit(arg)) return;
         int no = Integer.parseInt(arg);
-        event.getBot().sendMessage(event, "开启" + arg + (core.logicOpen(no) ? "成功" : "失败"));
+        event.reply("开启" + arg + (core.logicOpen(no) ? "成功" : "失败"));
     }
 
     @RuleCheck(rule = RuleEnum.superuser)
@@ -50,7 +50,7 @@ public class BasePlugin {
     public void list(MessageEvent event) {
         DispatcherCore core = IocUtil.getBean(DispatcherCore.class);
         String handlerNames = core.getHandlerNameList();
-        event.getBot().sendMessage(event, handlerNames);
+        event.reply(handlerNames);
     }
 
 }

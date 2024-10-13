@@ -9,7 +9,7 @@ import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
-import tech.flless.huhubot.core.constant.GocqAction;
+import tech.flless.huhubot.adapters.onebot.v11.constant.OnebotAction;
 import tech.flless.huhubot.core.rule.RuleEnum;
 import tech.flless.huhubot.utils.StringUtil;
 
@@ -31,6 +31,7 @@ public class CallApiPlugin {
 
     /**
      * ai get_group_info group_id:12312321 k:v ...
+     *
      * @param event
      */
     @RuleCheck(rule = RuleEnum.superuser)
@@ -39,11 +40,11 @@ public class CallApiPlugin {
         //[key:value,key:value]
         Bot bot = event.getBot();
         String[] args = event.getCommandArgs().split(" ");
-        GocqAction action = null;
+        OnebotAction action = null;
         try {
-            action = GocqAction.valueOf(args[0]);
+            action = OnebotAction.valueOf(args[0]);
         } catch (IllegalArgumentException e) {
-            bot.sendMessage(event, "没有这个API, 或huhubot暂未支持");
+            event.reply("没有这个API, 或huhubot暂未支持");
         }
         String[] keyValue = new String[args.length - 1];
         System.arraycopy(args, 1, keyValue, 0, args.length - 1);
@@ -53,7 +54,7 @@ public class CallApiPlugin {
         assert action != null;
         if (!action.isHasResp()) {
             bot.callApi(action, map);
-            bot.sendMessage(event, action.getRemark() + "已发送ws请求, 该api无响应数据");
+            event.reply(action.getRemark() + "已发送ws请求, 该api无响应数据");
             return;
         }
         long start = System.currentTimeMillis();
@@ -65,7 +66,7 @@ public class CallApiPlugin {
                 StringBuilder willSend = new StringBuilder();
                 JSONObject jsonObject = JSONObject.parse(resp);
                 jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
-                bot.sendMessage(event, willSend + "\n" + costTime);
+                event.reply(willSend + "\n" + costTime);
             } else if (resp.startsWith("[")) {
                 List<Object> messages = new ArrayList<>();
                 messages.add(costTime);
@@ -80,7 +81,7 @@ public class CallApiPlugin {
                 bot.sendForwardMsg(event, nodes);
             }
         } else {
-            bot.sendMessage(event, "onebotv11实现端可能未支持该api");
+            event.reply("onebotv11 实现端可能未支持该api");
         }
 
     }

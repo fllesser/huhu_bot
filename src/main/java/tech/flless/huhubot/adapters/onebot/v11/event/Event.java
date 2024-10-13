@@ -11,7 +11,7 @@ import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.meta.MetaEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.request.RequestEvent;
-import tech.flless.huhubot.core.constant.PostTypeEnum;
+import tech.flless.huhubot.adapters.onebot.v11.constant.PostTypeEnum;
 import tech.flless.huhubot.utils.StringUtil;
 
 /**
@@ -38,7 +38,6 @@ public abstract class Event {
         String postType = jsonObject.getString("post_type");
         Event event = null;
         if (StringUtil.hasLength(postType)) {
-            //event = PostTypeEnum.valueOf(postType).getFunction().apply(jsonObject);
             event = switch (PostTypeEnum.valueOf(postType)) {
                 case message_sent, message -> MessageEvent.build(jsonObject);
                 case notice -> NoticeEvent.build(jsonObject);

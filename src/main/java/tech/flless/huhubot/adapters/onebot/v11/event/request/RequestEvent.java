@@ -3,7 +3,7 @@ package tech.flless.huhubot.adapters.onebot.v11.event.request;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tech.flless.huhubot.core.constant.PostTypeEnum;
+import tech.flless.huhubot.adapters.onebot.v11.constant.PostTypeEnum;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 
 /**

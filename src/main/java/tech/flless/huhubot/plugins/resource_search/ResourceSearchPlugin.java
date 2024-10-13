@@ -2,11 +2,7 @@ package tech.flless.huhubot.plugins.resource_search;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import tech.flless.huhubot.adapters.onebot.v11.bot.BotContainer;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
-import tech.flless.huhubot.config.BotConfig;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
@@ -19,7 +15,6 @@ import tech.flless.huhubot.utils.StringUtil;
 import tech.flless.huhubot.utils.xiaoai.XiaoAIUtil;
 
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -62,21 +57,21 @@ public class ResourceSearchPlugin {
         } catch (RuntimeException e) {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
-        event.replyMessage(result);
+        event.reply(result);
         XiaoAIUtil.tts(result);
     }
 
     @MessageHandler(name = "GITCAFE", commands = {".s"})
     public void gitCafeSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), gitCafeClient::get);
-        event.replyMessage(ResourceUtil.buildString(dataList));
+        event.reply(ResourceUtil.buildString(dataList));
     }
 
 
     @MessageHandler(name = "HDHIVE", commands = {".ds"})
     public void hdhiveSearch(MessageEvent event) {
         List<ResourceData> dataList = StringUtil.hasLength(event.getCommandArgs(), hdhiveClient::get);
-        event.replyMessage(ResourceUtil.buildString(dataList));
+        event.reply(ResourceUtil.buildString(dataList));
     }
 
 
@@ -89,7 +84,7 @@ public class ResourceSearchPlugin {
 //    public void save(MessageEvent event) {
 //        String no = event.getCommandArgs();
 //        if (!StringUtil.isDigit(no)) {
-//            event.replyMessage("参数应为数字");
+//            event.reply("参数应为数字");
 //            return;
 //        }
 //        int index = Integer.parseInt(no);
@@ -107,7 +102,7 @@ public class ResourceSearchPlugin {
 //            } else {
 //                willSend += "失败, 分享者取消分享, 或被风控";
 //            }
-//            event.replyMessage(willSend);
+//            event.reply(willSend);
 //        }
 //
 //    }
@@ -118,6 +113,6 @@ public class ResourceSearchPlugin {
         String keyword = event.getCommandArgs();
         String cacheData = StringUtil.hasLength(keyword, ResourceUtil::getByKeyWord);
         String willSend = StringUtil.hasLength(cacheData) ? "从缓存中搜索到以下资源" + cacheData :"缓存中没有相关资源";
-        event.replyMessage(willSend);
+        event.reply(willSend);
     }
 }

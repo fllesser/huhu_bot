@@ -56,7 +56,7 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(WxConfig.clientId, WxConfig.clientSecret).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(content.get()));
-        bot.sendMessage(event, completion.getResult());
+        event.reply(completion.getResult());
 
     }
 
@@ -65,12 +65,20 @@ public class AIPlugin {
         Message message = event.getMessage();
         MessageInfo reply = event.getReply();
         String[] nameAndText = message.getPlainText().split("说", 2);
+
         String roleName = nameAndText[0].trim();
-        if (!StringUtil.hasLength(roleName) || roleName.length() > 8) return; //意外触发 ignore
+        if (!StringUtil.hasLength(roleName) || roleName.length() > 8 || reechoClient.isNotRole(roleName)) return; //意外触发 ignore
+
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (!StringUtil.hasLength(text)) return;
         if (text.length() >= 102) throw new FinishedException("api额度有限，so字符长度须少于100");
-        event.replyMessage(MessageSegment.record(reechoClient.generate(roleName, text)));
+
+        event.reply(Message.reply(event.getMessageId()).append(MessageSegment.text("正在合成语音中...")));
+        event.reply(MessageSegment.record(generate(roleName, text)));
+    }
+
+    public synchronized String generate(String roleName, String text) {
+        return reechoClient.generate(roleName, text);
     }
 
     @MessageHandler(name = "睿声角色列表", keywords = "角色列表")
@@ -79,7 +87,7 @@ public class AIPlugin {
         roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
         StringBuilder sb = new StringBuilder();
         roleList.getData().forEach(d -> sb.append(d.getName()).append(" | "));
-        event.replyMessage(sb.toString());
+        event.reply(sb.toString());
     }
 
 

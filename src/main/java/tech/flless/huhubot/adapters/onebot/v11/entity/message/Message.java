@@ -17,7 +17,7 @@ public class Message extends ArrayList<MessageSegment> {
     @JsonIgnore
     private String plainText;
 
-    public static Message reply(Long messageId) {
+    public static Message reply(Integer messageId) {
         Message message = new Message();
         return message.append(MessageSegment.reply(messageId));
     }

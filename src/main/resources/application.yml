@@ -26,4 +26,4 @@ logging:
   level:
     root: info 
   pattern:
-    console: '%d{MM-dd HH:mm:ss} %clr([%level]){green} %clr(%thread){magenta} | %clr(%msg){cyan}%n'
+    console: '%d{MM-dd HH:mm:ss} %clr([%level]){green} %clr(HuhuBot){cyan} | %clr(%thread){magenta} %msg%n'

@@ -3,7 +3,6 @@ package tech.flless.huhubot.config;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import tech.flless.huhubot.core.constant.ANSI;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ public class BotConfig {
     public static List<Character> commandPrefixes = new ArrayList<>(1);
     public static Long testGroup;
 
-    //public static String aliRefreshToken;
 
     public void setSuperUsers(ArrayList<Long> superUsers) {
         BotConfig.superUsers = superUsers;
@@ -36,11 +34,6 @@ public class BotConfig {
         BotConfig.testGroup = testGroup;
     }
 
-//    public void setAliRefreshToken(String aliRefreshToken) {
-//        BotConfig.aliRefreshToken = aliRefreshToken;
-//    }
-    
-
     @PostConstruct
     public void postLog() throws IllegalAccessException {
         StringBuilder sb = new StringBuilder();
@@ -48,7 +41,7 @@ public class BotConfig {
             if ("Logger".equals(f.getType().getSimpleName())) continue;
             sb.append(" ").append(f.getName()).append(": ").append(f.get(this));
         }
-        log.info("{}[BotConfig]{}{}", ANSI.YELLOW, sb, ANSI.RESET);
+        log.info("[BotConfig]{}", sb);
     }
 
     public static boolean isSuperUser(Long userId) {

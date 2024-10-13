@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tech.flless.huhubot.core.constant.NoticeTypeEnum;
+import tech.flless.huhubot.adapters.onebot.v11.constant.NoticeTypeEnum;
 
 /**
  * @author elastic chow

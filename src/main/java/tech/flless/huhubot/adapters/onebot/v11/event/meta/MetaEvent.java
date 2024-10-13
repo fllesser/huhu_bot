@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
-import tech.flless.huhubot.core.constant.PostTypeEnum;
+import tech.flless.huhubot.adapters.onebot.v11.constant.PostTypeEnum;
 
 /**
  * @author elastic chow

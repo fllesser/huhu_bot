@@ -7,7 +7,6 @@ import java.util.Map;
 
 /**
  * @author elastic chow
- * @date 25/7/2023
  * <p>
  * 不要使用String + MessageSegment发送消息
  * 使用Message.text().append(MessageSegment)
@@ -127,7 +126,7 @@ public class MessageSegment {
      * @param messageId 回复时所引用的消息id, 必须为本群消息.
      * @return MessageSegment
      */
-    public static MessageSegment reply(Long messageId) {
+    public static MessageSegment reply(Integer messageId) {
         return build("reply", Map.of("id", messageId));
     }
 

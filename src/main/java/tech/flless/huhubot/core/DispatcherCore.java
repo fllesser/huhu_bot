@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.NoticeHandler;
-import tech.flless.huhubot.core.constant.ANSI;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
@@ -49,7 +49,7 @@ public class DispatcherCore {
         List<Handler> messageHandlers = new ArrayList<>();
         List<Handler> noticeHandlers = new ArrayList<>();
         if (!botPluginMap.isEmpty()) {
-            log.info("huhubot starts to load plugins...");
+            log.info("Huhubot starts to load plugins...");
             int count = 1;
             StringBuilder pluginFuctionNames;
             //容器中的插件Bean
@@ -70,14 +70,14 @@ public class DispatcherCore {
                         handler = Handler.buildNoticeHandler(plugin, method);
                         noticeHandlers.add(handler);
                     } else continue;
-                    pluginFuctionNames.append(handler.name).append(" ");
+                    pluginFuctionNames.append("[").append(handler.name).append("] ");
                 }
-                log.info("huhubot succeeded to load plugin {}, progress:{}/{}, function:{}",
+                log.info("Huhubot Loaded Plugin[{}] Progress[{}/{}] Functions:{}",
                         pluginName, count++, botPluginMap.size(), pluginFuctionNames);
             }
         }
         if (messageHandlers.isEmpty() && noticeHandlers.isEmpty()) {
-            log.info("{}No plugin was found{}, this application will exit", ANSI.YELLOW, ANSI.RESET);
+            log.error("No Plugin Was Found, This Application Will Exit");
             System.exit(0);
             return;
         }
@@ -87,7 +87,7 @@ public class DispatcherCore {
         NOTICE_HANDLER_CONTAINER = List.copyOf(noticeHandlers.stream()
                 .sorted(Comparator.comparingInt(handler -> handler.priority)).toList());
         initHandlerNameMap();
-        log.info("huhubot is running...");
+        log.info("Huhubot Is Running...");
     }
 
     public void onMessage(final MessageEvent event) {
@@ -199,20 +199,19 @@ public class DispatcherCore {
             try {
                 this.method.invoke(this.plugin, event);
             } catch (IllegalAccessException e) {
-                log.info("{}IllegalAccessException: {}{}", ANSI.RED, "handler method must be public", ANSI.RESET);
+                log.error("IllegalAccessException: handler method[{}] must be public", method.getName());
             } catch (InvocationTargetException e) {
                 Throwable targetE = e.getTargetException();
                 if (targetE instanceof FinishedException fe) {
-                    log.info("[{}] | {} Finished, msg:{}, event:{}", plugin.getClass().getSimpleName(), name, fe.getMsg(), event);
-                    if (event instanceof MessageEvent messageEvent) messageEvent.replyMessage(fe.getMsg());
+                    log.info("[{}] | {} Finished, msg:{}, event:{}", plugin.getClass().getSimpleName(), name, fe.getMessage(), event);
+                    if (event instanceof MessageEvent me) me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else if (targetE instanceof ActionFailed) {
-                    log.info("{}ActionFailed: {}{}", ANSI.RED, targetE.getMessage(), ANSI.RESET);
+                    log.error("ActionFailed: {}", targetE.getMessage());
                 } else {
                     log.error(targetE.getMessage());
                 }
             }
         }
-
 
         public boolean match(Class<? extends Event> eventClass) {
             return eventType.isAssignableFrom(eventClass);

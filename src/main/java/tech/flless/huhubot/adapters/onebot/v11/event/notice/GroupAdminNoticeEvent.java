@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import tech.flless.huhubot.core.constant.NoticeTypeEnum;
+import tech.flless.huhubot.adapters.onebot.v11.constant.NoticeTypeEnum;
 
 /**
  * 群管理员变动事件

@@ -1,4 +1,4 @@
-package tech.flless.huhubot.core.constant;
+package tech.flless.huhubot.adapters.onebot.v11.constant;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

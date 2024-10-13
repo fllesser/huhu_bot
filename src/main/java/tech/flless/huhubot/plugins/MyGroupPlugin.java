@@ -4,11 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
-import tech.flless.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
-import tech.flless.huhubot.core.annotation.NoticeHandler;
-import tech.flless.huhubot.core.constant.SubTypeEnum;
 
 import java.util.List;
 

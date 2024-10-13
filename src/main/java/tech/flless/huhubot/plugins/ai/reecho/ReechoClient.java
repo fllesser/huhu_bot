@@ -39,28 +39,30 @@ public interface ReechoClient {
 
     Map<String, String> NameIdMap = new HashMap<>();
 
-    @SuppressWarnings("all")
-    default String generate(String name, String text) {
-        if (NameIdMap.size() == 0) {
+    default boolean isNotRole(String name) {
+        if (NameIdMap.isEmpty()) {
             RoleList roleList = getVoiceList(ReechoConfig.apiKey);
             roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
         }
-        if (!NameIdMap.containsKey(name)) throw new FinishedException("未支持角色[" + name + "]" + "\n请发送[角色列表]查看支持的角色");
+        return !NameIdMap.containsKey(name);
+    }
+
+
+    default String generate(String name, String text) {
         GenResp resp = generate(ReechoConfig.webToken, new GenReqBody("market:" + NameIdMap.get(name), text));
         if (resp.getData() == null) throw new FinishedException("请求失败，今日点数可能已耗尽");
         try {
             return ThreadPoolUtil.getScheduledExecutor().schedule(() -> {
                 String audioUrl;
+                int times = 0;
                 do {
                     AudioResp audioResp = this.generateWithId(ReechoConfig.webToken, resp.getData().getId());
                     audioUrl = audioResp.getData().getMetadata().getContents().get(0).getAudio();
                     Thread.sleep(1000);
-                } while (!StringUtil.hasLength(audioUrl));
+                } while (!StringUtil.hasLength(audioUrl) && ++times < 20);
                 return audioUrl;
-            }, 200 + text.length() * 100 , TimeUnit.MILLISECONDS).get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+            }, 200 + text.length() * 128L, TimeUnit.MILLISECONDS).get();
+        } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
     }

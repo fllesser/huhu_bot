@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.Message;
+import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 
 /**
  * @author elastic chow
@@ -46,7 +48,8 @@ public class GroupMessageEvent extends MessageEvent {
     }
 
     @Override
-    public void replyMessage(Object message) {
+    public void reply(Object message) {
         getBot().sendGroupMessage(this.getGroupId(), message);
     }
+
 }

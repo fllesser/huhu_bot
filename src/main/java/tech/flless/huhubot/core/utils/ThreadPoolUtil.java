@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-import tech.flless.huhubot.core.constant.ANSI;
 import tech.flless.huhubot.core.thread.ShareRunsPolicy;
 import java.util.concurrent.*;
 
@@ -33,9 +32,8 @@ public class ThreadPoolUtil {
                 new ArrayBlockingQueue<>(corePoolSize * 8),
                 new CustomizableThreadFactory("process-event-"),
                 new ShareRunsPolicy("EventExecutor"));
-        log.info("{}根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]{}",
-                ANSI.YELLOW, corePoolSize - 1, eventExecutor.getCorePoolSize(),
-                eventExecutor.getMaximumPoolSize(), ANSI.RESET);
+        log.info("根据CPU线程数:{}, 创建事件处理线程池 corePoolSize:[{}], maximumPoolSize:[{}]",
+                corePoolSize - 1, eventExecutor.getCorePoolSize(), eventExecutor.getMaximumPoolSize());
     }
 
     static class ProcessEventThreadPoolExecutor extends ThreadPoolExecutor {

@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class FinishedException extends RuntimeException {
-    private String msg;
-    public FinishedException(String msg) {
-         this.msg = msg;
-}
+
+    public FinishedException(String message) {
+        super(message);
+    }
+
 }
