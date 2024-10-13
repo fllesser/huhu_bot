@@ -31,11 +31,11 @@ public class PrivateMessageEvent extends MessageEvent {
 
     @Override
     public String toString() {
-        return "PrivateMessageEvent{" +
+        return "message.private[" +
                 "uid=" + super.getUserId() +
                 ", raw_msg=" + super.getRawMessage() +
                 ", sub_type=" + subType +
-                "}";
+                "]";
     }
 
     @Override

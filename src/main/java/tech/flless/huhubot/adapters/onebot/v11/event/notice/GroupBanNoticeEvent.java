@@ -16,7 +16,6 @@ import tech.flless.huhubot.adapters.onebot.v11.constant.NoticeTypeEnum;
 public class GroupBanNoticeEvent extends NoticeEvent {
     private final String noticeType = NoticeTypeEnum.group_ban.name();
 
-
     @JsonProperty("sub_type")
     private String subType;
     @JsonProperty("user_id")
