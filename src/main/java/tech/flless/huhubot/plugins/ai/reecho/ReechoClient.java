@@ -56,9 +56,9 @@ public interface ReechoClient {
                 String audioUrl;
                 int times = 0;
                 do {
+                    Thread.sleep(1000);
                     AudioResp audioResp = this.generateWithId(ReechoConfig.webToken, resp.getData().getId());
                     audioUrl = audioResp.getData().getMetadata().getContents().get(0).getAudio();
-                    Thread.sleep(1000);
                 } while (!StringUtil.hasLength(audioUrl) && ++times < 20);
                 return audioUrl;
             }, 200 + text.length() * 128L, TimeUnit.MILLISECONDS).get();
