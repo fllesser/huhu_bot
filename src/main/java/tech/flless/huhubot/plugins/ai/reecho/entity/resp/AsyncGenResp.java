@@ -1,11 +1,11 @@
-package tech.flless.huhubot.plugins.ai.reecho.entity;
+package tech.flless.huhubot.plugins.ai.reecho.entity.resp;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Data
-public class GenResp {
+public class AsyncGenResp {
     private Data data;
 
     @Setter

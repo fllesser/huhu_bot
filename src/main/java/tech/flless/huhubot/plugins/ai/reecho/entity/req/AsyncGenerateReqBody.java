@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.ai.reecho.entity;
+package tech.flless.huhubot.plugins.ai.reecho.entity.req;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Data
-public class GenReqBody {
+public class AsyncGenerateReqBody {
 
     private String model = "reecho-neural-voice-001";
     private List<Content> contents;
@@ -36,7 +36,7 @@ public class GenReqBody {
         private String text;
     }
 
-    public GenReqBody(String voiceId, String text) {
+    public AsyncGenerateReqBody(String voiceId, String text) {
         contents = List.of(new Content(voiceId, text));
     }
 }

@@ -1,15 +1,20 @@
+ws:
+  router: "/onebot/v11/ws"
+  allow-origins: "*"
+  text-buffer-size: "819200"
+
 bot:
   super-users: [1942422015] #超级用户
 
-wx:
-  client-id: 
+errie:
+  client-id:
   client-secret:
 
-apispace:
-  token: 
+api-space:
+  token:
 
 reecho:
-  api-key: 
+  api-key: sk-19ed04ac9a797dc9141c5a569bb1934b
   web-token: 
 
 retrofit:
@@ -18,7 +23,7 @@ retrofit:
     read-timeout-ms: 30000
     write-timeout-ms: 30000
   global-log:
-    enable: false
+    enable: true
     
 logging:
   file:

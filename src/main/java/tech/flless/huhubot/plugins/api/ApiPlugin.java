@@ -6,6 +6,7 @@ import tech.flless.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import tech.flless.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.config.ApiSpaceConfig;
+import tech.flless.huhubot.config.GlobalConfig;
 import tech.flless.huhubot.core.annotation.BotPlugin;
 import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.plugins.api.api_sapce.ApiSpaceClient;
@@ -65,7 +66,7 @@ public class ApiPlugin {
     @MessageHandler(name = "周公解梦", commands = "zgjm")
     public void zgjm(MessageEvent event) {
         if (!StringUtil.hasLength(event.getCommandArgs())) return;
-        ApiSpaceResult result = apiSpaceClient.zgjm(ApiSpaceConfig.token, event.getCommandArgs());
+        ApiSpaceResult result = apiSpaceClient.zgjm(GlobalConfig.apiSpaceCf.getToken(), event.getCommandArgs());
         if (result.getResult() == null) {
             event.reply("解梦失败");
             return;

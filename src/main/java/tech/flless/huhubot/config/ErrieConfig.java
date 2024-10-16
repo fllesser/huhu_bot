@@ -1,21 +1,19 @@
 package tech.flless.huhubot.config;
 
+
 import lombok.Data;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-/**
- * @author FLLess7
- * @date 22/1/2024
- */
+@Slf4j
 @Data
 @Component
-@ConfigurationProperties("api-space")
-public class ApiSpaceConfig {
+@ConfigurationProperties(prefix = "errie")
+public class ErrieConfig {
 
-    private String token;
+    private String clientId;
+    private String clientSecret;
 
 }
-

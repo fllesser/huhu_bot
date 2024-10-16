@@ -8,6 +8,7 @@ import tech.flless.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
+import tech.flless.huhubot.config.GlobalConfig;
 
 /**
  * @author elastic chow
@@ -33,7 +34,7 @@ public class RuleRef {
     }
 
     public static boolean superuser(Event event) {
-        if (event instanceof MessageEvent me) return BotConfig.isSuperUser(me.getUserId());
+        if (event instanceof MessageEvent me) return GlobalConfig.botCf.isSuperUser(me.getUserId());
         else return false;
     }
 
@@ -46,7 +47,7 @@ public class RuleRef {
     public static boolean admin(Event event) {
         if (event instanceof GroupMessageEvent gme) {
             String role = gme.getSender().getRole();
-            return "admin".equals(role) || "owner".equals(role) || BotConfig.isSuperUser(gme.getUserId());
+            return "admin".equals(role) || "owner".equals(role) || GlobalConfig.botCf.isSuperUser(gme.getUserId());
         } else return false;
     }
 

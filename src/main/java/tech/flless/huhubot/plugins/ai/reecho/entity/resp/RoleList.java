@@ -1,4 +1,4 @@
-package tech.flless.huhubot.plugins.ai.reecho.entity;
+package tech.flless.huhubot.plugins.ai.reecho.entity.resp;
 
 
 import lombok.Data;

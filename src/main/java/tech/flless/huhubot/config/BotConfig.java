@@ -1,8 +1,11 @@
 package tech.flless.huhubot.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Data;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -14,25 +17,15 @@ import java.util.List;
  */
 
 @Slf4j
+@Data
+@Component
 @ConfigurationProperties(prefix = "bot")
 public class BotConfig {
 
-    public static List<Long> superUsers;
-    public static List<Character> commandPrefixes = new ArrayList<>(1);
-    public static Long testGroup;
+    private List<Long> superUsers;
+    private List<Character> commandPrefixes = new ArrayList<>(1);
+    private Long testGroup;
 
-
-    public void setSuperUsers(ArrayList<Long> superUsers) {
-        BotConfig.superUsers = superUsers;
-    }
-
-    public void setCommandPrefixes(ArrayList<Character> commandPrefixes) {
-        BotConfig.commandPrefixes = commandPrefixes;
-    }
-
-    public void setTestGroup(Long testGroup) {
-        BotConfig.testGroup = testGroup;
-    }
 
     @PostConstruct
     public void postLog() throws IllegalAccessException {
@@ -44,7 +37,8 @@ public class BotConfig {
         log.info("[BotConfig]{}", sb);
     }
 
-    public static boolean isSuperUser(Long userId) {
-        return superUsers.contains(userId);
+
+    public boolean isSuperUser(Long userId) {
+        return superUsers != null && !superUsers.isEmpty() && superUsers.contains(userId);
     }
 }

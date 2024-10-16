@@ -1,21 +1,20 @@
 package tech.flless.huhubot.config;
 
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@Slf4j
+@Data
+@Component
 @ConfigurationProperties(prefix = "reecho")
 public class ReechoConfig {
 
-    public static String apiKey;
-    public static String webToken;
+    private String apiKey;
+    private String webToken;
 
-    public void setApiKey(String apiKey) {
-        ReechoConfig.apiKey = apiKey;
+    public String authorization() {
+        return "Bearer " + apiKey;
     }
 
-    public void setWebToken(String webToken) {
-        ReechoConfig.webToken = webToken;
-    }
 }

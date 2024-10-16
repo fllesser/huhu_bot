@@ -12,7 +12,7 @@ import tech.flless.huhubot.plugins.resource_search.cache_.ResourceUtil;
 import tech.flless.huhubot.plugins.resource_search.gitcafe.GitCafeClient;
 import tech.flless.huhubot.plugins.resource_search.hdhive.HdhiveClient;
 import tech.flless.huhubot.utils.StringUtil;
-import tech.flless.huhubot.utils.xiaoai.XiaoAIUtil;
+
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class ResourceSearchPlugin {
             result = "阿里云盘签到失败, refresh token 可能过期";
         }
         event.reply(result);
-        XiaoAIUtil.tts(result);
+        //XiaoAIUtil.tts(result);
     }
 
     @MessageHandler(name = "GITCAFE API", commands = {".s"})

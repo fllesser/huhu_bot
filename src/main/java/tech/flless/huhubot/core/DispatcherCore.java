@@ -142,8 +142,8 @@ public class DispatcherCore {
 
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);
-            Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name()).block(mh.block())
-                    .priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).status(true).build();
+            Handler handler = Handler.builder().plugin(plugin).method(method).name(mh.name())
+                    .block(mh.block()).priority(mh.priority()).commands(mh.commands()).keywords(mh.keywords()).status(true).build();
             handler.initEventType();
             return handler;
         }
