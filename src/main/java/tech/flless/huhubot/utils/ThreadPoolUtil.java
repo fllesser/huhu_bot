@@ -24,6 +24,8 @@ public class ThreadPoolUtil {
 
     public final static ThreadPoolExecutor ReechoExecutor;
 
+    public final static ThreadPoolExecutor ProcessEventExecutor;
+
     static {
         AsyncExecutor = new ThreadPoolExecutor(
                 2, 4, 1, TimeUnit.HOURS,
@@ -34,8 +36,13 @@ public class ThreadPoolUtil {
                 1, 2, 1, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(4),
                 new CustomizableThreadFactory("sync-reecho-"),
-                (r, executor) -> {throw new FinishedException("同步队列溢出, 请求拒绝");}
-        );
+                (r, executor) -> {throw new FinishedException("同步队列溢出, 请求拒绝");});
+        ProcessEventExecutor = new ThreadPoolExecutor(
+                5, 10, 1, TimeUnit.HOURS,
+                new ArrayBlockingQueue<>(10),
+                new CustomizableThreadFactory("process-event-"),
+                new ThreadPoolExecutor.CallerRunsPolicy());
+
     }
 
 

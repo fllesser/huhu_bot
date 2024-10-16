@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import tech.flless.huhubot.adapters.onebot.v11.bot.Bot;
 import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.meta.MetaEvent;
@@ -18,6 +19,7 @@ import tech.flless.huhubot.utils.StringUtil;
  * @author elastic chow
  * @date 16/5/2023
  */
+@Slf4j
 @Getter
 @Setter
 public abstract class Event {
@@ -45,7 +47,10 @@ public abstract class Event {
                 case meta_event -> jsonObject.toJavaObject(MetaEvent.class);
             };
             event.setEventJsonObject(jsonObject);
-        } else Bot.transferData(jsonObject.getLong("echo"), jsonObject.getString("data"));
+        } else {
+            Bot.transferData(jsonObject.getLong("echo"), jsonObject.get("data"));
+        }
+
         return event;
     }
 

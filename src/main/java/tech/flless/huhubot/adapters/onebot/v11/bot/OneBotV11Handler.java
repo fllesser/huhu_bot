@@ -8,12 +8,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import tech.flless.huhubot.adapters.onebot.v11.event.Event;
-import tech.flless.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import tech.flless.huhubot.adapters.onebot.v11.event.meta.MetaEvent;
-import tech.flless.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
-import tech.flless.huhubot.adapters.onebot.v11.event.request.RequestEvent;
-import tech.flless.huhubot.core.DispatcherCore;
-import tech.flless.huhubot.core.thread.ProcessEventTask;
 
 /**
  * @author elastic chow
@@ -43,7 +38,7 @@ public class OneBotV11Handler extends TextWebSocketHandler {
         }
         log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
         event.setBot(BotContainer.getBot(event.getSelfId()));
-        ProcessEventTask.dispatch(event);
+        ProcessEventTask.execute(event);
     }
 
 

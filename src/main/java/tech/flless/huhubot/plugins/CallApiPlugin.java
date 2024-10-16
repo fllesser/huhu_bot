@@ -58,25 +58,23 @@ public class CallApiPlugin {
             return;
         }
         long start = System.currentTimeMillis();
-        String resp = bot.callApiWaitResp(action, map);
+        Object resp = bot.callApiWaitResp(action, map);
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
-        if (StringUtil.hasLength(resp)) {
-            if (resp.startsWith("{")) {
+        if (resp != null) {
+            if (resp instanceof JSONObject json) {
                 StringBuilder willSend = new StringBuilder();
-                JSONObject jsonObject = JSONObject.parse(resp);
-                jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                json.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
                 event.reply(willSend + "\n" + costTime);
-            } else if (resp.startsWith("[")) {
+            } else if (resp instanceof JSONArray array) {
                 List<Object> messages = new ArrayList<>();
                 messages.add(costTime);
-                messages.addAll(JSONArray.parseArray(resp, String.class)
-                        .stream().limit(98).map(json -> {
-                            StringBuilder willSend = new StringBuilder();
-                            JSONObject jsonObject = JSONObject.parse(json);
-                            jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
-                            return willSend.toString();
-                        }).toList());
+                array.stream().limit(98).forEach(json -> {
+                    StringBuilder willSend = new StringBuilder();
+                    assert json instanceof JSONObject;
+                    ((JSONObject) json).forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                    messages.add(willSend);
+                });
                 List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
                 bot.sendForwardMsg(event, nodes);
             }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tech.flless.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
@@ -20,12 +21,14 @@ import tech.flless.huhubot.adapters.onebot.v11.constant.OnebotAction;
 import tech.flless.huhubot.core.exception.ActionFailed;
 import tech.flless.huhubot.core.exception.IllegalMessageTypeException;
 import tech.flless.huhubot.utils.MistIdGenerator;
+import tech.flless.huhubot.utils.ThreadPoolUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 /**
  * @author elastic chow
@@ -48,7 +51,14 @@ public class Bot {
 
     static  {
         EmojiMap = new HashMap<>();
-        int[] emojiArr = new int[]{4,5,8,9,10,12,14,16,21,23,24,25,26,27,28,29,30,32,33,34,38,39,41,42,43,49,53,60,63,66,74,75,76,78,79,85,89,96,97,98,99,100,101,102,103,104,106,109,111,116,118,120,122,123,124,125,129,144,147,171,173,174,175,176,179,180,181,182,183,201,203,212,214,219,222,227,232,240,243,246,262,264,265,266,267,268,269,270,271,272,273,277,278,281,282,284,285,287,289,290,293,294,297,298,299,305,306,307,314,315,318,319,320,322,324,326,9728,9749,9786,10024,10060,10068,127801,127817,127822,127827,127836,127838,127847,127866,127867,127881,128027,128046,128051,128053,128074,128076,128077,128079,128089,128102,128104,128147,128157,128164,128166,128168,128170,128235,128293,128513,128514,128516,128522,128524,128527,128530,128531,128532,128536,128538,128540,128541,128557,128560,128563};
+        int[] emojiArr = new int[]{4,5,8,9,10,12,14,16,21,23,24,25,26,27,28,29,30,32,33,34,38,39,41,42,43,49,53,60,63,66,
+                74,75,76,78,79,85,89,96,97,98,99,100,101,102,103,104,106,109,111,116,118,120,122,123,124,125,129,144,147,
+                171,173,174,175,176,179,180,181,182,183,201,203,212,214,219,222,227,232,240,243,246,262,264,265,266,267,
+                268, 269,270,271,272,273,277,278,281,282,284,285,287,289,290,293,294,297,298,299,305,306,307,314,315,318,
+                319,320, 322,324,326,9728,9749,9786,10024,10060,10068,127801,127817,127822,127827,127836,127838,127847,
+                127866,127867, 127881,128027,128046,128051,128053,128074,128076,128077,128079,128089,128102,128104,128147,
+                128157,128164,128166, 128168,128170,128235,128293,128513,128514,128516,128522,128524,128527,128530,128531,
+                128532,128536,128538,128540, 128541,128557,128560,128563};
         for (int id : emojiArr) {
             EmojiMap.put(id, null);
         }
@@ -67,9 +77,7 @@ public class Bot {
         } catch (IOException e) {
             log.error("[hb]-ws->[ob-{}]{}, exception[{}]", selfId, text, e.getMessage());
         }
-        if (!requestBox.getAction().equals("set_group_card")) {
-            log.info("[hb]-ws->[ob-{}]{}", selfId, text);
-        }
+        log.info("[hb]-ws->[ob-{}]{}", selfId, text);
     }
 
     public void callApi(OnebotAction action, Map<String, Object> paramsMap) {
@@ -85,7 +93,7 @@ public class Bot {
         return echoData;
     }
 
-    public static void transferData(long echo, String data) {
+    public static void transferData(long echo, Object data) {
         if (!ECHO_DATA_MAP.containsKey(echo)) return;
         EchoData echoData = ECHO_DATA_MAP.get(echo);
         echoData.syncSetAndNotify(data);
@@ -96,13 +104,13 @@ public class Bot {
         private static final long timeout = 10000L;
 
         private final long echo;
-        private String data;
+        private Object data; //JSONArray | JsonObject
 
         private EchoData(long echo) {
             this.echo = echo;
         }
 
-        private String waitAndGet() {
+        private Object waitAndGet() {
             try {
                 this.wait(timeout);
             } catch (InterruptedException e) {
@@ -113,7 +121,7 @@ public class Bot {
             return this.data;
         }
 
-        private synchronized void syncSetAndNotify(String data) {
+        private synchronized void syncSetAndNotify(Object data) {
             this.data = data;
             this.notify();
         }
@@ -127,14 +135,14 @@ public class Bot {
      * @return json 字符串数据
      */
     @SuppressWarnings("all")
-    public String callApiWaitResp(OnebotAction action, Map<String, Object> paramsMap) {
+    public Object callApiWaitResp(OnebotAction action, Map<String, Object> paramsMap) {
         long echo = MistIdGenerator.nextId();
         RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).echo(echo).build();
         EchoData echoData = buildEchoDataToMap(echo);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
             this.sessionSend(requestBox);
-            String res = echoData.waitAndGet();
+            Object res = echoData.waitAndGet();
             log.info("[hb]<-ws-[ob-{}]{}", this.selfId, res);
             return res;
         }
@@ -151,8 +159,11 @@ public class Bot {
      * @return SelfInfo
      */
     public SelfInfo getLoginInfo() {
-        String data = this.callApiWaitResp(OnebotAction.get_login_info, null);
-        return JSONObject.parseObject(data, SelfInfo.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_login_info, null);
+        if (data instanceof JSONObject json) {
+            return json.toJavaObject(SelfInfo.class);
+        } else return null;
+
     }
 
     /**
@@ -161,8 +172,10 @@ public class Bot {
      * @return List<FriendInfo>
      */
     public List<FriendInfo> getFriendList() {
-        String data = this.callApiWaitResp(OnebotAction.get_friend_list, null);
-        return JSONArray.parseArray(data, FriendInfo.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_friend_list, null);
+        if (data instanceof JSONArray array) {
+            return array.toJavaList(FriendInfo.class);
+        } else return List.of();
     }
 
 
@@ -174,8 +187,10 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        String data = this.callApiWaitResp(OnebotAction.get_group_member_list,Map.of("group_id", groupId, "no_cache", noCache));
-        return JSONArray.parseArray(data, GroupMember.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_group_member_list,Map.of("group_id", groupId, "no_cache", noCache));
+        if (data instanceof JSONArray array) {
+            return array.toJavaList(GroupMember.class);
+        } else return List.of();
     }
 
     /**
@@ -185,8 +200,10 @@ public class Bot {
      * @return List<GroupInfo>
      */
     public List<GroupInfo> getGroupList(boolean noCache) {
-        String data = this.callApiWaitResp(OnebotAction.get_group_list, Map.of("no_cache", noCache));
-        return JSONArray.parseArray(data, GroupInfo.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_group_list, Map.of("no_cache", noCache));
+        if (data instanceof JSONArray array) {
+            return array.toJavaList(GroupInfo.class);
+        } else return List.of();
     }
 
     public List<GroupInfo> getGroupList() {
@@ -197,8 +214,10 @@ public class Bot {
     }
 
     public GroupInfo getGroupInfo(Long groupId, boolean noCache) {
-        String data = this.callApiWaitResp(OnebotAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
-        return JSONObject.parseObject(data, GroupInfo.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_group_info, Map.of("group_id", groupId, "no_cache", noCache));
+        if (data instanceof JSONObject json) {
+            return json.toJavaObject(GroupInfo.class);
+        } else return null;
     }
 
 
@@ -209,9 +228,11 @@ public class Bot {
      * @return MessageInfo
      */
     public MessageInfo getMsg(Integer messageId) {
-        String data = this.callApiWaitResp(OnebotAction.get_msg, Map.of("message_id", messageId));
-        JSONObject jsonObject = JSONObject.parseObject(data);
-        return jsonObject.toJavaObject(MessageInfo.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_msg, Map.of("message_id", messageId));
+        if (data instanceof JSONObject json) {
+            return json.toJavaObject(MessageInfo.class);
+        } else return null;
+        //return jsonObject.toJavaObject(MessageInfo.class);
         //return JSONObject.parseObject(data, MessageInfo.class);//莫名其妙报错
     }
 
@@ -225,8 +246,10 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        String data = this.callApiWaitResp(OnebotAction.get_group_member_info,Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
-        return JSONObject.parseObject(data, GroupMember.class);
+        Object data = this.callApiWaitResp(OnebotAction.get_group_member_info,Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
+        if (data instanceof JSONObject json) {
+            return json.toJavaObject(GroupMember.class);
+        } else return null;
     }
 
     /**
@@ -287,6 +310,18 @@ public class Bot {
     }
 
 
+    public Future<Integer> asyncSendGroupMessage(Long groupId, Object message) {
+        return ThreadPoolUtil.AsyncExecutor.submit(() -> {
+            boolean autoEscape = message instanceof String;
+            if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+                throw new IllegalMessageTypeException();
+            Object data = this.callApiWaitResp(OnebotAction.send_group_msg,Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
+            assert data instanceof JSONObject;
+            return ((JSONObject) data).getInteger("message_id");
+        });
+    }
+
+
     /**
      * 发送私聊消息
      *
@@ -299,6 +334,17 @@ public class Bot {
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
         this.callApi(OnebotAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+    }
+
+    public Future<Integer> asyncSendPrivateMessage(Long userId, Object message) {
+        return ThreadPoolUtil.AsyncExecutor.submit(() -> {
+            boolean autoEscape = message instanceof String;
+            if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+                throw new IllegalMessageTypeException();
+            Object data = this.callApiWaitResp(OnebotAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+            assert data instanceof JSONObject;
+            return ((JSONObject) data).getInteger("message_id");
+        });
     }
 
 
@@ -323,8 +369,8 @@ public class Bot {
     /**
      * @param messageId Integer
      */
-    public void getForwardMsg(Integer messageId) {
-        String data = this.callApiWaitResp(OnebotAction.get_forward_msg, Map.of("message_id", messageId));
+    public String getForwardMsg(Integer messageId) {
+        return this.callApiWaitResp(OnebotAction.get_forward_msg, Map.of("message_id", messageId)).toString();
     }
 
     /**
