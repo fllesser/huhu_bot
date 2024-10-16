@@ -34,7 +34,7 @@ public class ThreadPoolUtil {
                 new ThreadPoolExecutor.CallerRunsPolicy());
         ReechoExecutor = new ThreadPoolExecutor(
                 2, 2, 1, TimeUnit.HOURS,
-                new ArrayBlockingQueue<>(0),
+                new ArrayBlockingQueue<>(1),
                 new CustomizableThreadFactory("sync-reecho-"),
                 (r, executor) -> {throw new FinishedException("同步队列溢出, 请求拒绝");});
         ProcessEventExecutor = new ThreadPoolExecutor(
