@@ -50,7 +50,7 @@ public interface ReechoClient {
         SyncGenerateReqBody reqBody = new SyncGenerateReqBody(voiceId, text, "default");
         Future<Result<SyncGenerateData>> future = ThreadPoolUtil.ReechoExecutor.submit(
                 () -> syncGenerate(GlobalConfig.reechoCf.authorization(), reqBody));
-        return future.get(60, TimeUnit.SECONDS).getData().getAudio();
+        return future.get(300, TimeUnit.SECONDS).getData().getAudio();
     }
 
 
