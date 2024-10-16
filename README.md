@@ -1,5 +1,6 @@
 # Huhubot
-nonebot2, but jvav
+nonebot, but jvav 
+onebotv11 sdk
 
 ## 介绍
 1. java17(springboot3), 支持onebotv11协议实现(gocqhttp,napchat,llonebot)反向ws连接
