@@ -11,7 +11,6 @@ import tech.flless.huhubot.core.annotation.MessageHandler;
 import tech.flless.huhubot.core.annotation.RuleCheck;
 import tech.flless.huhubot.adapters.onebot.v11.constant.OnebotAction;
 import tech.flless.huhubot.core.rule.RuleEnum;
-import tech.flless.huhubot.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,19 +61,19 @@ public class CallApiPlugin {
         long end = System.currentTimeMillis();
         String costTime = "time-consuming: " + (end - start) + "ms";
         if (resp != null) {
-            if (resp instanceof JSONObject json) {
+            if (resp instanceof JSONObject jsonObject) {
                 StringBuilder willSend = new StringBuilder();
-                json.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
                 event.reply(willSend + "\n" + costTime);
-            } else if (resp instanceof JSONArray array) {
+            } else if (resp instanceof JSONArray jsonArray) {
                 List<Object> messages = new ArrayList<>();
                 messages.add(costTime);
-                array.stream().limit(98).forEach(json -> {
-                    StringBuilder willSend = new StringBuilder();
-                    assert json instanceof JSONObject;
-                    ((JSONObject) json).forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
-                    messages.add(willSend);
-                });
+                messages.addAll(jsonArray.toJavaList(JSONObject.class)
+                        .stream().limit(98).map(jsonObject -> {
+                            StringBuilder willSend = new StringBuilder();
+                            jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
+                            return willSend.toString();
+                        }).toList());
                 List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
                 bot.sendForwardMsg(event, nodes);
             }
