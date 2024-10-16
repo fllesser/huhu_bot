@@ -20,9 +20,16 @@ public class ThreadPoolUtil {
     private ThreadPoolUtil() {
     }
 
+    public final static ThreadPoolExecutor AsyncExecutor;
+
     public final static ThreadPoolExecutor ReechoExecutor;
 
     static {
+        AsyncExecutor = new ThreadPoolExecutor(
+                2, 4, 1, TimeUnit.HOURS,
+                new ArrayBlockingQueue<>(8),
+                new CustomizableThreadFactory("async-"),
+                new ThreadPoolExecutor.CallerRunsPolicy());
         ReechoExecutor = new ThreadPoolExecutor(
                 1, 2, 1, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(4),

@@ -41,19 +41,13 @@ public interface ReechoClient {
     @GET("/api/tts/voice")
     RoleList getVoiceList(@Header("Authorization") String key);
 
-    Map<String, String> NameIdMap = new HashMap<>();
-
-    default boolean isNotRole(String name) {
-        if (NameIdMap.isEmpty()) {
-            RoleList roleList = getVoiceList(GlobalConfig.reechoCf.authorization());
-            roleList.getData().forEach(role -> NameIdMap.put(role.getName(), role.getId()));
-        }
-        return !NameIdMap.containsKey(name);
+    default RoleList getVoiceList() {
+        return getVoiceList(GlobalConfig.reechoCf.authorization());
     }
 
 
-    default String generate(String name, String text) throws ExecutionException, InterruptedException, TimeoutException {
-        SyncGenerateReqBody reqBody = new SyncGenerateReqBody(NameIdMap.get(name), text, "default");
+    default String generate(String voiceId, String text) throws ExecutionException, InterruptedException, TimeoutException {
+        SyncGenerateReqBody reqBody = new SyncGenerateReqBody(voiceId, text, "default");
         Future<Result<SyncGenerateData>> future = ThreadPoolUtil.ReechoExecutor.submit(
                 () -> syncGenerate(GlobalConfig.reechoCf.authorization(), reqBody));
         return future.get(60, TimeUnit.SECONDS).getData().getAudio();
@@ -61,8 +55,8 @@ public interface ReechoClient {
 
 
     @Deprecated
-    default String oldGenerate(String name, String text) {
-        AsyncGenResp resp = asyncGenerate(GlobalConfig.reechoCf.getWebToken(), new AsyncGenerateReqBody("market:" + NameIdMap.get(name), text));
+    default String oldGenerate(String voiceId, String text) {
+        AsyncGenResp resp = asyncGenerate(GlobalConfig.reechoCf.getWebToken(), new AsyncGenerateReqBody("market:" + voiceId, text));
         if (resp.getData() == null) throw new FinishedException("请求失败，今日点数可能已耗尽");
         try {
             return ThreadPoolUtil.ReechoExecutor.submit(() -> {
