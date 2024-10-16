@@ -24,21 +24,7 @@ public class OneBotV11Handler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(@NotNull final WebSocketSession session, final TextMessage message) {
-        String json = message.getPayload();
-        Event event = Event.build(JSONObject.parseObject(json));
-        if (event == null) return;
-        if (event instanceof MetaEvent metaEvent) {
-            if (metaEvent.isHeartbeat()) return;//心跳忽略
-            else if (metaEvent.isConnected()) {
-                //刚连接成功时，onebot实现端会发一条消息给bot, 添加bot到map中
-                BotContainer.addBot(event.getSelfId(), session);
-                log.info("Received OnebotV11 Client[{}] Connection Success Message", metaEvent.getSelfId());
-                return;
-            }
-        }
-        log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
-        event.setBot(BotContainer.getBot(event.getSelfId()));
-        ProcessEventTask.execute(event);
+        ProcessEventTask.dispatch(message.getPayload(), session);
     }
 
 
