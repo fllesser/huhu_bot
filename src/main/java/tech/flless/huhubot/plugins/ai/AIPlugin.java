@@ -97,7 +97,7 @@ public class AIPlugin {
             String audioUrl = reechoClient.generate(voiceMap.get(roleName), text);
             event.reply(MessageSegment.record(audioUrl));
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new FinishedException("未知错误: " + e.getClass().toString());
+            throw new FinishedException("请求超时");
         } finally {
             try {
                 bot.deleteMsg(messageId.get());
