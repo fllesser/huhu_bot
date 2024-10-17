@@ -30,6 +30,8 @@ public record ProcessEventTask(String json, WebSocketSession session) implements
     public void run() {
         Event event = Event.build(JSONObject.parseObject(json));
         if (event == null) return;
+ log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
+
         event.setBot(BotContainer.getBot(event.getSelfId()));
         if (event instanceof MessageEvent messageEvent) {
             DISPATCHER_CORE.onMessage(messageEvent);
@@ -46,8 +48,7 @@ public record ProcessEventTask(String json, WebSocketSession session) implements
                 return;
             }
         }
-        log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
-
+       
     }
 
     public static void dispatch(String json, WebSocketSession session) {
