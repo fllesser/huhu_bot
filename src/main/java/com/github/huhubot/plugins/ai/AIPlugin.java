@@ -53,8 +53,6 @@ public class AIPlugin {
     @Resource
     private ReechoConfig reechoConfig;
 
-    @Resource
-    private WordsDict wordsDict;
 
 
     @Resource
@@ -140,6 +138,7 @@ public class AIPlugin {
 
     @NoticeHandler(name = "语音回应戳一戳", priority = 0)
     public void replyPoke(NotifyNoticeEvent event) {
+        if (event.getGroupId() == null) return;
         Bot bot = event.getBot();
         if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
                 || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
@@ -150,9 +149,9 @@ public class AIPlugin {
         if (random < 0.33) {
             willSend = MessageSegment.poke(event.getUserId());
         } else if (random < 0.66) {
-            willSend = wordsDict.randWord();
+            willSend = WordsDict.randWord();
         } else {
-            willSend = MessageSegment.record(wordsDict.randVoice());
+            willSend = MessageSegment.record("file://" + WordsDict.randVoice());
         }
         bot.sendGroupMessage(event.getGroupId(), willSend);
     }

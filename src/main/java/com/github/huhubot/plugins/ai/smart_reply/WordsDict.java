@@ -6,6 +6,7 @@ import cn.hutool.http.HttpUtil;
 import com.github.huhubot.config.GlobalConfig;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
+import com.github.huhubot.utils.IocUtil;
 import com.github.huhubot.utils.ThreadPoolUtil;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
@@ -17,15 +18,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-@Component
+
 public class WordsDict {
 
-    @Resource
-    private ReechoClient reechoClient;
+    private static final List<String> words;
+    public static List<RoleList.Role> roles = new ArrayList<>();
 
-    private final List<String> words;
-
-    {
+    static {
         String[] wordArr = new String[]{"lsp你再戳？",
                 "连个可爱美少女都要戳的肥宅真恶心啊。",
                 "你再戳！",
@@ -52,17 +51,20 @@ public class WordsDict {
     }
 
 
-    public String randWord() {
+    public static String randWord() {
         return words.get((int) (Math.random() * words.size()));
     }
 
-    public String randVoice() {
+    public static String randVoice() {
         int wordId = (int) (Math.random() * words.size());
-        List<RoleList.Role> roles = reechoClient.getVoiceList().getData();
+        ReechoClient reechoClient = IocUtil.getBean(ReechoClient.class);
+        if (roles.isEmpty()) {
+            roles = reechoClient.getVoiceList().getData();
+        }
         RoleList.Role role = roles.get((int) (Math.random() * roles.size()));
         String fileName = wordId + "_" + role.getId() + ".mp3";
-        //遍历文件夹voice，如果有
-        String voicePath = "file://" + System.getProperty("user.dir") + File.separator  + "voices" + File.separator + fileName;
+
+        String voicePath = System.getProperty("user.dir") + File.separator  + "voices" + File.separator + fileName;
         try (FileReader ignored = new FileReader(voicePath)) {
             return voicePath;
         } catch (IOException ignored1) {

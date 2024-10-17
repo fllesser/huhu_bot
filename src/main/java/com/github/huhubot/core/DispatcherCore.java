@@ -208,7 +208,7 @@ public class DispatcherCore {
                 } else if (targetE instanceof ActionFailed) {
                     log.error("ActionFailed: {}", targetE.getMessage());
                 } else {
-                    log.error(targetE.getMessage());
+                    log.error("未知错误{}", targetE.getMessage());
                 }
             }
         }
