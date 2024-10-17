@@ -145,15 +145,16 @@ public class AIPlugin {
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
         double random = Math.random();
-        Object willSend = null;
         if (random < 0.33) {
-            willSend = MessageSegment.poke(event.getUserId());
+            bot.groupPoke(event.getGroupId(), event.getUserId());
         } else if (random < 0.66) {
-            willSend = WordsDict.randWord();
+            String willSend = WordsDict.randWord();
+            bot.sendGroupMessage(event.getGroupId(), willSend);
         } else {
-            willSend = MessageSegment.record("file://" + WordsDict.randVoice());
+            MessageSegment willSend = MessageSegment.record("file://" + WordsDict.randVoice());
+            bot.sendGroupMessage(event.getGroupId(), willSend);
         }
-        bot.sendGroupMessage(event.getGroupId(), willSend);
+
     }
 
 
