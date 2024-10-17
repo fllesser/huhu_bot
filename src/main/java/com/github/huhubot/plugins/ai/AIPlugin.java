@@ -93,8 +93,8 @@ public class AIPlugin {
 
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (!StringUtil.hasLength(text)) return;
-        if (!botConfig.isSuperUser(event.getUserId()) && text.length() >= 102)
-            throw new FinishedException("api 额度有限，so 字符长度须少于100, 或者 vivo 20给你加白名单");
+        if (!botConfig.isSuperUser(event.getUserId()) && text.length() >= 120)
+            throw new FinishedException("Api 额度有限，单词调用字数须少于 40, 或者 vivo 20 给你加白名单");
 
         Bot bot = event.getBot();
         Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
@@ -145,9 +145,7 @@ public class AIPlugin {
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
         double random = Math.random();
-        if (random < 0.33) {
-            bot.groupPoke(event.getGroupId(), event.getUserId());
-        } else if (random < 0.66) {
+        if (random < 0.5) {
             String willSend = WordsDict.randWord();
             bot.sendGroupMessage(event.getGroupId(), willSend);
         } else {
