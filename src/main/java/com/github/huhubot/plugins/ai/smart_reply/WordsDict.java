@@ -1,0 +1,79 @@
+package com.github.huhubot.plugins.ai.smart_reply;
+
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import com.github.huhubot.config.GlobalConfig;
+import com.github.huhubot.plugins.ai.reecho.ReechoClient;
+import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
+import com.github.huhubot.utils.ThreadPoolUtil;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
+@Component
+public class WordsDict {
+
+    @Resource
+    private ReechoClient reechoClient;
+
+    private final List<String> words;
+
+    {
+        String[] wordArr = new String[]{"lsp你再戳？",
+                "连个可爱美少女都要戳的肥宅真恶心啊。",
+                "你再戳！",
+                "？再戳试试？",
+                "别戳了别戳了再戳就坏了555",
+                "我爪巴爪巴，球球别再戳了",
+                "你戳你马呢？！",
+                "请不要戳" + GlobalConfig.botCf.getNickName() + ">_<",
+                "放手啦，不给戳QAQ",
+                "喂(#`O′) 戳" + GlobalConfig.botCf.getNickName() + "干嘛！",
+                "戳坏了，赔钱！",
+                "戳坏了",
+                "嗯……不可以……啦……不要乱戳",
+                "那...那里...那里不能戳...绝对...",
+                "(。´・ω・)ん?",
+                "有事恁叫我，别天天一个劲戳戳戳！",
+                "欸很烦欸！你戳锤子呢",
+                "再戳一下试试？",
+                "正在关闭对您的所有服务...关闭成功",
+                "啊呜，太舒服刚刚竟然睡着了。什么事？",
+                "正在定位您的真实地址...定位成功。轰炸机已起飞"};
+        words = new ArrayList<>(wordArr.length);
+        words.addAll(Arrays.asList(wordArr));
+    }
+
+
+    public String randWord() {
+        return words.get((int) (Math.random() * words.size()));
+    }
+
+    public String randVoice() {
+        int wordId = (int) (Math.random() * words.size());
+        List<RoleList.Role> roles = reechoClient.getVoiceList().getData();
+        RoleList.Role role = roles.get((int) (Math.random() * roles.size()));
+        String fileName = wordId + "_" + role.getId() + ".mp3";
+        //遍历文件夹voice，如果有
+        String voicePath = "file://" + System.getProperty("user.dir") + File.separator  + "voices" + File.separator + fileName;
+        try (FileReader ignored = new FileReader(voicePath)) {
+            return voicePath;
+        } catch (IOException ignored1) {
+            try {
+                String audioUrl = reechoClient.generate(role.getId(), words.get(wordId));
+                HttpUtil.downloadFile(audioUrl, voicePath);
+                return voicePath;
+            } catch (ExecutionException | InterruptedException | TimeoutException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+}

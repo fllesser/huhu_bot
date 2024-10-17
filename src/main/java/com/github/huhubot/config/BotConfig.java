@@ -22,6 +22,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "bot")
 public class BotConfig {
 
+    private String nickName;
     private List<Long> superUsers;
     private List<Character> commandPrefixes = new ArrayList<>(1);
     private Long testGroup;

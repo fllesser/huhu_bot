@@ -31,6 +31,6 @@ public class NoticeEvent extends Event {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", "notice." + noticeType + "[", "](未定义)").toString();
+        return new StringJoiner(", ", "notice." + noticeType + "[", "](Undefined Notice)").toString();
     }
 }

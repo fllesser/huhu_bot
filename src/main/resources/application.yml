@@ -5,6 +5,7 @@ ws:
 
 bot:
   super-users: [1942422015] #超级用户
+  nick-name: "大头"
 
 errie:
   client-id:

@@ -3,6 +3,7 @@ package com.github.huhubot.plugins.ai;
 import com.github.huhubot.adapters.onebot.v11.constant.SubTypeEnum;
 import com.github.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import com.github.huhubot.core.annotation.NoticeHandler;
+import com.github.huhubot.plugins.ai.smart_reply.WordsDict;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
@@ -23,6 +24,8 @@ import com.github.huhubot.plugins.ai.errie.entity.WxMessages;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
 import com.github.huhubot.utils.StringUtil;
+import okhttp3.OkHttp;
+import okhttp3.OkHttpClient;
 
 
 import java.util.*;
@@ -49,6 +52,9 @@ public class AIPlugin {
 
     @Resource
     private ReechoConfig reechoConfig;
+
+    @Resource
+    private WordsDict wordsDict;
 
 
     @Resource
@@ -132,14 +138,23 @@ public class AIPlugin {
     }
 
 
-    @NoticeHandler(name = "群内回戳", priority = 0)
+    @NoticeHandler(name = "语音回应戳一戳", priority = 0)
     public void replyPoke(NotifyNoticeEvent event) {
         Bot bot = event.getBot();
         if (!SubTypeEnum.poke.name().equals(event.getSubType()) //不是戳一戳事件
                 || !bot.getSelfId().equals(event.getTargetId()) //被戳的不是bot
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
-        bot.sendGroupMessage(event.getGroupId(), MessageSegment.poke(event.getUserId()));
+        double random = Math.random();
+        Object willSend = null;
+        if (random < 0.33) {
+            willSend = MessageSegment.poke(event.getUserId());
+        } else if (random < 0.66) {
+            willSend = wordsDict.randWord();
+        } else {
+            willSend = MessageSegment.record(wordsDict.randVoice());
+        }
+        bot.sendGroupMessage(event.getGroupId(), willSend);
     }
 
 
