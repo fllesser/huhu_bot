@@ -8,9 +8,9 @@
         <version>3.1.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>tech.flless</groupId>
+    <groupId>com.github</groupId>
     <artifactId>huhubot</artifactId>
-    <version>1.9.3</version>
+    <version>1.9.4</version>
     <name>huhubot</name>
     <description>huhubot</description>
 
