@@ -76,7 +76,7 @@ public class Bot {
         } catch (IOException e) {
             log.error("[hb]-ws->[ob-{}]{}, exception[{}]", selfId, text, e.getMessage());
         }
-        log.info("[hb]-ws->[ob-{}]{}", selfId, text);
+        log.info("[hb]-ws->[ob-{}] action.{}[echo={},params={}]", selfId, requestBox.getAction(),requestBox.getEcho(), JSONObject.toJSONString(requestBox.getParams()));
     }
 
     public void callApi(OnebotAction action, Map<String, Object> paramsMap) {
