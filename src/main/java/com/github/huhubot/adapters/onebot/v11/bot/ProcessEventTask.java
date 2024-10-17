@@ -35,7 +35,7 @@ public record ProcessEventTask(String json, WebSocketSession session) implements
             return;
         }
         event.setBot(BotContainer.getBot(event.getSelfId()));
-        log.info("[hb]<-ws-[ob-{}] {} ", event.getSelfId(), event);
+        log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
         if (event instanceof MessageEvent me) {
             DISPATCHER_CORE.onMessage(me);
         } else if (event instanceof NoticeEvent ne) {

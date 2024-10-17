@@ -36,6 +36,6 @@ public class MetaEvent extends Event {
 
     @Override
     public String toString() {
-        return postType + "." + metaEventType + "." + subType;
+        return postType + "." + metaEventType + "." + (subType == null ? "" : subType);
     }
 }
