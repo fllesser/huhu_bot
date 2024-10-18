@@ -3,6 +3,9 @@ package com.github.huhubot.plugins.ai;
 import com.github.huhubot.adapters.onebot.v11.constant.SubTypeEnum;
 import com.github.huhubot.adapters.onebot.v11.event.notice.NotifyNoticeEvent;
 import com.github.huhubot.core.annotation.NoticeHandler;
+import com.github.huhubot.core.annotation.RuleCheck;
+import com.github.huhubot.core.rule.RuleEnum;
+import com.github.huhubot.plugins.ai.reecho.entity.resp.AccountInfo;
 import com.github.huhubot.plugins.ai.smart_reply.WordsDict;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +57,6 @@ public class AIPlugin {
     private ReechoConfig reechoConfig;
 
 
-
     @Resource
     private BotConfig botConfig;
 
@@ -83,7 +85,7 @@ public class AIPlugin {
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")
-    public void aiVoice(GroupMessageEvent event) {
+    public void aiVoice(GroupMessageEvent event) throws ExecutionException, InterruptedException {
         Message message = event.getMessage();
         MessageInfo reply = event.getReply();
         String[] nameAndText = message.getPlainText().split("说", 2);
@@ -99,18 +101,9 @@ public class AIPlugin {
         Bot bot = event.getBot();
         Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
                 Message.reply(event.getMessageId()).append(MessageSegment.text("正在合成语音中...")));
-        try {
-            String audioUrl = reechoClient.generate(voiceMap.get(roleName), text);
-            event.reply(MessageSegment.record(audioUrl));
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new FinishedException("请求超时");
-        } finally {
-            try {
-                bot.deleteMsg(messageId.get());
-            } catch (InterruptedException | ExecutionException ignored) {
-            }
-        }
-
+        String audioUrl = reechoClient.generate(voiceMap.get(roleName), text);
+        event.reply(MessageSegment.record(audioUrl));
+        bot.deleteMsg(messageId.get());
     }
 
 
@@ -153,6 +146,13 @@ public class AIPlugin {
             bot.sendGroupMessage(event.getGroupId(), willSend);
         }
 
+    }
+
+    @RuleCheck(rule = RuleEnum.superuser)
+    @MessageHandler(name = "获取账户信息", commands = "账户")
+    public void credits(MessageEvent event) {
+        AccountInfo accountInfo = reechoClient.getAccountInfo(reechoConfig.authorization());
+        event.reply("剩余点数：" + accountInfo.getUser().getCredits());
     }
 
 

@@ -4,6 +4,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.github.huhubot.config.GlobalConfig;
+import com.github.huhubot.core.exception.FinishedException;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
 import com.github.huhubot.utils.IocUtil;
@@ -64,17 +65,11 @@ public class WordsDict {
         String fileName = wordId + "_" + role.getId() + ".mp3";
 
         String voicePath = System.getProperty("user.dir") + File.separator  + "voices" + File.separator + fileName;
-        try (FileReader ignored = new FileReader(voicePath)) {
-            return voicePath;
-        } catch (IOException ignored1) {
-            try {
-                String audioUrl = reechoClient.generate(role.getId(), words.get(wordId));
-                HttpUtil.downloadFile(audioUrl, voicePath);
-                return voicePath;
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                throw new RuntimeException(e);
-            }
+        if (!new File(voicePath).exists()) {
+            String audioUrl = reechoClient.generate(role.getId(), words.get(wordId));
+            HttpUtil.downloadFile(audioUrl, voicePath);
         }
+        return voicePath;
 
     }
 }

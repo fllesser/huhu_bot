@@ -7,6 +7,7 @@ import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
+import com.github.huhubot.config.BotConfig;
 import com.github.huhubot.config.GlobalConfig;
 
 /**
@@ -16,7 +17,9 @@ import com.github.huhubot.config.GlobalConfig;
 public class RuleRef {
 
     public static boolean tome(Event event) {
-        if (event instanceof GroupMessageEvent gme) return gme.isToMe();
+        if (event instanceof GroupMessageEvent gme) {
+            return gme.isToMe() || gme.getRawMessage().contains(GlobalConfig.botCf.getNickName());
+        }
         return false;
     }
 

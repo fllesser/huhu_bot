@@ -46,20 +46,20 @@ public class Bot {
     //群列表
     private List<GroupInfo> groups;
 
-    private static final Map<Integer, String> EmojiMap;
+    private static final Map<Integer, Boolean> EmojiMap;
 
-    static  {
+    static {
         EmojiMap = new HashMap<>();
-        int[] emojiArr = new int[]{4,5,8,9,10,12,14,16,21,23,24,25,26,27,28,29,30,32,33,34,38,39,41,42,43,49,53,60,63,66,
-                74,75,76,78,79,85,89,96,97,98,99,100,101,102,103,104,106,109,111,116,118,120,122,123,124,125,129,144,147,
-                171,173,174,175,176,179,180,181,182,183,201,203,212,214,219,222,227,232,240,243,246,262,264,265,266,267,
-                268, 269,270,271,272,273,277,278,281,282,284,285,287,289,290,293,294,297,298,299,305,306,307,314,315,318,
-                319,320, 322,324,326,9728,9749,9786,10024,10060,10068,127801,127817,127822,127827,127836,127838,127847,
-                127866,127867, 127881,128027,128046,128051,128053,128074,128076,128077,128079,128089,128102,128104,128147,
-                128157,128164,128166, 128168,128170,128235,128293,128513,128514,128516,128522,128524,128527,128530,128531,
-                128532,128536,128538,128540, 128541,128557,128560,128563};
+        int[] emojiArr = new int[]{4, 5, 8, 9, 10, 12, 14, 16, 21, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 38, 39, 41, 42, 43, 49, 53, 60, 63, 66,
+                74, 75, 76, 78, 79, 85, 89, 96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 109, 111, 116, 118, 120, 122, 123, 124, 125, 129, 144, 147,
+                171, 173, 174, 175, 176, 179, 180, 181, 182, 183, 201, 203, 212, 214, 219, 222, 227, 232, 240, 243, 246, 262, 264, 265, 266, 267,
+                268, 269, 270, 271, 272, 273, 277, 278, 281, 282, 284, 285, 287, 289, 290, 293, 294, 297, 298, 299, 305, 306, 307, 314, 315, 318,
+                319, 320, 322, 324, 326, 9728, 9749, 9786, 10024, 10060, 10068, 127801, 127817, 127822, 127827, 127836, 127838, 127847,
+                127866, 127867, 127881, 128027, 128046, 128051, 128053, 128074, 128076, 128077, 128079, 128089, 128102, 128104, 128147,
+                128157, 128164, 128166, 128168, 128170, 128235, 128293, 128513, 128514, 128516, 128522, 128524, 128527, 128530, 128531,
+                128532, 128536, 128538, 128540, 128541, 128557, 128560, 128563};
         for (int id : emojiArr) {
-            EmojiMap.put(id, null);
+            EmojiMap.put(id, true);
         }
     }
 
@@ -76,7 +76,7 @@ public class Bot {
         } catch (IOException e) {
             log.error("[hb]-ws->[ob-{}]{}, exception[{}]", selfId, text, e.getMessage());
         }
-        log.info("[hb]-ws->[ob-{}] action.{}[echo={},params={}]", selfId, requestBox.getAction(),requestBox.getEcho(), JSONObject.toJSONString(requestBox.getParams()));
+        log.info("[hb]-ws->[ob-{}] action.{}[echo={},params={}]", selfId, requestBox.getAction(), requestBox.getEcho(), JSONObject.toJSONString(requestBox.getParams()));
     }
 
     public void callApi(OnebotAction action, Map<String, Object> paramsMap) {
@@ -141,15 +141,16 @@ public class Bot {
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
             this.sessionSend(requestBox);
-            Object res = echoData.waitAndGet();
-            log.info("[hb]<-ws-[ob-{}]{}", this.selfId, res);
-            return res;
+            Object data = echoData.waitAndGet();
+            log.info("[hb]<-ws-[ob-{}] action.resp:[echo:{}, data:{}]", this.selfId, echoData.echo, data);
+            return data;
         }
+
     }
 
 
     public void deleteFriend(Long userId) {
-        this.callApiWaitResp(OnebotAction.delete_friend, Map.of("user_id", userId));
+        this.callApi(OnebotAction.delete_friend, Map.of("user_id", userId));
     }
 
     /**
@@ -159,10 +160,8 @@ public class Bot {
      */
     public SelfInfo getLoginInfo() {
         Object data = this.callApiWaitResp(OnebotAction.get_login_info, null);
-        if (data instanceof JSONObject json) {
-            return json.toJavaObject(SelfInfo.class);
-        } else return null;
-
+        assert data instanceof JSONObject;
+        return ((JSONObject) data).toJavaObject(SelfInfo.class);
     }
 
     /**
@@ -186,7 +185,7 @@ public class Bot {
      * @param noCache 为true时, 不使用缓存
      **/
     public List<GroupMember> getGroupMembers(Long groupId, boolean noCache) {
-        Object data = this.callApiWaitResp(OnebotAction.get_group_member_list,Map.of("group_id", groupId, "no_cache", noCache));
+        Object data = this.callApiWaitResp(OnebotAction.get_group_member_list, Map.of("group_id", groupId, "no_cache", noCache));
         if (data instanceof JSONArray array) {
             return array.toJavaList(GroupMember.class);
         } else return List.of();
@@ -245,7 +244,7 @@ public class Bot {
      * @return GroupMember
      */
     public GroupMember getGroupMember(Long groupId, Long userId, boolean noCache) {
-        Object data = this.callApiWaitResp(OnebotAction.get_group_member_info,Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
+        Object data = this.callApiWaitResp(OnebotAction.get_group_member_info, Map.of("group_id", groupId, "user_id", userId, "no_cache", noCache));
         if (data instanceof JSONObject json) {
             return json.toJavaObject(GroupMember.class);
         } else return null;
@@ -259,7 +258,7 @@ public class Bot {
      * @param specialTitle special_title
      */
     public void setGroupSpecialTitle(Long groupId, Long userId, String specialTitle) {
-        this.callApi(OnebotAction.set_group_special_title,Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
+        this.callApi(OnebotAction.set_group_special_title, Map.of("group_id", groupId, "user_id", userId, "special_title", specialTitle));
     }
 
     /**
@@ -270,7 +269,7 @@ public class Bot {
      * @param card    card
      */
     public void setGroupCard(Long groupId, Long userId, String card) {
-        this.callApi(OnebotAction.set_group_card,Map.of("group_id", groupId, "user_id", userId, "card", card));
+        this.callApi(OnebotAction.set_group_card, Map.of("group_id", groupId, "user_id", userId, "card", card));
     }
 
     /**
@@ -290,7 +289,7 @@ public class Bot {
      * @param enable  true 为设置, false 为取消
      */
     public void setGroupAdmin(Long groupId, Long userId, boolean enable) {
-        this.callApi(OnebotAction.set_group_admin,Map.of("group_id", groupId, "user_id", userId, "enable", enable));
+        this.callApi(OnebotAction.set_group_admin, Map.of("group_id", groupId, "user_id", userId, "enable", enable));
     }
 
 
@@ -305,7 +304,7 @@ public class Bot {
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        this.callApi(OnebotAction.send_group_msg,Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
+        this.callApi(OnebotAction.send_group_msg, Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
     }
 
 
@@ -314,7 +313,7 @@ public class Bot {
             boolean autoEscape = message instanceof String;
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
-            Object data = this.callApiWaitResp(OnebotAction.send_group_msg,Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
+            Object data = this.callApiWaitResp(OnebotAction.send_group_msg, Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
             assert data instanceof JSONObject;
             return ((JSONObject) data).getInteger("message_id");
         });
@@ -332,7 +331,7 @@ public class Bot {
         boolean autoEscape = message instanceof String;
         if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
             throw new IllegalMessageTypeException();
-        this.callApi(OnebotAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+        this.callApi(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
     }
 
     public Future<Integer> asyncSendPrivateMessage(Long userId, Object message) {
@@ -340,7 +339,7 @@ public class Bot {
             boolean autoEscape = message instanceof String;
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
-            Object data = this.callApiWaitResp(OnebotAction.send_private_msg,Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+            Object data = this.callApiWaitResp(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
             assert data instanceof JSONObject;
             return ((JSONObject) data).getInteger("message_id");
         });
@@ -404,6 +403,7 @@ public class Bot {
     /**
      * 根据事件, 来发送对应的消息
      * 建议使用event.reply(Object message)
+     *
      * @param event   event object
      * @param message 消息 Message | MessageSegment | String
      *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
@@ -423,7 +423,7 @@ public class Bot {
     }
 
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
-        this.callApi(OnebotAction.set_group_kick,Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
+        this.callApi(OnebotAction.set_group_kick, Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
     }
 
 

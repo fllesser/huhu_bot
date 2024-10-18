@@ -35,20 +35,26 @@ public interface ReechoClient {
     @POST("/api/tts/simple-generate")
     Result<SyncGenerateData> syncGenerate(@Header("Authorization") String key, @Body SyncGenerateReqBody body);
 
-
     @GET("/api/tts/voice")
     RoleList getVoiceList(@Header("Authorization") String key);
+
+    @GET("/api/account/info")
+    AccountInfo getAccountInfo(@Header("Authorization") String key);
 
     default RoleList getVoiceList() {
         return getVoiceList(GlobalConfig.reechoCf.authorization());
     }
 
 
-    default String generate(String voiceId, String text) throws ExecutionException, InterruptedException, TimeoutException {
+    default String generate(String voiceId, String text)  {
         SyncGenerateReqBody reqBody = new SyncGenerateReqBody(voiceId, text, "default");
         Future<Result<SyncGenerateData>> future = ThreadPoolUtil.ReechoExecutor.submit(
                 () -> syncGenerate(GlobalConfig.reechoCf.authorization(), reqBody));
-        return future.get(300, TimeUnit.SECONDS).getData().getAudio();
+        try {
+            return future.get(300, TimeUnit.SECONDS).getData().getAudio();
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new FinishedException("合成超时");
+        }
     }
 
 
