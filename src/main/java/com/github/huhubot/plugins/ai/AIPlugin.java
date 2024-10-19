@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
-com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
+import com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import com.github.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
