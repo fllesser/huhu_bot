@@ -81,6 +81,9 @@ public class MessageSegment {
     public static MessageSegment atAll() {
         return build("at", Map.of("qq", "all"));
     }
+public static MessageSegment markdown(String content) {
+   return build("markdown", Map.of("content", content));
+}
 
     //gocq已不支持
     @Deprecated
