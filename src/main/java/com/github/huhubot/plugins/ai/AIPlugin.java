@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
+com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import com.github.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
@@ -58,7 +59,8 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-        event.reply(completion.getResult());
+                       List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), List.of(completion.getResult()));
+                bot.sendForwardMsg(event, nodes); //event.reply(completion.getResult());
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")
