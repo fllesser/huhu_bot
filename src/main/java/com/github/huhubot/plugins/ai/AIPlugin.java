@@ -96,7 +96,7 @@ public class AIPlugin {
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (!StringUtil.hasLength(text)) return;
         if (!botConfig.isSuperUser(event.getUserId()) && text.length() >= 120)
-            throw new FinishedException("Api 额度有限，单词调用字数须少于 40, 或者 vivo 20 给你加白名单");
+            throw new FinishedException("Api 额度有限，单次调用字数须少于 40, 或者 vivo 20 给你加白名单");
 
         Bot bot = event.getBot();
         Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
