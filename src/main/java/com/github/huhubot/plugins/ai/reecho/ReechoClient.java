@@ -4,6 +4,8 @@ package com.github.huhubot.plugins.ai.reecho;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.*;
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
 
+import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.stereotype.Component;
 import retrofit2.http.*;
 import com.github.huhubot.config.GlobalConfig;
 import com.github.huhubot.core.exception.FinishedException;
@@ -17,7 +19,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-@RetrofitClient(baseUrl = "https://v1.reecho.cn")
+@Component
+@RetrofitClient(baseUrl = "https://v1.reecho.cn", readTimeoutMs = 300000)
 public interface ReechoClient {
 
     @POST("/api/tts/generate")

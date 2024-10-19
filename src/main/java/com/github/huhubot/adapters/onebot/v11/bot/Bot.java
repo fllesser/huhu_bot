@@ -23,9 +23,7 @@ import com.github.huhubot.utils.MistIdGenerator;
 import com.github.huhubot.utils.ThreadPoolUtil;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -46,10 +44,10 @@ public class Bot {
     //群列表
     private List<GroupInfo> groups;
 
-    private static final Map<Integer, Boolean> EmojiMap;
+    private static final Set<Integer> EmojiMap;
 
     static {
-        EmojiMap = new HashMap<>();
+        EmojiMap = new HashSet<>(200);
         int[] emojiArr = new int[]{4, 5, 8, 9, 10, 12, 14, 16, 21, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 38, 39, 41, 42, 43, 49, 53, 60, 63, 66,
                 74, 75, 76, 78, 79, 85, 89, 96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 109, 111, 116, 118, 120, 122, 123, 124, 125, 129, 144, 147,
                 171, 173, 174, 175, 176, 179, 180, 181, 182, 183, 201, 203, 212, 214, 219, 222, 227, 232, 240, 243, 246, 262, 264, 265, 266, 267,
@@ -59,7 +57,7 @@ public class Bot {
                 128157, 128164, 128166, 128168, 128170, 128235, 128293, 128513, 128514, 128516, 128522, 128524, 128527, 128530, 128531,
                 128532, 128536, 128538, 128540, 128541, 128557, 128560, 128563};
         for (int id : emojiArr) {
-            EmojiMap.put(id, true);
+            EmojiMap.add(id);
         }
     }
 
@@ -84,18 +82,16 @@ public class Bot {
         this.sessionSend(requestBox);
     }
 
-    private static final Map<Long, EchoData> ECHO_DATA_MAP = new ConcurrentHashMap<>();
+    //应该没有线程安全问题（确信
+    private static final Map<Long, EchoData> echoDataMap = new HashMap<>();
 
-    private static EchoData buildEchoDataToMap(long echo) {
-        EchoData echoData = new EchoData(echo);
-        ECHO_DATA_MAP.put(echo, echoData);
-        return echoData;
-    }
-
-    public static void transferData(long echo, Object data) {
-        if (!ECHO_DATA_MAP.containsKey(echo)) return;
-        EchoData echoData = ECHO_DATA_MAP.get(echo);
-        echoData.syncSetAndNotify(data);
+    protected static void setAndNotify(long echo, Object data) {
+        if (!echoDataMap.containsKey(echo)) return;
+        EchoData echoData = echoDataMap.get(echo);
+        synchronized (echoData) {
+            echoData.data = data;
+            echoData.notify();
+        }
     }
 
     static class EchoData {
@@ -109,20 +105,12 @@ public class Bot {
             this.echo = echo;
         }
 
-        private Object waitAndGet() {
-            try {
-                this.wait(timeout);
-            } catch (InterruptedException e) {
-                throw new ActionFailed("等待响应数据, 出现线程中断异常, echo:" + echo);
-            } finally {
-                ECHO_DATA_MAP.remove(echo);
-            }
-            return this.data;
-        }
-
-        private synchronized void syncSetAndNotify(Object data) {
-            this.data = data;
-            this.notify();
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", "action.resp" + "[", "]")
+                    .add("echo=" + echo)
+                    .add("data=" + data)
+                    .toString();
         }
     }
 
@@ -137,15 +125,21 @@ public class Bot {
     public Object callApiWaitResp(OnebotAction action, Map<String, Object> paramsMap) {
         long echo = MistIdGenerator.nextId();
         RequestBox requestBox = RequestBox.builder().action(action.name()).params(paramsMap).echo(echo).build();
-        EchoData echoData = buildEchoDataToMap(echo);
+        EchoData echoData = new EchoData(echo);
+        echoDataMap.put(echo, echoData);
         //因为存在当前线程还没获得锁, 其他线程就抢先获得了锁的情况, 所以先获取锁, 再sessionSend
         synchronized (echoData) {
             this.sessionSend(requestBox);
-            Object data = echoData.waitAndGet();
-            log.info("[hb]<-ws-[ob-{}] action.resp:[echo:{}, data:{}]", this.selfId, echoData.echo, data);
-            return data;
+            try {
+                echoData.wait(10000L);
+            } catch (InterruptedException e) {
+                throw new ActionFailed("等待响应数据, 出现线程中断异常, echo:" + echo);
+            } finally {
+                echoDataMap.remove(echo);
+            }
         }
-
+        log.info("[hb]<-ws-[ob-{}] {}]", this.selfId, echoData);
+        return echoData.data;
     }
 
 
@@ -160,8 +154,9 @@ public class Bot {
      */
     public SelfInfo getLoginInfo() {
         Object data = this.callApiWaitResp(OnebotAction.get_login_info, null);
-        assert data instanceof JSONObject;
-        return ((JSONObject) data).toJavaObject(SelfInfo.class);
+        if (data instanceof JSONObject jsonObject) {
+            return jsonObject.toJavaObject(SelfInfo.class);
+        } else return null;
     }
 
     /**
@@ -179,7 +174,6 @@ public class Bot {
 
     /**
      * 获取群成员列表
-     * GocqActionEnum.GET_GROUP_MEMBER_LIST
      *
      * @param groupId groupId
      * @param noCache 为true时, 不使用缓存
@@ -230,8 +224,6 @@ public class Bot {
         if (data instanceof JSONObject json) {
             return json.toJavaObject(MessageInfo.class);
         } else return null;
-        //return jsonObject.toJavaObject(MessageInfo.class);
-        //return JSONObject.parseObject(data, MessageInfo.class);//莫名其妙报错
     }
 
     /**
@@ -314,8 +306,9 @@ public class Bot {
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
             Object data = this.callApiWaitResp(OnebotAction.send_group_msg, Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
-            assert data instanceof JSONObject;
-            return ((JSONObject) data).getInteger("message_id");
+            if (data instanceof JSONObject jsonObject) {
+                return jsonObject.getInteger("message_id");
+            } else return null;
         });
     }
 
@@ -340,8 +333,9 @@ public class Bot {
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
             Object data = this.callApiWaitResp(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
-            assert data instanceof JSONObject;
-            return ((JSONObject) data).getInteger("message_id");
+            if (data instanceof JSONObject jsonObject) {
+                return jsonObject.getInteger("message_id");
+            } else return null;
         });
     }
 
@@ -449,7 +443,7 @@ public class Bot {
     }
 
     public void setMsgEmojiLike(Integer messageId, Integer emojiId) {
-        if (EmojiMap.containsKey(emojiId)) {
+        if (EmojiMap.contains(emojiId)) {
             this.callApi(OnebotAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
         }
     }

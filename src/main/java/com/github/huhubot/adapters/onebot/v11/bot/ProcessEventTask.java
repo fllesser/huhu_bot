@@ -1,7 +1,7 @@
 package com.github.huhubot.adapters.onebot.v11.bot;
 
 import com.alibaba.fastjson2.JSONObject;
-import lombok.ToString;
+import com.github.huhubot.adapters.onebot.v11.event.request.RequestEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
 import com.github.huhubot.adapters.onebot.v11.event.meta.MetaEvent;
@@ -9,7 +9,6 @@ import com.github.huhubot.core.DispatcherCore;
 import com.github.huhubot.adapters.onebot.v11.event.Event;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
-import com.github.huhubot.adapters.onebot.v11.event.request.RequestEvent;
 import com.github.huhubot.utils.IocUtil;
 import com.github.huhubot.utils.ThreadPoolUtil;
 
@@ -20,36 +19,35 @@ import com.github.huhubot.utils.ThreadPoolUtil;
 @Slf4j
 public record ProcessEventTask(String json, WebSocketSession session) implements Runnable {
 
-    private static final DispatcherCore DISPATCHER_CORE;
+    private static final DispatcherCore dispatcherCore;
 
     static {
-        DISPATCHER_CORE = IocUtil.getBean(DispatcherCore.class);
+        dispatcherCore = IocUtil.getBean(DispatcherCore.class);
     }
 
-    //@Override
+    @Override
     public void run() {
         JSONObject jsonObject = JSONObject.parseObject(json);
         Event event = Event.build(jsonObject);
         if (event == null) {
-            Bot.transferData(jsonObject.getLong("echo"), jsonObject.get("data"));
+            Bot.setAndNotify(jsonObject.getLong("echo"), jsonObject.get("data"));
             return;
         }
         event.setBot(BotContainer.getBot(event.getSelfId()));
         log.info("[hb]<-ws-[ob-{}] {}", event.getSelfId(), event);
         if (event instanceof MessageEvent me) {
-            DISPATCHER_CORE.onMessage(me);
+            dispatcherCore.onMessage(me);
         } else if (event instanceof NoticeEvent ne) {
-            DISPATCHER_CORE.onNotice(ne);
+            dispatcherCore.onNotice(ne);
         } else if (event instanceof MetaEvent me) {
             if (me.isConnected()) {
                 //刚连接成功时，onebot实现端会发一条消息给bot, 添加bot到map中
                 BotContainer.addBot(event.getSelfId(), session);
                 log.info("Received OnebotV11 Client[{}] Connection Success Message", me.getSelfId());
             }
+        } else if (event instanceof RequestEvent requestEvent) {
+            //ignored
         }
-//        else if (event instanceof RequestEvent requestEvent) {
-//            log.info("[hb]<-ws-[ob-{}] {}", requestEvent);
-//        }
 
     }
 

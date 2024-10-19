@@ -2,12 +2,14 @@ package com.github.huhubot.plugins.ai.errie;
 
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
+import org.springframework.stereotype.Component;
 import retrofit2.http.*;
 import com.github.huhubot.plugins.ai.errie.entity.CompletionRes;
 import com.github.huhubot.plugins.ai.errie.entity.TokenRes;
 import com.github.huhubot.plugins.ai.errie.entity.WxMessages;
 
-@RetrofitClient(baseUrl = "https://aip.baidubce.com")
+@Component
+@RetrofitClient(baseUrl = "https://aip.baidubce.com", readTimeoutMs = 30000)
 public interface ErnieClient {
 
     @POST("/oauth/2.0/token?grant_type=client_credentials")

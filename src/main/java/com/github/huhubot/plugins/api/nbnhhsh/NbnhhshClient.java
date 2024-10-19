@@ -1,6 +1,7 @@
 package com.github.huhubot.plugins.api.nbnhhsh;
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
+import org.springframework.stereotype.Component;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author elastic chow
  * &#064;date  26/7/2023
  */
+@Component
 @RetrofitClient(baseUrl = "https://lab.magiconch.com/api/nbnhhsh/")
 public interface NbnhhshClient {
 

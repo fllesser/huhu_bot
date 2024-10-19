@@ -1,17 +1,11 @@
 package com.github.huhubot.adapters.onebot.v11.entity.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
+import com.github.huhubot.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author elastic chow
- * &#064;date  25/7/2023
- */
-@Getter
-@SuppressWarnings("unused")
 public class Message extends ArrayList<MessageSegment> {
 
     @JsonIgnore
@@ -61,12 +55,14 @@ public class Message extends ArrayList<MessageSegment> {
     }
 
 
-
     /**
      * 初始化所有text信息, 去除所有cq码
      * 即合并所有[CQ:text,text=?]中的?
      */
     public String plainText() {
+        if (StringUtil.hasLength(plainText)) {
+            return plainText;
+        }
         StringBuilder sb = new StringBuilder();
         for (MessageSegment segment : this) sb.append(segment.text());
         this.plainText = sb.toString().trim();

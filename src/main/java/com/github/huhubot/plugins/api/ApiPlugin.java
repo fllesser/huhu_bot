@@ -13,6 +13,7 @@ import com.github.huhubot.plugins.api.api_sapce.ApiSpaceResult;
 import com.github.huhubot.plugins.api.nbnhhsh.NbnhhshClient;
 import com.github.huhubot.plugins.api.vvhan.VvhanClient;
 import com.github.huhubot.utils.StringUtil;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,15 +25,12 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings("unused")
 @BotPlugin("API")
+@RequiredArgsConstructor
 public class ApiPlugin {
-    @Resource
-    private VvhanClient vvhanClient;
 
-    @Resource
-    private NbnhhshClient nbnhhshClient;
-
-    @Resource
-    private ApiSpaceClient apiSpaceClient;
+    private final VvhanClient vvhanClient;
+    private final NbnhhshClient nbnhhshClient;
+    private final ApiSpaceClient apiSpaceClient;
 
 
     //@RuleCheck(rule = RuleEnum.superuser)
@@ -44,7 +42,7 @@ public class ApiPlugin {
             if (reply != null) {
                 Message message = reply.getMessage();
                 message.plainText();
-                word = StringUtil.getFirstLAN(message.getPlainText());
+                word = StringUtil.getFirstLAN(message.plainText());
             }
         }
         List<String> trans = StringUtil.hasLength(word, nbnhhshClient::defaultGuess);

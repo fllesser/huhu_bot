@@ -1,6 +1,7 @@
 package com.github.huhubot.plugins.api.api_sapce;
 
 import com.github.lianjiatech.retrofit.spring.boot.core.RetrofitClient;
+import org.springframework.stereotype.Component;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Header;
@@ -11,6 +12,7 @@ import retrofit2.http.POST;
  * &#064;date  22/1/2024
  */
 @SuppressWarnings("unused")
+@Component
 @RetrofitClient(baseUrl = "https://eolink.o.apispace.com")
 public interface ApiSpaceClient {
 

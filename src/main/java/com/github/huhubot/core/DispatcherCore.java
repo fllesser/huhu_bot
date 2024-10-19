@@ -160,7 +160,7 @@ public class DispatcherCore {
          * 命令匹配
          */
         private boolean matchCommand(final MessageEvent event) {
-            String plainText = event.getMessage().getPlainText();
+            String plainText = event.getMessage().plainText();
             for (String command : this.commands) {
                 //匹配前缀命令
                 if (plainText.startsWith(command)) {
@@ -177,7 +177,7 @@ public class DispatcherCore {
          * 关键词匹配
          */
         private boolean matchKeyword(final MessageEvent event) {
-            String plainText = event.getMessage().getPlainText();
+            String plainText = event.getMessage().plainText();
             for (String keyword : this.keywords) {
                 if (plainText.contains(keyword)) {
                     this.execute(event);

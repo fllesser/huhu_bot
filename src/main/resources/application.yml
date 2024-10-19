@@ -19,10 +19,6 @@ reecho:
   web-token: 
 
 retrofit:
-  global-timeout:
-    connect-timeout-ms: 10000
-    read-timeout-ms: 30000
-    write-timeout-ms: 30000
   global-log:
     enable: true
     

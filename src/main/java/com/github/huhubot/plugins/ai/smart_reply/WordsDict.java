@@ -1,34 +1,25 @@
 package com.github.huhubot.plugins.ai.smart_reply;
 
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.github.huhubot.config.GlobalConfig;
-import com.github.huhubot.core.exception.FinishedException;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
-import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
+import com.github.huhubot.plugins.ai.reecho.ReechoUtil;
 import com.github.huhubot.utils.IocUtil;
-import com.github.huhubot.utils.ThreadPoolUtil;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 
 public class WordsDict {
 
     private static final List<String> words;
-    public static List<RoleList.Role> roles = new ArrayList<>();
 
     static {
         String[] wordArr = new String[]{"lsp你再戳？",
                 "连个可爱美少女都要戳的肥宅真恶心啊。",
-                "你再戳！",
+                "老色批，你再戳！",
                 "？再戳试试？",
                 "别戳了别戳了再戳就坏了555",
                 "我爪巴爪巴，球球别再戳了",
@@ -58,18 +49,12 @@ public class WordsDict {
     public static String randVoice() {
         int wordId = (int) (Math.random() * words.size());
         ReechoClient reechoClient = IocUtil.getBean(ReechoClient.class);
-        if (roles.isEmpty()) {
-            roles = reechoClient.getVoiceList().getData();
-        }
-        RoleList.Role role = roles.get((int) (Math.random() * roles.size()));
-        String fileName = wordId + "_" + role.getId() + ".mp3";
-
-        String voicePath = System.getProperty("user.dir") + File.separator  + "voices" + File.separator + fileName;
+        String id = ReechoUtil.randId();
+        String voicePath = System.getProperty("user.dir") + File.separator + "voices" + File.separator + wordId + "_" + id + ".mp3";
         if (!new File(voicePath).exists()) {
-            String audioUrl = reechoClient.generate(role.getId(), words.get(wordId));
+            String audioUrl = reechoClient.generate(id, words.get(wordId));
             HttpUtil.downloadFile(audioUrl, voicePath);
         }
         return voicePath;
-
     }
 }
