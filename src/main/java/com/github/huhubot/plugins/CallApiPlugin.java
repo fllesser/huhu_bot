@@ -2,9 +2,10 @@ package com.github.huhubot.plugins;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
+import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
-import com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import com.github.huhubot.core.annotation.BotPlugin;
 import com.github.huhubot.core.annotation.MessageHandler;
@@ -12,9 +13,7 @@ import com.github.huhubot.core.annotation.RuleCheck;
 import com.github.huhubot.adapters.onebot.v11.constant.OnebotAction;
 import com.github.huhubot.core.rule.RuleEnum;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -66,16 +65,15 @@ public class CallApiPlugin {
                 jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
                 event.reply(willSend + "\n" + costTime);
             } else if (resp instanceof JSONArray jsonArray) {
-                List<Object> messages = new ArrayList<>();
-                messages.add(costTime);
-                messages.addAll(jsonArray.toJavaList(JSONObject.class)
-                        .stream().limit(98).map(jsonObject -> {
+                Message message = new Message();
+                message.append(MessageSegment.node("call-api-plugin", bot.getSelfId(), costTime));
+                jsonArray.toJavaList(JSONObject.class).stream().limit(98)
+                        .forEach(jsonObject -> {
                             StringBuilder willSend = new StringBuilder();
                             jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
-                            return willSend.toString();
-                        }).toList());
-                List<ForwardMessage> nodes = ForwardMessage.quickBuild("call-api-plugin", bot.getSelfId(), messages);
-                bot.sendForwardMsg(event, nodes);
+                            message.append(MessageSegment.node("call-api-plugin", bot.getSelfId(), willSend.toString()));
+                        });
+                bot.sendForwardMsg(event, message);
             }
         } else {
             event.reply("onebotv11 实现端可能未支持该api");

@@ -7,9 +7,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
 import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import com.github.huhubot.adapters.onebot.v11.entity.request.RequestBox;
@@ -327,6 +327,7 @@ public class Bot {
         this.callApi(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
     }
 
+
     public Future<Integer> asyncSendPrivateMessage(Long userId, Object message) {
         return ThreadPoolUtil.AsyncExecutor.submit(() -> {
             boolean autoEscape = message instanceof String;
@@ -371,7 +372,7 @@ public class Bot {
      * @param groupId 群号
      * @param nodes   nodes
      */
-    public void sendGroupForwardMsg(Long groupId, List<ForwardMessage> nodes) {
+    public void sendGroupForwardMsg(Long groupId, Message nodes) {
         this.callApi(OnebotAction.send_group_forward_msg, Map.of("group_id", groupId, "messages", nodes));
     }
 
@@ -381,12 +382,12 @@ public class Bot {
      * @param userId qq
      * @param nodes  nodes
      */
-    public void sendPrivateForwardMsg(Long userId, List<ForwardMessage> nodes) {
+    public void sendPrivateForwardMsg(Long userId, Message nodes) {
         this.callApi(OnebotAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
     }
 
 
-    public void sendForwardMsg(MessageEvent event, List<ForwardMessage> nodes) {
+    public void sendForwardMsg(MessageEvent event, Message nodes) {
         if (event instanceof GroupMessageEvent gme) {
             this.sendGroupForwardMsg(gme.getGroupId(), nodes);
         } else {

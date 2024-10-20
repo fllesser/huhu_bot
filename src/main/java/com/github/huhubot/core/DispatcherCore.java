@@ -1,6 +1,5 @@
 package com.github.huhubot.core;
 
-import com.github.huhubot.config.BotConfig;
 import com.github.huhubot.config.GlobalConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.Builder;
@@ -16,7 +15,6 @@ import com.github.huhubot.core.annotation.NoticeHandler;
 import com.github.huhubot.adapters.onebot.v11.event.Event;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
-import com.github.huhubot.core.exception.ActionFailed;
 import com.github.huhubot.core.exception.FinishedException;
 import com.github.huhubot.core.rule.Rule;
 
@@ -209,10 +207,23 @@ public class DispatcherCore {
                     if (event instanceof MessageEvent me)
                         me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else {
-                    log.error("{}\n{}", targetE.getClass().getSimpleName(), targetE.getMessage());
+                    StackTraceElement[] stackTrace = targetE.getStackTrace();
+                    StringBuilder stackTraceInfo = new StringBuilder();
+                    for (StackTraceElement element : stackTrace) {
+                        stackTraceInfo.append(element.toString()).append("\n");
+                    }
+                    log.error("{} {} {}", targetE.getClass().getSimpleName(), targetE.getMessage(), stackTraceInfo);
                     Long testGroup = GlobalConfig.botCf.getTestGroup();
                     if (testGroup != null) {
-                        event.getBot().sendGroupMessage(testGroup, "event:\n" + event + "\nerror[" + targetE.getClass().getSimpleName() + "]:\n" + targetE.getMessage());
+                        String willSend = """
+                                Event:
+                                %s
+                                Error[%s]:
+                                %s
+                                Stacktrace:
+                                %s
+                                """;
+                        event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTraceInfo));
                     }
 
                 }

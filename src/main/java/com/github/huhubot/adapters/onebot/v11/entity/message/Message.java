@@ -20,6 +20,12 @@ public class Message extends ArrayList<MessageSegment> {
         return new Message().append(text);
     }
 
+    public static Message forward(List<MessageSegment> nodes) {
+        Message message = new Message();
+        message.addAll(nodes);
+        return message;
+    }
+
     public boolean checkToMe(Long selfId) {
         for (MessageSegment segment : this) {
             if ("at".equals(segment.getType())) {
@@ -86,5 +92,7 @@ public class Message extends ArrayList<MessageSegment> {
         if (segments.size() > index) return segments.get(index);
         return null;
     }
+
+
 
 }

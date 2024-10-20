@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
-import com.github.huhubot.adapters.onebot.v11.entity.message.ForwardMessage;
 import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import com.github.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
@@ -29,6 +28,7 @@ import com.github.huhubot.plugins.ai.errie.entity.WxMessages;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
 import com.github.huhubot.utils.StringUtil;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -61,8 +61,10 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-        List<ForwardMessage> nodes = ForwardMessage.quickBuild("最菜的文心四", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
-        bot.sendForwardMsg(event,ForwardMessage.quickBuild("最菜的文心四", bot.getSelfId(), List.of(nodes)));
+        MessageSegment innerNode = MessageSegment.node("最菜的文心四", bot.getSelfId(), MessageSegment.markdown(completion.getResult()));
+        MessageSegment node = MessageSegment.node("最菜的文心四", bot.getSelfId(), Message.forward(List.of(innerNode)));
+        Message forward = Message.forward(List.of(node));
+        bot.sendGroupForwardMsg(event.getGroupId(), forward);
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")

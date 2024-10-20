@@ -28,7 +28,6 @@ public class ReechoUtil {
         return RoleMap.isEmpty();
     }
 
-
     public static String randId() {
         List<String> ids = RoleMap.values().stream().toList();
         return ids.get((int) (Math.random() * ids.size()));

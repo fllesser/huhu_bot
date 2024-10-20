@@ -90,6 +90,18 @@ public class MessageSegment {
         return build("forward", Map.of("id", resId));
     }
 
+    public static MessageSegment node(String nickname, long userId, MessageSegment content) {
+        return build("node", Map.of("nickname", nickname, "user_id", userId, "content", content));
+    }
+
+    public static MessageSegment node(String nickname, long userId, Message content) {
+        return build("node", Map.of("nickname", nickname, "user_id", userId, "content", content));
+    }
+
+    public static MessageSegment node(String nickname, long userId, String content) {
+        return build("node", Map.of("nickname", nickname, "user_id", userId, "content", content));
+    }
+
     //gocq已不支持
     @Deprecated
     public static MessageSegment tts(String text) {
