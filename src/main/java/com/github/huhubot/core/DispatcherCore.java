@@ -215,12 +215,12 @@ public class DispatcherCore {
                                 [Event]
                                 %s
                                 ——————
-                                [%s]:
+                                [%s]
                                 %s
                                 ——————
-                                [Stack Top]:
+                                [Stack Top]
                                 %s
-                                """;
+                                """
                         event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTrace[0]));
                     }
 
