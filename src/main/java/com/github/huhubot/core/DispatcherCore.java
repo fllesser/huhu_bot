@@ -212,11 +212,13 @@ public class DispatcherCore {
                     Long testGroup = GlobalConfig.botCf.getTestGroup();
                     if (testGroup != null) {
                         String willSend = """
-                                Event:
+                                [Event]
                                 %s
-                                Error[%s]:
+                                ——————
+                                [%s]:
                                 %s
-                                Stack Top:
+                                ——————
+                                [Stack Top]:
                                 %s
                                 """;
                         event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTrace[0]));
