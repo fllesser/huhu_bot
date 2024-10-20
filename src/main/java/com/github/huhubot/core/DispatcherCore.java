@@ -208,11 +208,7 @@ public class DispatcherCore {
                         me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else {
                     StackTraceElement[] stackTrace = targetE.getStackTrace();
-                    StringBuilder stackTraceInfo = new StringBuilder();
-                    for (StackTraceElement element : stackTrace) {
-                        stackTraceInfo.append(element.toString()).append("\n");
-                    }
-                    log.error("{} {} {}", targetE.getClass().getSimpleName(), targetE.getMessage(), stackTraceInfo);
+                    log.error("{} | {} | {}", targetE.getClass().getSimpleName(), targetE.getMessage(), stackTrace[0]);
                     Long testGroup = GlobalConfig.botCf.getTestGroup();
                     if (testGroup != null) {
                         String willSend = """
@@ -220,10 +216,10 @@ public class DispatcherCore {
                                 %s
                                 Error[%s]:
                                 %s
-                                Stacktrace:
+                                Stack Top:
                                 %s
                                 """;
-                        event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTraceInfo));
+                        event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTrace[0]));
                     }
 
                 }
