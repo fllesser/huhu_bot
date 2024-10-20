@@ -61,11 +61,8 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-        List<ForwardMessage> nodes = ForwardMessage.quickBuild("...", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
-        int resId = bot.buildForwardMsg(event.getGroupId(), nodes);
-        List<ForwardMessage> secondsNodes = ForwardMessage.quickBuild("...", bot.getSelfId(), List.of(MessageSegment.forward(resId)));
-        bot.sendGroupForwardMsg(event.getGroupId(), secondsNodes);
-
+        List<ForwardMessage> nodes = ForwardMessage.quickBuild("最菜的文心四", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
+        bot.sendForwardMsg(event,ForwardMessage.quickBuild("最菜的文心四", bot.getSelfId(), List.of(nodes)));
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")

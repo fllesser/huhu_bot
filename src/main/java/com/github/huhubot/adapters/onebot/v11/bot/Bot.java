@@ -137,7 +137,7 @@ public class Bot {
                 echoDataMap.remove(echo);
             }
         }
-        if (echoData.data == null) throw new ActionFailed(requestBox.toString());
+        if (echoData.data == null) throw new ActionFailed("call api resp is null:\n" + requestBox.toString());
         log.info("[hb]<-ws-[ob-{}] {}]", this.selfId, echoData);
         return echoData.data;
     }
@@ -393,15 +393,6 @@ public class Bot {
             this.sendPrivateForwardMsg(event.getUserId(), nodes);
         }
     }
-
-    public int buildForwardMsg(Long groupId, List<ForwardMessage> nodes) {
-        Object resp = this.callApiWaitResp(OnebotAction.send_forward_msg, Map.of("group_id" ,groupId, "messages", nodes));
-        if (resp instanceof JSONObject jsonObject) {
-            return jsonObject.getInteger("message_id");
-        } else return -1;
-    }
-
-
 
 
     /**

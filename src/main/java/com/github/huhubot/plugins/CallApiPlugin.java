@@ -74,7 +74,7 @@ public class CallApiPlugin {
                             jsonObject.forEach((k, v) -> willSend.append(k).append(":").append(v).append("\n"));
                             return willSend.toString();
                         }).toList());
-                List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), messages);
+                List<ForwardMessage> nodes = ForwardMessage.quickBuild("call-api-plugin", bot.getSelfId(), messages);
                 bot.sendForwardMsg(event, nodes);
             }
         } else {

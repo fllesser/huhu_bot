@@ -209,10 +209,10 @@ public class DispatcherCore {
                     if (event instanceof MessageEvent me)
                         me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else {
-                    log.error(targetE.getMessage());
+                    log.error("{}\n{}", targetE.getClass().getSimpleName(), targetE.getMessage());
                     Long testGroup = GlobalConfig.botCf.getTestGroup();
                     if (testGroup != null) {
-                        event.getBot().sendGroupMessage(testGroup, "event:\n" + event + "\n错误:\n" + targetE.getMessage());
+                        event.getBot().sendGroupMessage(testGroup, "event:\n" + event + "\nerror[" + targetE.getClass().getSimpleName() + "]:\n" + targetE.getMessage());
                     }
 
                 }
