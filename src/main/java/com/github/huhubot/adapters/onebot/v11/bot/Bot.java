@@ -133,11 +133,12 @@ public class Bot {
             try {
                 echoData.wait(10000L);
             } catch (InterruptedException e) {
-                throw new ActionFailed("等待响应数据, 出现线程中断异常, echo:" + echo);
+                throw new ActionFailed("等待响应数据, 出现线程中断异常, " + requestBox.toString());
             } finally {
                 echoDataMap.remove(echo);
             }
         }
+        if (echoData.data == null) throw new ActionFailed(requestBox.toString());
         log.info("[hb]<-ws-[ob-{}] {}]", this.selfId, echoData);
         return echoData.data;
     }

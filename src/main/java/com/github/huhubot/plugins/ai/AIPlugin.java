@@ -29,6 +29,8 @@ import com.github.huhubot.plugins.ai.errie.entity.WxMessages;
 import com.github.huhubot.plugins.ai.reecho.ReechoClient;
 import com.github.huhubot.plugins.ai.reecho.entity.resp.RoleList;
 import com.github.huhubot.utils.StringUtil;
+
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -59,8 +61,9 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-                       List<ForwardMessage> nodes = ForwardMessage.quickBuild("OneBotV11Handler", event.getUserId(), List.of(completion.getResult()));
-                bot.sendForwardMsg(event, nodes); //event.reply(completion.getResult());
+        List<ForwardMessage> nodes = ForwardMessage.quickBuild("最烂的文心四", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
+        bot.sendForwardMsg(event, nodes);
+
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")
@@ -113,14 +116,16 @@ public class AIPlugin {
                 || bot.getSelfId().equals(event.getUserId())    //是bot号自己戳的
         ) return;
         double random = Math.random();
-        if (random < 0.5) {
-            String willSend = WordsDict.randWord();
+        Object willSend;
+        if (random < 0.33) {
+            bot.groupPoke(event.getGroupId(), event.getUserId());
+        } else if (random < 0.66) {
+            willSend = WordsDict.randWord();
             bot.sendGroupMessage(event.getGroupId(), willSend);
         } else {
-            MessageSegment willSend = MessageSegment.record("file://" + WordsDict.randVoice());
+            willSend = MessageSegment.record("file://" + WordsDict.randVoice());
             bot.sendGroupMessage(event.getGroupId(), willSend);
         }
-
     }
 
     @RuleCheck(rule = RuleEnum.superuser)

@@ -1,5 +1,6 @@
 package com.github.huhubot.adapters.onebot.v11.entity.message;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,7 +38,9 @@ public class ForwardMessage {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Node {
+        @JsonProperty("nickname")
         private String name;    //发送者显示名字	用于自定义消息 (自定义消息并合并转发, 实际查看顺序为自定义消息段顺序)
+        @JsonProperty("user_id")
         private Long uin;       //uin	int64	发送者QQ号	用于自定义消息
         private Object content; //用MessageSegment组合构建
     }

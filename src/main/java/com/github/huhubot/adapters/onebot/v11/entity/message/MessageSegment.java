@@ -81,9 +81,10 @@ public class MessageSegment {
     public static MessageSegment atAll() {
         return build("at", Map.of("qq", "all"));
     }
-public static MessageSegment markdown(String content) {
-   return build("markdown", Map.of("content", content));
-}
+
+    public static MessageSegment markdown(String content) {
+        return build("markdown", Map.of("data", content));
+    }
 
     //gocq已不支持
     @Deprecated
@@ -177,6 +178,7 @@ public static MessageSegment markdown(String content) {
      * 绝对路径，例如 file:///xxx/xx/xxx.mp3
      * 网络 URL，例如 https://xxx.com/xxx.mp3
      * Base64 编码，例如 base64://...
+     *
      * @param file  语音文件名
      * @param magic 发送时可选, 默认 0, 设置为 1 表示变声
      * @return MessageSegment
@@ -190,10 +192,11 @@ public static MessageSegment markdown(String content) {
     /**
      * 语音
      * <a href="https://docs.go-cqhttp.org/cqcode/#%E8%AF%AD%E9%9F%B3">...</a>
-     * @param file 语音网络路径
-     * @param magic 发送时可选, 默认 0, 设置为 1 表示变声
-     * @param cache 只在通过网络 URL 发送时有效, 表示是否使用已缓存的文件, 默认 1
-     * @param proxy 只在通过网络 URL 发送时有效, 表示是否通过代理下载文件 ( 需通过环境变量或配置文件配置代理 ) , 默认 1
+     *
+     * @param file    语音网络路径
+     * @param magic   发送时可选, 默认 0, 设置为 1 表示变声
+     * @param cache   只在通过网络 URL 发送时有效, 表示是否使用已缓存的文件, 默认 1
+     * @param proxy   只在通过网络 URL 发送时有效, 表示是否通过代理下载文件 ( 需通过环境变量或配置文件配置代理 ) , 默认 1
      * @param timeout 只在通过网络 URL 发送时有效, 单位秒, 表示下载网络文件的超时时间 , 默认不超时
      * @return MessageSegment
      */

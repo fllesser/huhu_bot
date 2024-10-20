@@ -1,5 +1,7 @@
 package com.github.huhubot.core;
 
+import com.github.huhubot.config.BotConfig;
+import com.github.huhubot.config.GlobalConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -207,8 +209,10 @@ public class DispatcherCore {
                     if (event instanceof MessageEvent me) me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else if (targetE instanceof ActionFailed) {
                     log.error("ActionFailed: {}", targetE.getMessage());
+                    event.getBot().sendGroupMessage(GlobalConfig.botCf.getTestGroup(), targetE.getMessage());
                 } else {
                     log.error("未知错误{}", targetE.getMessage());
+                    event.getBot().sendGroupMessage(GlobalConfig.botCf.getTestGroup(), "未知错误: \n" +  targetE.getMessage());
                 }
             }
         }
