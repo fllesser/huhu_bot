@@ -6,6 +6,6 @@ package com.github.huhubot.core.exception;
  */
 public class ActionFailed extends RuntimeException {
     public ActionFailed(String message) {
-        super("ActionFailed: \n" + message);
+        super(message);
     }
 }

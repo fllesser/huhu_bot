@@ -86,6 +86,10 @@ public class MessageSegment {
         return build("markdown", Map.of("data", content));
     }
 
+    public static MessageSegment forward(int resId) {
+        return build("forward", Map.of("id", resId));
+    }
+
     //gocq已不支持
     @Deprecated
     public static MessageSegment tts(String text) {

@@ -20,6 +20,7 @@ public enum OnebotAction {
     send_private_forward_msg("私聊转发合并消息", true),
     send_group_sign("群打卡", false),
     _send_group_notice("发送群公告", false),
+    send_forward_msg("伪造合并转发", true),
 
     set_group_card("设置群名片", false),
     set_group_special_title( "设置群专属头衔", false),

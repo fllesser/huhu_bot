@@ -24,7 +24,6 @@ import com.github.huhubot.utils.ThreadPoolUtil;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 /**
@@ -44,10 +43,10 @@ public class Bot {
     //群列表
     private List<GroupInfo> groups;
 
-    private static final Set<Integer> EmojiMap;
+    private static final Set<Integer> emojiSet;
 
     static {
-        EmojiMap = new HashSet<>(200);
+        emojiSet = new HashSet<>(200);
         int[] emojiArr = new int[]{4, 5, 8, 9, 10, 12, 14, 16, 21, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 38, 39, 41, 42, 43, 49, 53, 60, 63, 66,
                 74, 75, 76, 78, 79, 85, 89, 96, 97, 98, 99, 100, 101, 102, 103, 104, 106, 109, 111, 116, 118, 120, 122, 123, 124, 125, 129, 144, 147,
                 171, 173, 174, 175, 176, 179, 180, 181, 182, 183, 201, 203, 212, 214, 219, 222, 227, 232, 240, 243, 246, 262, 264, 265, 266, 267,
@@ -57,7 +56,7 @@ public class Bot {
                 128157, 128164, 128166, 128168, 128170, 128235, 128293, 128513, 128514, 128516, 128522, 128524, 128527, 128530, 128531,
                 128532, 128536, 128538, 128540, 128541, 128557, 128560, 128563};
         for (int id : emojiArr) {
-            EmojiMap.add(id);
+            emojiSet.add(id);
         }
     }
 
@@ -386,6 +385,7 @@ public class Bot {
         this.callApi(OnebotAction.send_private_forward_msg, Map.of("user_id", userId, "messages", nodes));
     }
 
+
     public void sendForwardMsg(MessageEvent event, List<ForwardMessage> nodes) {
         if (event instanceof GroupMessageEvent gme) {
             this.sendGroupForwardMsg(gme.getGroupId(), nodes);
@@ -393,6 +393,15 @@ public class Bot {
             this.sendPrivateForwardMsg(event.getUserId(), nodes);
         }
     }
+
+    public int buildForwardMsg(Long groupId, List<ForwardMessage> nodes) {
+        Object resp = this.callApiWaitResp(OnebotAction.send_forward_msg, Map.of("group_id" ,groupId, "messages", nodes));
+        if (resp instanceof JSONObject jsonObject) {
+            return jsonObject.getInteger("message_id");
+        } else return -1;
+    }
+
+
 
 
     /**
@@ -444,7 +453,7 @@ public class Bot {
     }
 
     public void setMsgEmojiLike(Integer messageId, Integer emojiId) {
-        if (EmojiMap.contains(emojiId)) {
+        if (emojiSet.contains(emojiId)) {
             this.callApi(OnebotAction.set_msg_emoji_like, Map.of("message_id", messageId, "emoji_id", emojiId));
         }
     }

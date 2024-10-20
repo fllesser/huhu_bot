@@ -17,9 +17,10 @@ public class WordsDict {
     private static final List<String> words;
 
     static {
-        String[] wordArr = new String[]{"lsp你再戳？",
+        String[] wordArr = new String[]{
+                "老色批，你再戳？",
                 "连个可爱美少女都要戳的肥宅真恶心啊。",
-                "老色批，你再戳！",
+                "你再戳！",
                 "？再戳试试？",
                 "别戳了别戳了再戳就坏了555",
                 "我爪巴爪巴，球球别再戳了",

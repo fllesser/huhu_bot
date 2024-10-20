@@ -206,14 +206,17 @@ public class DispatcherCore {
                 Throwable targetE = e.getTargetException();
                 if (targetE instanceof FinishedException fe) {
                     log.info("[{}] | {} Finished, Msg:{}, Event:{}", plugin.getClass().getSimpleName(), name, fe.getMessage(), event);
-                    if (event instanceof MessageEvent me) me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
-                } else if (targetE instanceof ActionFailed) {
-                    log.error("ActionFailed: {}", targetE.getMessage());
-                    event.getBot().sendGroupMessage(GlobalConfig.botCf.getTestGroup(), targetE.getMessage());
+                    if (event instanceof MessageEvent me)
+                        me.reply(Message.reply(me.getMessageId()).append(fe.getMessage()));
                 } else {
-                    log.error("未知错误{}", targetE.getMessage());
-                    event.getBot().sendGroupMessage(GlobalConfig.botCf.getTestGroup(), "未知错误: \n" +  targetE.getMessage());
+                    log.error(targetE.getMessage());
+                    Long testGroup = GlobalConfig.botCf.getTestGroup();
+                    if (testGroup != null) {
+                        event.getBot().sendGroupMessage(testGroup, "event:\n" + event + "\n错误:\n" + targetE.getMessage());
+                    }
+
                 }
+
             }
         }
 

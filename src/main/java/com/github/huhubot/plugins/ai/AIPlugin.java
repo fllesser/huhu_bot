@@ -52,7 +52,7 @@ public class AIPlugin {
 
     //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "一言", commands = "ai")
-    public void ai(MessageEvent event) {
+    public void ai(GroupMessageEvent event) {
         Bot bot = event.getBot();
         MessageInfo reply = event.getReply();
         String text = event.getCommandArgs() + (reply != null ? reply.getMessage().plainText() : "");
@@ -61,8 +61,10 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-        List<ForwardMessage> nodes = ForwardMessage.quickBuild("最烂的文心四", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
-        bot.sendForwardMsg(event, nodes);
+        List<ForwardMessage> nodes = ForwardMessage.quickBuild("...", bot.getSelfId(), List.of(MessageSegment.markdown(completion.getResult())));
+        int resId = bot.buildForwardMsg(event.getGroupId(), nodes);
+        List<ForwardMessage> secondsNodes = ForwardMessage.quickBuild("...", bot.getSelfId(), List.of(MessageSegment.forward(resId)));
+        bot.sendGroupForwardMsg(event.getGroupId(), secondsNodes);
 
     }
 
