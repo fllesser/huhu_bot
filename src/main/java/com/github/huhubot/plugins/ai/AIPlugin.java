@@ -74,7 +74,7 @@ public class AIPlugin {
         String[] nameAndText = message.plainText().split("说", 2);
 
         String roleName = nameAndText[0].trim();
-        if (!StringUtil.hasLength(roleName) || isNotRole(roleName)) return; //意外触发 ignore
+        if (!StringUtil.hasLength(roleName) || !ReechoUtil.contains(roleName)) return; //意外触发 ignore
 
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (!StringUtil.hasLength(text)) return;
@@ -94,17 +94,12 @@ public class AIPlugin {
     public void list(MessageEvent event) {
         RoleList roleList = reechoClient.getVoiceList(reechoConfig.authorization());
         ReechoUtil.update(roleList);
-        StringBuilder sb = new StringBuilder();
-        roleList.getData().forEach(d -> sb.append(d.getName()).append(" | "));
-        event.reply(sb.toString());
-    }
-
-    private boolean isNotRole(String name) {
-        if (ReechoUtil.isEmpty()) {
-            RoleList roleList = reechoClient.getVoiceList();
-            ReechoUtil.update(roleList);
-        }
-        return !ReechoUtil.contains(name);
+        Message message = new Message();
+        message.append(MessageSegment.node("使用说明", event.getSelfId(), Message.text("角色+说+文字(支持回复别人的消息)")));
+        roleList.getData().forEach(d -> {
+            message.append(MessageSegment.node("角色信息", event.getSelfId(), Message.text(d.getName() + "\n" + d.getMetadata().getDescription())));
+        });
+        event.reply(message);
     }
 
 

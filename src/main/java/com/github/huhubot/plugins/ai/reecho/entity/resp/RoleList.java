@@ -16,6 +16,13 @@ public class RoleList {
     public static class Role {
         private String id;
         private String name;
+        private MetaData metadata;
+    }
+
+    @Data
+    public static class MetaData {
+        private String avatar;
+        private String description;
     }
 
 }

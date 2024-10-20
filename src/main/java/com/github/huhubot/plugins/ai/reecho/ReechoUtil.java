@@ -14,10 +14,7 @@ public class ReechoUtil {
 
     static {
         ReechoClient reechoClient = IocUtil.getBean(ReechoClient.class);
-        if (roleMap.isEmpty()) {
-            RoleList roleList = reechoClient.getVoiceList();
-            update(roleList);
-        }
+        reechoClient.getVoiceList().getData().forEach(role -> roleMap.put(role.getName(), role.getId()));
     }
 
     public static boolean contains(String name) {
