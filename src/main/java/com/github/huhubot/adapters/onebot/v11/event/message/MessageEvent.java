@@ -3,6 +3,7 @@ package com.github.huhubot.adapters.onebot.v11.event.message;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.huhubot.core.exception.FinishedException;
 import lombok.Getter;
 import lombok.Setter;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
@@ -66,5 +67,8 @@ public class MessageEvent extends Event {
 
     }
 
+    public void finish(String message) {
+        throw new FinishedException(message);
+    }
 
 }

@@ -220,7 +220,7 @@ public class DispatcherCore {
                                 ——————
                                 [Stack Top]
                                 %s
-                                """
+                                """;
                         event.getBot().sendGroupMessage(testGroup, willSend.formatted(event, targetE.getClass().getSimpleName(), targetE.getMessage(), stackTrace[0]));
                     }
 

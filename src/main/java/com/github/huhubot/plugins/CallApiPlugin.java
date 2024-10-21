@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
 import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
+import com.github.huhubot.core.exception.FinishedException;
 import lombok.extern.slf4j.Slf4j;
 import com.github.huhubot.adapters.onebot.v11.bot.Bot;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
@@ -42,7 +43,7 @@ public class CallApiPlugin {
         try {
             action = OnebotAction.valueOf(args[0]);
         } catch (IllegalArgumentException e) {
-            event.reply("没有这个API, 或huhubot暂未支持");
+            event.finish("没有这个API, 或huhubot暂未支持");
         }
         String[] keyValue = new String[args.length - 1];
         System.arraycopy(args, 1, keyValue, 0, args.length - 1);
@@ -52,8 +53,7 @@ public class CallApiPlugin {
         assert action != null;
         if (!action.isHasResp()) {
             bot.callApi(action, map);
-            event.reply(action.getRemark() + "已发送ws请求, 该api无响应数据");
-            return;
+            event.finish(action.getRemark() + "已发送ws请求, 该api无响应数据");
         }
         long start = System.currentTimeMillis();
         Object resp = bot.callApiWaitResp(action, map);
@@ -76,7 +76,7 @@ public class CallApiPlugin {
                 bot.sendForwardMsg(event, message);
             }
         } else {
-            event.reply("onebotv11 实现端可能未支持该api");
+            event.finish("onebotv11 实现端可能未支持该api");
         }
 
     }
