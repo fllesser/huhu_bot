@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
@@ -25,6 +26,7 @@ import com.github.huhubot.utils.ThreadPoolUtil;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * @author elastic chow
@@ -300,8 +302,9 @@ public class Bot {
     }
 
 
+    @Async("asyncExecutor")
     public Future<Integer> asyncSendGroupMessage(Long groupId, Object message) {
-        return ThreadPoolUtil.AsyncExecutor.submit(() -> {
+        return new FutureTask<>(() -> {
             boolean autoEscape = message instanceof String;
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
@@ -329,7 +332,7 @@ public class Bot {
 
 
     public Future<Integer> asyncSendPrivateMessage(Long userId, Object message) {
-        return ThreadPoolUtil.AsyncExecutor.submit(() -> {
+        return new FutureTask<>(() -> {
             boolean autoEscape = message instanceof String;
             if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
                 throw new IllegalMessageTypeException();
