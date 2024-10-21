@@ -57,6 +57,7 @@ public class Handler {
         handler.setMethod(method);
         handler.setPriority(nh.priority());
         handler.setParameterType(parameterType);
+        handler.setName(nh.name());
         return handler;
     }
 
