@@ -39,7 +39,10 @@ public class DispatcherCore {
     private List<Handler> MESSAGE_HANDLER_CONTAINER;
     private List<Handler> NOTICE_HANDLER_CONTAINER;
 
-    //private final Map<String, Handler> HANDLER_CALL_RECORD = new HashMap<>();
+//    private List<Handler> privateMessageHandlers;
+//    private List<Handler> groupMessageHandlers;
+//    private List<Handler> noticeHandlers;
+
 
     @PostConstruct
     private void loadPlugin() {
@@ -139,6 +142,7 @@ public class DispatcherCore {
                 }
             }
         }
+
 
         public static Handler buildMessageHandler(Object plugin, Method method) {
             MessageHandler mh = method.getAnnotation(MessageHandler.class);

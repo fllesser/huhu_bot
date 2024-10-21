@@ -1,6 +1,9 @@
 package com.github.huhubot.core.aop;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
+import com.github.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
+import com.github.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -41,18 +44,17 @@ public class RuleAndCDAspect {
             //log.info("Rule mismatch, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
             return null;
         }
-        //校验cd
+        //校验 cd
         if (method.isAnnotationPresent(CoolDown.class)) {
             CoolDown cd = method.getAnnotation(CoolDown.class);
             // 获取id
-            JSONObject jsonObject = event.getEventJsonObject();
-            Long groupId = jsonObject.getLong("group_id");
-            Long id = groupId != null ? groupId : jsonObject.getLong("user_id");
+            Long id = 0L;
+            if (event instanceof GroupMessageEvent gme) {
+                id = gme.getGroupId();
+            } else if (event instanceof PrivateMessageEvent pme) {
+                id = pme.getUserId();
+            }
             if (CoolDownLimiter.check(handlerName + id, cd.seconds())) {
-                //log.info("Cooling down, this call will be intercepted, Event:{}, Handler:{}", event, handlerName);
-                //if (StringUtil.hasLength(cd.msg())) {
-                //    event.getBot().sendMessage(event, "冷却中");
-                //}
                 return null;
             }
         }

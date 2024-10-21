@@ -396,28 +396,6 @@ public class Bot {
     }
 
 
-    /**
-     * 根据事件, 来发送对应的消息
-     * 建议使用event.reply(Object message)
-     *
-     * @param event   event object
-     * @param message 消息 Message | MessageSegment | String
-     *                autoEscape 是否以纯文本发送 true:以纯文本发送，不解析cq码
-     */
-    @Deprecated
-    public void sendMessage(Event event, Object message) {
-        JSONObject jsonObject = event.getEventJsonObject();
-        Long groupId = jsonObject.getLong("group_id");
-        if (groupId != null) {
-            this.sendGroupMessage(groupId, message);
-        } else {
-            Long userId = jsonObject.getLong("user_id");
-            //if (this.userId.equals(userId)) return;
-            assert userId != null;
-            this.sendPrivateMessage(userId, message);
-        }
-    }
-
     public void setGroupKick(Long groupId, Long userId, boolean rejectAddRequest) {
         this.callApi(OnebotAction.set_group_kick, Map.of("group_id", groupId, "user_id", userId, "reject_add_request", rejectAddRequest));
     }

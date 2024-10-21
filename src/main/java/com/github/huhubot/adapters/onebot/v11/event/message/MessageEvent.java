@@ -3,6 +3,7 @@ package com.github.huhubot.adapters.onebot.v11.event.message;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.huhubot.adapters.onebot.v11.bot.BotContainer;
 import com.github.huhubot.core.exception.FinishedException;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +12,14 @@ import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import com.github.huhubot.adapters.onebot.v11.entity.response.MessageInfo;
 import com.github.huhubot.adapters.onebot.v11.entity.response.Sender;
 import com.github.huhubot.adapters.onebot.v11.event.Event;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author elastic chow
  * @date 16/5/2023
  */
 
+@Slf4j
 @Getter
 @Setter
 public class MessageEvent extends Event {
@@ -53,6 +56,7 @@ public class MessageEvent extends Event {
         } else {
             event = jsonObject.toJavaObject(GroupMessageEvent.class);
         }
+        event.init();
         return event;
     }
 

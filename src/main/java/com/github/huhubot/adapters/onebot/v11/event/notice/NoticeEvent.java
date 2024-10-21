@@ -26,7 +26,9 @@ public class NoticeEvent extends Event {
 
     public static NoticeEvent build(final JSONObject jsonObject) {
         String noticeType = jsonObject.getString("notice_type");
-        return jsonObject.toJavaObject(NoticeTypeEnum.valueOf(noticeType).getType());
+        NoticeEvent event = jsonObject.toJavaObject(NoticeTypeEnum.valueOf(noticeType).getType());
+        event.init();
+        return event;
     }
 
     @Override
