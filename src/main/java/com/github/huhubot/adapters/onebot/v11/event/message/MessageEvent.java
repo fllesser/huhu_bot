@@ -14,6 +14,8 @@ import com.github.huhubot.adapters.onebot.v11.entity.response.Sender;
 import com.github.huhubot.adapters.onebot.v11.event.Event;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.Future;
+
 /**
  * @author elastic chow
  * @date 16/5/2023
@@ -71,8 +73,12 @@ public class MessageEvent extends Event {
 
     }
 
+    //中断handler，并回复触发者
     public void finish(String message) {
         throw new FinishedException(message);
     }
+
+
+
 
 }

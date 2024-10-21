@@ -33,6 +33,8 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 @BotPlugin("AI")
@@ -51,24 +53,23 @@ public class AIPlugin {
     private String AccessToken;
 
     @MessageHandler(name = "一言", commands = "ai")
-    public void ai(GroupMessageEvent event) throws ExecutionException, InterruptedException {
+    public void ai(GroupMessageEvent event) throws ExecutionException, InterruptedException, TimeoutException {
         Bot bot = event.getBot();
         MessageInfo reply = event.getReply();
         String text = event.getCommandArgs() + (reply != null ? reply.getMessage().plainText() : "");
         if (!StringUtil.hasLength(text)) return;
-        Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
-                Message.reply(event.getMessageId()).append(MessageSegment.text("大头正在思考中...")));
+        Future<Integer> messageId = event.tempReply("大头正在思考中...");
         if (!StringUtil.hasLength(AccessToken)) {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
         MessageSegment node = MessageSegment.node("最菜的文心四", bot.getSelfId(), completion.getResult());
         bot.sendGroupForwardMsg(event.getGroupId(), Message.forward(List.of(node)));
-        bot.deleteMsg(messageId.get());
+        bot.deleteMsg(messageId.get(30, TimeUnit.SECONDS));
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")
-    public void aiVoice(GroupMessageEvent event) throws ExecutionException, InterruptedException {
+    public void aiVoice(GroupMessageEvent event) throws ExecutionException, InterruptedException, TimeoutException {
         Message message = event.getMessage();
         MessageInfo reply = event.getReply();
         String[] nameAndText = message.plainText().split("说", 2);
@@ -78,13 +79,14 @@ public class AIPlugin {
 
         String text = reply != null ? reply.getMessage().plainText() : nameAndText[1].trim();
         if (!StringUtil.hasLength(text)) return;
-        if (!botConfig.isSuperUser(event.getUserId()) && text.length() >= 120) event.finish("Api 额度有限，单次调用字数须少于 40, 或者 vivo 20 给你加白名单");
+        if (!botConfig.isSuperUser(event.getUserId()) && text.length() >= 120) {
+            event.finish("Api 额度有限，单次调用字数须少于 40, 或者 vivo 20 给你加白名单");
+        }
         Bot bot = event.getBot();
-        Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
-                Message.reply(event.getMessageId()).append(MessageSegment.text("正在合成语音中...")));
+        Future<Integer> messageId = event.tempReply("正在合成语音中...");
         String audioUrl = reechoClient.generate(ReechoUtil.get(roleName), text);
         event.reply(MessageSegment.record(audioUrl));
-        bot.deleteMsg(messageId.get());
+        bot.deleteMsg(messageId.get(30, TimeUnit.SECONDS));
     }
 
 

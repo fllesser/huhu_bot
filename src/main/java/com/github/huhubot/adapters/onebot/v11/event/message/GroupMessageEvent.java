@@ -2,11 +2,14 @@ package com.github.huhubot.adapters.onebot.v11.event.message;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.huhubot.adapters.onebot.v11.entity.message.Message;
+import com.github.huhubot.adapters.onebot.v11.entity.message.MessageSegment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.StringJoiner;
+import java.util.concurrent.Future;
 
 /**
  * @author elastic chow
@@ -49,6 +52,15 @@ public class GroupMessageEvent extends MessageEvent {
     @Override
     public void reply(Object message) {
         getBot().sendGroupMessage(this.getGroupId(), message);
+    }
+
+    /**
+     * 临时回复， 并返回 message_id
+     * @param message String
+     * @return message_id
+     */
+    public Future<Integer> tempReply(String message) {
+        return getBot().asyncSendGroupMessage(this.getGroupId(), Message.reply(getMessageId()).append(MessageSegment.text(message)));
     }
 
 }
