@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 @Setter
 public abstract class Event {
 
-
     @JsonIgnore
     private Bot bot;
 
@@ -33,19 +32,6 @@ public abstract class Event {
     @JsonProperty("post_type")
     private String postType;
     private Long time;
-
-    @Deprecated
-    public static Event build(final JSONObject jsonObject) {
-        String postType = jsonObject.getString("post_type");
-        if (StringUtil.hasLength(postType)) {
-            return switch (PostTypeEnum.valueOf(postType)) {
-                case message_sent, message -> MessageEvent.build(jsonObject);
-                case notice -> NoticeEvent.build(jsonObject);
-                case request -> jsonObject.toJavaObject(RequestEvent.class);
-                case meta_event -> jsonObject.toJavaObject(MetaEvent.class);
-            };
-        } else return null;
-    }
 
     public void init() {
         this.setBot(BotContainer.getBot(this.getSelfId()));

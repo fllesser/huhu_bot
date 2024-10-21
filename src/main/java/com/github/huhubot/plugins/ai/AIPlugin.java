@@ -50,7 +50,6 @@ public class AIPlugin {
 
     private String AccessToken;
 
-    //@RuleCheck(rule = RuleEnum.superuser)
     @MessageHandler(name = "一言", commands = "ai")
     public void ai(GroupMessageEvent event) {
         Bot bot = event.getBot();
