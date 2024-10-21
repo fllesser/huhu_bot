@@ -40,7 +40,7 @@ public class Handler {
         } else if (mh.keywords().length > 0) {
             handler = new KeywordHandler(mh.keywords());
         } else {
-            throw new PluginLoadException("MessageHandler need to fill commands os keywords");
+            throw new PluginLoadException("MessageHandler need to fill commands or keywords");
         }
         handler.setPlugin(plugin);
         handler.setMethod(method);
