@@ -24,7 +24,6 @@ public class ThreadPoolUtil {
     public final static ThreadPoolExecutor ProcessEventExecutor;
 
     static {
-
         ReechoExecutor = new ThreadPoolExecutor(
                 2, 2, 1, TimeUnit.HOURS,
                 new ArrayBlockingQueue<>(1),

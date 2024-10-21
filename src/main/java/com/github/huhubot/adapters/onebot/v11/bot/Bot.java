@@ -25,6 +25,7 @@ import com.github.huhubot.utils.ThreadPoolUtil;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -304,15 +305,13 @@ public class Bot {
 
     @Async("asyncExecutor")
     public Future<Integer> asyncSendGroupMessage(Long groupId, Object message) {
-        return new FutureTask<>(() -> {
-            boolean autoEscape = message instanceof String;
-            if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
-                throw new IllegalMessageTypeException();
-            Object data = this.callApiWaitResp(OnebotAction.send_group_msg, Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
-            if (data instanceof JSONObject jsonObject) {
-                return jsonObject.getInteger("message_id");
-            } else return null;
-        });
+        boolean autoEscape = message instanceof String;
+        if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+            throw new IllegalMessageTypeException();
+        Object data = this.callApiWaitResp(OnebotAction.send_group_msg, Map.of("group_id", groupId, "message", message, "auto_escape", autoEscape));
+        if (data instanceof JSONObject jsonObject) {
+            return CompletableFuture.completedFuture(jsonObject.getInteger("message_id"));
+        } else return null;
     }
 
 
@@ -331,16 +330,15 @@ public class Bot {
     }
 
 
+    @Async("asyncExecutor")
     public Future<Integer> asyncSendPrivateMessage(Long userId, Object message) {
-        return new FutureTask<>(() -> {
-            boolean autoEscape = message instanceof String;
-            if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
-                throw new IllegalMessageTypeException();
-            Object data = this.callApiWaitResp(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
-            if (data instanceof JSONObject jsonObject) {
-                return jsonObject.getInteger("message_id");
-            } else return null;
-        });
+        boolean autoEscape = message instanceof String;
+        if (!autoEscape && !(message instanceof MessageSegment) && !(message instanceof Message))
+            throw new IllegalMessageTypeException();
+        Object data = this.callApiWaitResp(OnebotAction.send_private_msg, Map.of("user_id", userId, "message", message, "auto_escape", autoEscape));
+        if (data instanceof JSONObject jsonObject) {
+            return CompletableFuture.completedFuture(jsonObject.getInteger("message_id"));
+        } else return null;
     }
 
 
