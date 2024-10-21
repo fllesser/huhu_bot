@@ -4,7 +4,7 @@ package com.github.huhubot.adapters.onebot.v11.constant;
  * @author elastic chow
  * @date 14/5/2023
  */
-public enum CqTypeEnum {
+public enum SegmentTypeEnum {
     //参考gocq文档 https://docs.go-cqhttp.org/cqcode
     //text, //自定义类型
     //

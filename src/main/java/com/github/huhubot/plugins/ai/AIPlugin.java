@@ -51,17 +51,20 @@ public class AIPlugin {
     private String AccessToken;
 
     @MessageHandler(name = "一言", commands = "ai")
-    public void ai(GroupMessageEvent event) {
+    public void ai(GroupMessageEvent event) throws ExecutionException, InterruptedException {
         Bot bot = event.getBot();
         MessageInfo reply = event.getReply();
         String text = event.getCommandArgs() + (reply != null ? reply.getMessage().plainText() : "");
         if (!StringUtil.hasLength(text)) return;
+        Future<Integer> messageId = bot.asyncSendGroupMessage(event.getGroupId(),
+                Message.reply(event.getMessageId()).append(MessageSegment.text("大头正在思考中...")));
         if (!StringUtil.hasLength(AccessToken)) {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
         MessageSegment node = MessageSegment.node("最菜的文心四", bot.getSelfId(), completion.getResult());
         bot.sendGroupForwardMsg(event.getGroupId(), Message.forward(List.of(node)));
+        bot.deleteMsg(messageId.get());
     }
 
     @MessageHandler(name = "睿声语音生成", keywords = "说")
