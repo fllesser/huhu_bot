@@ -60,9 +60,6 @@ public class AIPlugin {
             AccessToken = ernieClient.getToken(errieConfig.getClientId(), errieConfig.getClientSecret()).getAccessToken();
         }
         CompletionRes completion = ernieClient.getCompletion(AccessToken, new WxMessages(text));
-//        MessageSegment innerNode = MessageSegment.node("最菜的文心四", bot.getSelfId(), MessageSegment.markdown(completion.getResult()));
-//        MessageSegment node = MessageSegment.node("最菜的文心四", bot.getSelfId(), Message.forward(List.of(innerNode)));
-//        Message forward = Message.forward(List.of(node));
         MessageSegment node = MessageSegment.node("最菜的文心四", bot.getSelfId(), completion.getResult());
         bot.sendGroupForwardMsg(event.getGroupId(), Message.forward(List.of(node)));
     }

@@ -2,6 +2,7 @@ package com.github.huhubot.core;
 
 import com.github.huhubot.adapters.onebot.v11.event.message.GroupMessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.message.PrivateMessageEvent;
+import com.github.huhubot.adapters.onebot.v11.event.request.RequestEvent;
 import com.github.huhubot.core.handler.Handler;
 import com.github.huhubot.core.handler.Handlers;
 import jakarta.annotation.PostConstruct;
@@ -57,19 +58,19 @@ public class DispatcherCore {
                     Handler handler;
                     //取消检查
                     method.setAccessible(true);
-                    Class<?> eventClazz = method.getParameterTypes()[0];
-                    if (method.isAnnotationPresent(MessageHandler.class) && MessageEvent.class.isAssignableFrom(eventClazz)) {
+                    Class<?> parameterType = method.getParameterTypes()[0];
+                    if (method.isAnnotationPresent(MessageHandler.class) && MessageEvent.class.isAssignableFrom(parameterType)) {
                         handler = Handler.buildMessageHandler(plugin, method);
-                        if (eventClazz == MessageEvent.class) {
+                        if (parameterType == MessageEvent.class) {
                             groupMessageHandlers.add(handler);
                             privateMessageHandlers.add(handler);
-                        } else if (eventClazz == PrivateMessageEvent.class) {
+                        } else if (parameterType == PrivateMessageEvent.class) {
                             privateMessageHandlers.add(handler);
-                        } else if (eventClazz == GroupMessageEvent.class) {
+                        } else if (parameterType == GroupMessageEvent.class) {
                             groupMessageHandlers.add(handler);
                         }
-                    } else if (method.isAnnotationPresent(NoticeHandler.class) && NoticeEvent.class.isAssignableFrom(eventClazz)) {
-                        handler = Handler.buildNoticeHandler(plugin, method);
+                    } else if (method.isAnnotationPresent(NoticeHandler.class) && NoticeEvent.class.isAssignableFrom(parameterType)) {
+                        handler = Handler.buildNoticeHandler(plugin, method, parameterType);
                         noticeHandlers.add(handler);
                     } else continue;
                     pluginFuctionNames.append("[").append(handler.getName()).append("] ");
@@ -108,6 +109,10 @@ public class DispatcherCore {
         for (Handler handler : noticeHandlers) {
             if (handler.match(event)) break;
         }
+    }
+
+    public void onRequest(final RequestEvent event) {
+
     }
 
 

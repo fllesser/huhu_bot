@@ -5,12 +5,10 @@ import com.github.huhubot.adapters.onebot.v11.event.Event;
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
 import com.github.huhubot.adapters.onebot.v11.event.notice.NoticeEvent;
 import com.github.huhubot.config.GlobalConfig;
-import com.github.huhubot.core.DispatcherCore;
 import com.github.huhubot.core.annotation.MessageHandler;
 import com.github.huhubot.core.annotation.NoticeHandler;
 import com.github.huhubot.core.exception.FinishedException;
 import com.github.huhubot.core.exception.PluginLoadException;
-import com.github.huhubot.core.rule.Rule;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +29,7 @@ public class Handler {
     private int priority;
     private boolean block;       //false 为不阻断
 
+    private Class<?> parameterType;
     //private Rule rule;
 
     public static Handler buildMessageHandler(Object plugin, Method method) {
@@ -51,12 +50,13 @@ public class Handler {
         return handler;
     }
 
-    public static Handler buildNoticeHandler(Object plugin, Method method) {
+    public static Handler buildNoticeHandler(Object plugin, Method method, Class<?> parameterType) {
         NoticeHandler nh = method.getAnnotation(NoticeHandler.class);
         Handler handler = new Handler();
         handler.setPlugin(plugin);
         handler.setMethod(method);
         handler.setPriority(nh.priority());
+        handler.setParameterType(parameterType);
         return handler;
     }
 
@@ -67,8 +67,11 @@ public class Handler {
 
 
     public boolean match(final NoticeEvent event) {
-        execute(event);
-        return block;
+        if (parameterType.isAssignableFrom(event.getClass())) {
+            execute(event);
+            return true;
+        }
+        return true;
     }
 
     protected void execute(final Event event) {

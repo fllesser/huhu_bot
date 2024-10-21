@@ -2,8 +2,6 @@ package com.github.huhubot.core.handler;
 
 
 import com.github.huhubot.adapters.onebot.v11.event.message.MessageEvent;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
